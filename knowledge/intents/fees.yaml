@@ -1,0 +1,27 @@
+intents:
+  - intent: fees_charges
+    label: "Fees & charges"
+    category: fees
+    status: draft
+    phrases:
+      - "fees"
+      - "charges"
+      - "bank charges"
+      - "how much are your charges"
+      - "monthly fees"
+      - "account charges"
+      - "withdrawal fees"
+      - "what are your fees"
+      - "tariff guide"
+      - "how much does it cost"
+      - "ledger fees"
+    answer: |
+      All our fees and charges are published in the official tariff guide:
+      {tariff_url}
+      I deliberately don't quote figures in chat — the guide is always the
+      current, correct source. Tell me what you're looking for and I can
+      point you to the right place, or our team can walk you through it.
+    buttons:
+      - {label: "eTumba fees", payload: "etumba_fees"}
+      - {label: "Types of accounts", payload: "account_types_overview"}
+      - {label: "Talk to a person", payload: "human_handoff"}

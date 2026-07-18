@@ -1,0 +1,89 @@
+intents:
+  - intent: branch_locator
+    label: "Find a branch"
+    category: locations
+    status: draft
+    flow: locator
+    flow_args: {kind: branch}
+    phrases:
+      - "where are your branches"
+      - "nearest branch"
+      - "branch in lusaka"
+      - "branch in kitwe"
+      - "where are you located"
+      - "your address"
+      - "find a branch"
+      - "branches"
+      - "where is ab bank"
+      - "ab bank location"
+      - "which towns are you in"
+
+  - intent: agent_locator
+    label: "Find an eTumba agent"
+    category: locations
+    status: draft
+    flow: locator
+    flow_args: {kind: agent}
+    phrases:
+      - "where can i find an agent"
+      - "etumba agent near me"
+      - "where do i cash out"
+      - "kazang agent"
+      - "konse konse agent"
+      - "543 agent"
+      - "zoona agent"
+      - "where can i deposit money on etumba"
+      - "cash out etumba"
+      - "where to withdraw etumba money"
+      - "agents"
+
+  - intent: opening_hours
+    label: "Opening hours"
+    category: locations
+    status: draft
+    phrases:
+      - "what time do you open"
+      - "opening hours"
+      - "working hours"
+      - "what time do you close"
+      - "are you open on saturday"
+      - "are you open on weekends"
+      - "banking hours"
+      - "business hours"
+      - "opening times"
+      - "are you open now"
+    answer: |
+      Our branches are open [CONFIRM: weekday hours] on weekdays, and
+      [CONFIRM: Saturday hours or closed] on Saturdays.
+      Remember, eTumba on {ussd_code} works 24 hours a day.
+    buttons:
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Contact details", payload: "contact_details"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: contact_details
+    label: "Contact details"
+    category: locations
+    status: draft
+    phrases:
+      - "phone number"
+      - "contact details"
+      - "how do i contact you"
+      - "customer care number"
+      - "call centre number"
+      - "email address"
+      - "whatsapp number"
+      - "how can i reach you"
+      - "contact number"
+      - "your contacts"
+    answer: |
+      You can reach AB Bank Zambia on:
+      Phone: {contact_phone}
+      Email: {contact_email}
+      Website: {website_url}
+      Or ask me for a callback and our team will phone you within one
+      working day.
+    buttons:
+      - {label: "Request a callback", payload: "human_handoff"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Opening hours", payload: "opening_hours"}

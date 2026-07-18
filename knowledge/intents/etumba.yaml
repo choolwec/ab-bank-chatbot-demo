@@ -1,0 +1,106 @@
+intents:
+  - intent: etumba_what_is
+    label: "What is eTumba?"
+    category: etumba
+    status: draft
+    phrases:
+      - "what is etumba"
+      - "wat is etumba"
+      - "tell me about etumba"
+      - "e tumba"
+      - "etumba wallet"
+      - "mobile wallet"
+      - "etumba account"
+      - "do you have mobile money"
+      - "what is e-tumba"
+      - "explain etumba"
+      - "etumba meaning"
+    answer: |
+      eTumba is AB Bank Zambia's mobile wallet. It lets you send and receive
+      money, buy airtime and pay for services straight from your phone — no
+      smartphone or internet needed, just dial {ussd_code}.
+      You can put money in or take it out at our branches and at Kazang,
+      543 Konse Konse and Zoona agents countrywide.
+    buttons:
+      - {label: "Register for eTumba", payload: "etumba_register"}
+      - {label: "eTumba fees", payload: "etumba_fees"}
+      - {label: "Find an agent", payload: "agent_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: etumba_register
+    label: "Register for eTumba"
+    category: etumba
+    status: draft
+    phrases:
+      - "how do i register for etumba"
+      - "sign up for etumba"
+      - "get etumba"
+      - "join etumba"
+      - "activate etumba"
+      - "etumba registration"
+      - "register etumba"
+      - "how to get etumba wallet"
+      - "open etumba account"
+      - "etumba sign up"
+    answer: |
+      To get started with eTumba, dial {ussd_code} on your phone and follow
+      the prompts to register. [CONFIRM: exact registration steps, SIM/NRC
+      requirements, and whether branch registration is also offered.]
+      If you get stuck, any branch or agent can help you register.
+    buttons:
+      - {label: "What is eTumba?", payload: "etumba_what_is"}
+      - {label: "eTumba fees", payload: "etumba_fees"}
+      - {label: "Find an agent", payload: "agent_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: etumba_ussd
+    label: "Using *888#"
+    category: etumba
+    status: draft
+    phrases:
+      - "how do i use *888#"
+      - "*888#"
+      - "888"
+      - "dial 888"
+      - "what is the ussd code"
+      - "etumba code"
+      - "ussd menu"
+      - "etumba menu"
+      - "how to check etumba balance"
+      - "send money on etumba"
+    answer: |
+      Dial {ussd_code} on your phone to open the eTumba menu. From there you
+      can register, check your own balance, send money, buy airtime and more —
+      it all happens securely on your phone, so I never see your balance or
+      PIN. [CONFIRM: full USSD menu capabilities.]
+    buttons:
+      - {label: "Register for eTumba", payload: "etumba_register"}
+      - {label: "eTumba fees", payload: "etumba_fees"}
+      - {label: "Find an agent", payload: "agent_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: etumba_fees
+    label: "eTumba fees"
+    category: etumba
+    status: draft
+    phrases:
+      - "etumba charges"
+      - "etumba fees"
+      - "how much does etumba cost"
+      - "is etumba free"
+      - "cost of sending money on etumba"
+      - "etumba withdrawal charges"
+      - "charges for etumba"
+      - "etumba tariffs"
+      - "what does etumba charge"
+      - "etumba transaction fees"
+    answer: |
+      I don't quote fees in chat — that way you always get the current,
+      official numbers. All eTumba charges are listed in the tariff guide:
+      {tariff_url}
+      [CONFIRM: whether the {ussd_code} menu shows the charge on screen
+      before you confirm a transaction.]
+    buttons:
+      - {label: "What is eTumba?", payload: "etumba_what_is"}
+      - {label: "Register for eTumba", payload: "etumba_register"}
+      - {label: "Talk to a person", payload: "human_handoff"}

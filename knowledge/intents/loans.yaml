@@ -1,0 +1,113 @@
+intents:
+  - intent: msme_loan
+    label: "Business (MSME) loans"
+    category: loans
+    status: draft
+    phrases:
+      - "business loan"
+      - "busines loan"
+      - "loan for my business"
+      - "msme loan"
+      - "sme loan"
+      - "i need money for my shop"
+      - "working capital loan"
+      - "loan for stock"
+      - "borrow money for business"
+      - "do you give business loans"
+      - "capital for my business"
+    answer: |
+      We lend to Zambian micro, small and medium businesses — for stock,
+      equipment and working capital. Loan size and terms depend on your
+      business, and a loan officer assesses each application personally,
+      usually with a visit to your business. I don't quote rates in chat —
+      your loan officer gives you the full cost in writing before you sign.
+      [CONFIRM: product range and amounts.]
+    buttons:
+      - {label: "Loan requirements", payload: "loan_requirements"}
+      - {label: "How to apply", payload: "loan_apply_how"}
+      - {label: "Agriculture loans", payload: "agri_loan"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: agri_loan
+    label: "Agriculture loans"
+    category: loans
+    status: draft
+    phrases:
+      - "agriculture loan"
+      - "agri loan"
+      - "farming loan"
+      - "loan for farming"
+      - "loan for my farm"
+      - "loan for fertiliser"
+      - "farmers loan"
+      - "agro loan"
+      - "loan for seeds"
+      - "do you have loans for farmers"
+      - "livestock loan"
+    answer: |
+      Our agri loans support farmers — for inputs like seed and fertiliser,
+      for equipment, and for growing your farm business. Repayment is
+      designed around farming seasons where possible. [CONFIRM: product
+      details and repayment structures.] A loan officer will assess your farm
+      and explain the full cost before you sign anything.
+    buttons:
+      - {label: "Loan requirements", payload: "loan_requirements"}
+      - {label: "How to apply", payload: "loan_apply_how"}
+      - {label: "Business loans", payload: "msme_loan"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: loan_requirements
+    label: "Loan requirements"
+    category: loans
+    status: draft
+    phrases:
+      - "what do i need for a loan"
+      - "loan requirements"
+      - "requirments for loan"
+      - "requirements for a loan"
+      - "do i need collateral"
+      - "documents for loan application"
+      - "what do you need to give me a loan"
+      - "loan qualification"
+      - "who qualifies for a loan"
+      - "can i get a loan without collateral"
+    answer: |
+      For most loans you will need:
+      - your NRC
+      - a running business or farm that a loan officer can visit
+      - [CONFIRM: minimum months in operation, records required, and the
+        security/collateral policy per product]
+      You don't need a perfect paper trail — our loan officers assess real
+      businesses as they are. The best first step is to speak to one.
+    buttons:
+      - {label: "How to apply", payload: "loan_apply_how"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: loan_apply_how
+    label: "How to apply for a loan"
+    category: loans
+    status: draft
+    phrases:
+      - "how do i apply for a loan"
+      - "i want a loan"
+      - "i want loan"
+      - "apply for a loan"
+      - "apply loan"
+      - "loan application"
+      - "loan aplication process"
+      - "get a loan"
+      - "how can i borrow money"
+      - "i need a loan"
+      - "how long does a loan take"
+    answer: |
+      Applying is straightforward:
+      1. Visit your nearest branch, or request a callback and we'll contact you
+      2. A loan officer discusses your business and what you need
+      3. The officer visits your business or farm to assess the application
+      4. If approved, you get the full terms and cost in writing before signing
+      [CONFIRM: typical turnaround time.]
+    buttons:
+      - {label: "Loan requirements", payload: "loan_requirements"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Request a callback", payload: "human_handoff"}

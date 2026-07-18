@@ -1,0 +1,122 @@
+# ============================================================================
+# Intent schema (all files in this directory):
+#   intent:    unique id (used as button payload)
+#   label:     human-readable name, shown on "Did you mean...?" buttons
+#   category:  topic slot stored in session context
+#   status:    draft | legal_review | approved   <- ALL DRAFT until legal signs off
+#   flow:      (optional) start this state machine instead of a static answer
+#   flow_args: (optional) parameters for the flow
+#   phrases:   curated free-text triggers — include misspellings and Zambian
+#              English; the regression suite asserts every phrase matches
+#   answer:    approved text; {placeholders} filled from app/config.py CONTACTS
+#   buttons:   every answer must offer at least one next step (no dead ends)
+#
+# Content edits are deploys (§6): run pytest before committing. Git history
+# is the content audit trail.
+# ============================================================================
+
+intents:
+  - intent: greeting
+    label: "Say hello"
+    category: smalltalk
+    status: draft
+    phrases:
+      - "hi"
+      - "hello"
+      - "hey"
+      - "hie"
+      - "helo"
+      - "hallo"
+      - "good morning"
+      - "good afternoon"
+      - "good evening"
+      - "muli bwanji"
+      - "how are you"
+      - "hi there"
+    answer: |
+      Hello! I'm the AB Bank assistant — an automated helper, not a person.
+      I can help with branches and agents, opening an account, eTumba, and
+      loans, or connect you to our team. What can I help with?
+    buttons:
+      - {label: "Branches & agents", payload: "branch_locator"}
+      - {label: "Open an account", payload: "account_types_overview"}
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Loans", payload: "msme_loan"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: thanks_goodbye
+    label: "Thanks / goodbye"
+    category: smalltalk
+    status: draft
+    phrases:
+      - "thanks"
+      - "thank you"
+      - "thank u"
+      - "thanx"
+      - "zikomo"
+      - "natotela"
+      - "twalumba"
+      - "bye"
+      - "goodbye"
+      - "ok thanks"
+      - "that is all"
+      - "cheers"
+    answer: |
+      You're welcome. Is there anything else I can help with? If not, thank
+      you for chatting with AB Bank — goodbye for now.
+    buttons:
+      - {label: "Main menu", payload: "menu"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: bot_capabilities
+    label: "What can you do?"
+    category: smalltalk
+    status: draft
+    phrases:
+      - "what can you do"
+      - "help"
+      - "help me"
+      - "what is this"
+      - "who are you"
+      - "are you a robot"
+      - "are you a real person"
+      - "are you human"
+      - "what do you do"
+      - "how does this work"
+      - "menu"
+      - "options"
+      - "start over"
+    answer: |
+      I'm an automated assistant (not a person). I can:
+      - find branches and eTumba agents
+      - explain our accounts and what you need to open one
+      - explain eTumba and {ussd_code}
+      - explain MSME and agri loans and how to apply
+      - take complaints and fraud reports, and arrange a callback from our team
+      I can't check balances, move money, or handle PINs and passwords — for
+      your security, I never ask for those.
+    buttons:
+      - {label: "Branches & agents", payload: "branch_locator"}
+      - {label: "Open an account", payload: "account_types_overview"}
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Loans", payload: "msme_loan"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: human_handoff
+    label: "Talk to a person"
+    category: smalltalk
+    status: draft
+    flow: lead
+    phrases:
+      - "talk to a person"
+      - "speak to someone"
+      - "talk to a human"
+      - "customer care"
+      - "customer service"
+      - "call me"
+      - "can someone call me"
+      - "i want to talk to an agent"
+      - "speak to a consultant"
+      - "operator"
+      - "real person please"
+      - "talk to staff"

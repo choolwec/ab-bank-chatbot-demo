@@ -1,0 +1,160 @@
+intents:
+  - intent: account_types_overview
+    label: "Types of accounts"
+    category: accounts
+    status: draft
+    phrases:
+      - "what types of accounts do you have"
+      - "which accounts do you offer"
+      - "tell me about your accounts"
+      - "accounts available"
+      - "types of acounts"
+      - "kinds of accounts"
+      - "what account can i open"
+      - "do you have personal accounts"
+      - "compare your accounts"
+      - "account options"
+      - "banking accounts you offer"
+    answer: |
+      We offer these main account types:
+      - Savings account — for keeping money safe and saving towards a goal
+      - Current account — for everyday banking and frequent transactions
+      - Business account — for MSMEs and business owners
+      Which one would you like to know more about?
+    buttons:
+      - {label: "Savings account", payload: "savings_account"}
+      - {label: "Current account", payload: "current_account"}
+      - {label: "Business account", payload: "business_account"}
+      - {label: "How to open an account", payload: "account_opening_how"}
+
+  - intent: savings_account
+    label: "Savings account"
+    category: accounts
+    status: draft
+    phrases:
+      - "savings account"
+      - "tell me about savings"
+      - "savngs account"
+      - "savings acount"
+      - "i want to save money"
+      - "saving account details"
+      - "interest on savings"
+      - "how does the savings account work"
+      - "open a savings account"
+      - "is my money safe in savings"
+    answer: |
+      A savings account helps you keep money safe and build towards a goal,
+      with access when you need it. For current interest rates and charges I
+      point you to the official tariff guide, so you always get up-to-date
+      figures: {tariff_url}
+      To open one, visit any branch — I can show you what to bring.
+    buttons:
+      - {label: "What you need to open", payload: "account_opening_requirements"}
+      - {label: "How to open", payload: "account_opening_how"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Fees & charges", payload: "fees_charges"}
+
+  - intent: current_account
+    label: "Current account"
+    category: accounts
+    status: draft
+    phrases:
+      - "current account"
+      - "curent account"
+      - "cheque account"
+      - "everyday account"
+      - "transactional account"
+      - "account for daily use"
+      - "current acount details"
+      - "how does a current account work"
+      - "open a current account"
+      - "account for salary"
+    answer: |
+      A current account is designed for everyday banking — deposits,
+      withdrawals and payments — with no limit on how often you transact.
+      Charges are listed in the official tariff guide: {tariff_url}
+      Would you like to know what you need to open one?
+    buttons:
+      - {label: "What you need to open", payload: "account_opening_requirements"}
+      - {label: "How to open", payload: "account_opening_how"}
+      - {label: "Fees & charges", payload: "fees_charges"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: business_account
+    label: "Business account"
+    category: accounts
+    status: draft
+    phrases:
+      - "business account"
+      - "busness account"
+      - "account for my business"
+      - "msme account"
+      - "company account"
+      - "account for my shop"
+      - "sme account"
+      - "business banking"
+      - "open account for business"
+      - "corporate account"
+    answer: |
+      Our business accounts are built for Zambian MSMEs — traders, shops and
+      growing businesses — for daily takings, payments, and building a banking
+      record (which also helps when you apply for a business loan).
+      Requirements differ slightly from personal accounts, so our team can
+      guide you through it.
+    buttons:
+      - {label: "What you need to open", payload: "account_opening_requirements"}
+      - {label: "Business loans", payload: "msme_loan"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: account_opening_requirements
+    label: "What you need to open an account"
+    category: accounts
+    status: draft
+    phrases:
+      - "what do i need to open an account"
+      - "requirements to open account"
+      - "documents for opening account"
+      - "requirements for opening acount"
+      - "what documents do i need"
+      - "do i need my nrc"
+      - "kyc requirements"
+      - "what should i bring to open account"
+      - "papers needed to open account"
+      - "requirements to open a bank account"
+    answer: |
+      To open a personal account you will typically need:
+      - your green National Registration Card (NRC) or a valid passport
+      - [CONFIRM: proof of address / photo / minimum opening deposit — full
+        list per account type, from branch operations]
+      Business accounts need additional documents for the business itself.
+      Bring these to any branch and the team will help you open the account.
+    buttons:
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Types of accounts", payload: "account_types_overview"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: account_opening_how
+    label: "How to open an account"
+    category: accounts
+    status: draft
+    phrases:
+      - "how do i open an account"
+      - "i want to open an account"
+      - "open account"
+      - "how to open acount"
+      - "can i open an account online"
+      - "where can i open an account"
+      - "account opening process"
+      - "i want a bank account"
+      - "help me open an account"
+      - "how long does it take to open an account"
+    answer: |
+      Opening an account is done at any of our branches — the team will take
+      you through it, usually the same day, as long as you bring the right
+      documents. [CONFIRM: whether online/remote opening is available.]
+      Would you like the list of documents, or the nearest branch?
+    buttons:
+      - {label: "What to bring", payload: "account_opening_requirements"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}

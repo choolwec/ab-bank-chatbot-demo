@@ -1,0 +1,26 @@
+{
+  "_note": "PLACEHOLDER DATA. Every branch entry must be verified and completed by ops before launch (build plan §3.5). Keep 'verified' false until confirmed.",
+  "branches": [
+    {
+      "name": "Head Office & Main Branch",
+      "city": "Lusaka",
+      "address": "[CONFIRM: street address]",
+      "phone": "[CONFIRM: branch phone]",
+      "hours": "[CONFIRM: hours]",
+      "verified": false
+    },
+    {
+      "name": "Kitwe Branch",
+      "city": "Kitwe",
+      "address": "[CONFIRM: street address]",
+      "phone": "[CONFIRM: branch phone]",
+      "hours": "[CONFIRM: hours]",
+      "verified": false
+    }
+  ],
+  "agent_networks": [
+    {"name": "Kazang", "note": "eTumba cash-in/cash-out at Kazang agents countrywide"},
+    {"name": "543 Konse Konse", "note": "eTumba cash-in/cash-out at 543 Konse Konse agents"},
+    {"name": "Zoona", "note": "eTumba cash-in/cash-out at Zoona agents"}
+  ]
+}

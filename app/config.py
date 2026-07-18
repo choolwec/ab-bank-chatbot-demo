@@ -30,6 +30,17 @@ SESSION_TIMEOUT_MINUTES = 30
 MAX_MESSAGE_CHARS = 500
 RATE_LIMIT_PER_MINUTE = int(os.environ.get("RATE_LIMIT_PER_MINUTE", "20"))
 
+
+def proxy_hops() -> int:
+    """Number of reverse proxies in front of this app (nginx/IIS/load
+    balancer). 0 = none, rate-limit on the socket peer address. Set to 1 (or
+    however many proxies IT runs) in production so the limiter sees real
+    client IPs from X-Forwarded-For instead of one shared proxy IP."""
+    try:
+        return int(os.environ.get("PROXY_HOPS", "0"))
+    except ValueError:
+        return 0
+
 # --- Retention, in days — numbers TO BE CONFIRMED BY LEGAL (§3.3 / §7) ---
 TRANSCRIPT_RETENTION_DAYS = int(os.environ.get("TRANSCRIPT_RETENTION_DAYS", "90"))
 # 0 = never auto-purge; complaint/fraud tickets follow the complaints unit's policy

@@ -136,6 +136,21 @@
     els.send.disabled = busy;
   }
 
+  var typingEl = null;
+
+  function showTyping() {
+    if (typingEl) return;
+    typingEl = h("div", "abz-msg abz-msg--bot abz-typing", { "aria-hidden": "true" });
+    for (var i = 0; i < 3; i++) typingEl.appendChild(h("span", "abz-typing-dot"));
+    els.log.appendChild(typingEl);
+    els.log.scrollTop = els.log.scrollHeight;
+  }
+
+  function hideTyping() {
+    if (typingEl && typingEl.parentNode) typingEl.parentNode.removeChild(typingEl);
+    typingEl = null;
+  }
+
   function addBubble(role, text) {
     var bubble = h("div", "abz-msg abz-msg--" + role);
     var parts = String(text).split("\n");
@@ -163,6 +178,7 @@
 
   function post(body) {
     setBusy(true);
+    showTyping();
     fetch(BASE + "/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -173,8 +189,14 @@
         return r.json();
       })
       .then(function (data) {
+        hideTyping();
         sessionId = data.session_id;
         try { sessionStorage.setItem("abz_chat_session", sessionId); } catch (e) {}
+        // After a page reload the server replays the earlier (masked)
+        // transcript so the customer isn't staring at an empty window.
+        (data.history || []).forEach(function (turn) {
+          addBubble(turn.role === "user" ? "user" : "bot", turn.text);
+        });
         (data.replies || []).forEach(function (reply) {
           addBubble("bot", reply.text);
         });
@@ -182,6 +204,7 @@
         renderQuick(last ? last.buttons : []);
       })
       .catch(function () {
+        hideTyping();
         addBubble(
           "bot",
           "Sorry — I can't connect right now. Please try again in a " +

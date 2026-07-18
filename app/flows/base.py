@@ -28,6 +28,15 @@ class FormFlow:
     def _prompt(self, i):
         return {"text": self.steps[i][1], "buttons": [CANCEL_BUTTON]}
 
+    def resume(self, session):
+        """Re-issue the current step's prompt without touching collected data.
+
+        Used when a returning page load reopens an in-progress flow — a
+        half-finished fraud report must never be silently discarded.
+        """
+        i = min(session.flow_state.get("step", 0), len(self.steps) - 1)
+        return [self._prompt(i)]
+
     def handle(self, session, text, payload=None):
         state = session.flow_state
         i = state.get("step", 0)

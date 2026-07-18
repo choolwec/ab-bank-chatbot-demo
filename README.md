@@ -63,6 +63,25 @@ Flip by editing `flags.json` (re-read live) or setting the env var (`0`/`false`)
 
 Intent schema is documented at the top of `knowledge/intents/smalltalk.yaml`.
 
+## Deployment notes for IT (read before hosting)
+
+- **Run exactly ONE process, ONE worker.** Sessions and rate-limit counters
+  live in process memory (a deliberate simplicity choice at <100 users/month).
+  `uvicorn app.main:app` with no `--workers` flag is correct; running multiple
+  workers or instances "for reliability" silently fragments conversations and
+  rate limits across processes. If the bot ever needs to scale past one
+  process, sessions move to SQLite/Redis first — that's a code change, not a
+  config change.
+- **Behind a reverse proxy (nginx/IIS/load balancer), set `PROXY_HOPS`.**
+  Default `0` rate-limits on the socket peer address, which behind a proxy is
+  the proxy itself — all visitors would share one 20-messages/minute bucket.
+  Set `PROXY_HOPS=1` (or the number of proxies you run) and the real client IP
+  is read from `X-Forwarded-For`; make sure the proxy overwrites/appends that
+  header rather than passing it through from clients.
+- **CORS**: set `ALLOWED_ORIGINS=https://<bank domain>` (comma-separated if
+  several). The dev default only allows localhost.
+- HTTPS terminates at your existing setup; the app itself serves plain HTTP.
+
 ## Before launch — every `[CONFIRM …]` must be resolved
 
 - Emergency / card-block line, customer-care phone + email (`app/config.py` CONTACTS, or env vars)

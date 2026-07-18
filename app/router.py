@@ -41,6 +41,8 @@ ABUSE_TEXT = (
     "I can hear this is frustrating — I'm sorry. Let me connect you with a "
     "person who can sort it out properly."
 )
+RESUME_FLOW_TEXT = "Welcome back — let's pick up where we left off."
+RESUME_TEXT = "Welcome back! What can I help with?"
 
 
 class _SafeDict(dict):
@@ -63,6 +65,28 @@ def welcome(session):
     session.add("bot", WELCOME_TEXT)
     audit.log_event(session.id, "bot", WELCOME_TEXT, action="welcome")
     return replies
+
+
+def resume(session):
+    """A returning page load (widget reopened with a live session).
+
+    Never resets state: a half-finished fraud/complaint/callback flow is
+    re-prompted at its current step — only a human closes those (§1 rule 3).
+    """
+    if session.active_flow:
+        flow = FLOWS[session.active_flow]
+        replies = [{"text": RESUME_FLOW_TEXT, "buttons": []}] + flow.resume(session)
+        meta = {"action": "resume_flow"}
+    else:
+        replies = [{"text": RESUME_TEXT, "buttons": list(MENU_BUTTONS)}]
+        meta = {"action": "resume"}
+    if not replies[-1].get("buttons"):
+        replies[-1]["buttons"] = list(DEFAULT_BUTTONS)
+    for reply in replies:
+        reply["text"] = _render(reply["text"])
+        session.add("bot", reply["text"])
+        audit.log_event(session.id, "bot", reply["text"], action=meta["action"])
+    return replies, meta
 
 
 def handle(session, text=None, payload=None):

@@ -26,17 +26,23 @@ class LocatorFlow:
             return self._agents(), True
         if kind == "branch":
             return [self._city_prompt("Happy to help you find a branch.")], False
-        return [
-            {
-                "text": "Are you looking for a branch, or an eTumba cash-in/"
-                "cash-out agent?",
-                "buttons": [
-                    {"label": "A branch", "payload": "loc_branch"},
-                    {"label": "An eTumba agent", "payload": "loc_agent"},
-                    CANCEL_BUTTON,
-                ],
-            }
-        ], False
+        return [self._mode_prompt()], False
+
+    def _mode_prompt(self):
+        return {
+            "text": "Are you looking for a branch, or an eTumba cash-in/"
+            "cash-out agent?",
+            "buttons": [
+                {"label": "A branch", "payload": "loc_branch"},
+                {"label": "An eTumba agent", "payload": "loc_agent"},
+                CANCEL_BUTTON,
+            ],
+        }
+
+    def resume(self, session):
+        if session.flow_state.get("mode") is None:
+            return [self._mode_prompt()]
+        return [self._city_prompt("")]
 
     def handle(self, session, text, payload=None):
         state = session.flow_state

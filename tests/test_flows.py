@@ -153,3 +153,56 @@ def test_talk_to_person_works_even_mid_flow(client):
     data = chat(client, sid, payload="human_handoff")
     assert data["meta"]["action"] == "flow_start"
     assert "name" in _all_text(data).lower()
+
+
+# --- Page-reload resume: a refresh must never wipe an in-progress flow ---
+
+
+def test_empty_post_on_new_session_still_welcomes(client):
+    data = chat(client)
+    assert data["meta"]["action"] == "welcome"
+    assert data["history"] == []
+
+
+def test_refresh_mid_fraud_flow_resumes_not_wipes(client):
+    sid = new_session(client)
+    data = chat(client, sid, message="i lost my card")
+    assert data["meta"]["action"] == "urgent:fraud"
+    chat(client, sid, message="Lost it at the market")  # step: what_happened
+    # Customer refreshes the page — the widget reopens with an empty post.
+    data = chat(client, sid)
+    assert data["meta"]["action"] == "resume_flow"
+    assert "pick up where we left off" in _all_text(data).lower()
+    # The flow continues from the same step and the pre-refresh answer survives.
+    chat(client, sid, message="today")
+    data = chat(client, sid, message="card")
+    match = re.search(r"FRD-\d{8}-[A-Z0-9]{4}", _all_text(data))
+    assert match, _all_text(data)
+    con = sqlite3.connect(audit.DB_FILE)
+    fields = con.execute(
+        "SELECT fields FROM tickets WHERE ref = ?", (match.group(0),)
+    ).fetchone()[0]
+    con.close()
+    assert "market" in fields.lower()
+
+
+def test_refresh_mid_locator_flow_reprompts_city(client):
+    sid = new_session(client)
+    chat(client, sid, payload="branch_locator")
+    data = chat(client, sid)  # page reload
+    assert data["meta"]["action"] == "resume_flow"
+    assert "which town or city" in _all_text(data).lower()
+    data = chat(client, sid, message="Lusaka")
+    assert "Lusaka" in _all_text(data)
+
+
+def test_resume_replays_masked_history_without_button_payloads(client):
+    sid = new_session(client)
+    chat(client, sid, message="what is etumba")
+    chat(client, sid, payload="menu")
+    data = chat(client, sid)  # page reload, no active flow
+    assert data["meta"]["action"] == "resume"
+    history = data["history"]
+    assert any(t["role"] == "user" and "etumba" in t["text"].lower() for t in history)
+    # internal '[button] <payload>' turns are never shown to the customer
+    assert not any(t["text"].startswith("[button]") for t in history)

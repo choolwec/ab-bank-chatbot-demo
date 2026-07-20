@@ -11,7 +11,7 @@ import sqlite3
 import string
 import threading
 
-from . import config
+from . import config, jira_export
 
 DB_FILE = config.DATA_DIR / "audit.db"
 JSONL_FILE = config.DATA_DIR / "audit.jsonl"
@@ -109,7 +109,22 @@ def create_ticket(kind: str, fields: dict, transcript: list) -> str:
     con.commit()
     con.close()
     log_event("-", "system", f"ticket created: {ref}", action=f"ticket:{kind}")
+    _push_to_jira(kind, ref, fields, transcript)
     return ref
+
+
+def _push_to_jira(kind: str, ref: str, fields: dict, transcript: list) -> None:
+    """Best-effort: a Jira outage or bad credentials must never block the
+    customer-facing ticket flow (§1 rule 1 — no dead ends, extended to us)."""
+    try:
+        result = jira_export.push_ticket(kind, ref, fields, transcript)
+    except Exception:
+        result = None
+    if result:
+        log_event(
+            "-", "system", f"jira issue created: {result['key']} ({result['mode']})",
+            action="jira_push",
+        )
 
 
 def purge_expired() -> None:

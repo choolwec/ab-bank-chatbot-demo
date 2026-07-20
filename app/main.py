@@ -11,11 +11,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import audit, config, router
+from . import audit, config, jira_export, router
 from .session import store
 
 WIDGET_DIR = config.BASE_DIR / "widget"
@@ -132,3 +132,12 @@ def _history(session) -> list[dict]:
 @app.get("/")
 def demo_page():
     return FileResponse(WIDGET_DIR / "demo.html")
+
+
+@app.get("/admin/jira-preview", response_class=HTMLResponse)
+def jira_preview():
+    """Staff-facing preview of the contact-center handoff — see CLAUDE.md
+    for why this exists and jira_export.py for the mock/real split. No auth
+    yet: fine for a pre-launch demo, must gate before this carries real
+    customer data (name/phone/transcript)."""
+    return jira_export.render_jira_preview()

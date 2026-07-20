@@ -29,9 +29,10 @@ app/
   guards.py        PII detect/mask, urgent-keyword scan, input caps, abuse filter
   session.py       in-memory session store, context slots, 30-min timeout
   audit.py         structured SQLite + JSONL logging (always post-masking), tickets
+  jira_export.py   contact-center handoff: pushes tickets to Jira (or a mock preview)
   config.py        thresholds, contacts, kill switches
 knowledge/
-  intents/*.yaml   27 launch intents: phrases + approved answer + follow-up buttons
+  intents/*.yaml   28 launch intents: phrases + approved answer + follow-up buttons
   faq/*.md         source content (basis for V2 RAG chunks)
   branches.json    branch + agent locator data  ← PLACEHOLDER, verify before launch
 widget/            widget.js, widget.css, demo.html (embeddable, WCAG 2.1 AA build spec)
@@ -51,8 +52,26 @@ Checked on **every request**: environment variable wins, then `flags.json`, then
 |---|---|
 | `FREE_TEXT_ENABLED` | menu-only mode; typed messages get the menu |
 | `WIDGET_ENABLED` | `/chat` returns 503 and the widget hides itself gracefully |
+| `JIRA_ENABLED` | tickets stay local only — no Jira push, mock or real |
 
 Flip by editing `flags.json` (re-read live) or setting the env var (`0`/`false`).
+
+## Contact-center handoff (Jira)
+
+The contact center works out of Jira, not a second inbox — so every ticket
+(fraud/complaint/callback) also becomes a Jira issue via `app/jira_export.py`,
+called best-effort from `audit.create_ticket()` (a Jira outage never blocks
+the customer-facing flow). Two modes, decided automatically:
+
+- **Mock** (current state — no credentials set): a synthetic issue (`CC-1`,
+  `CC-2`, …) with the real fields, priority, and full masked transcript is
+  appended to `data/jira_mock.jsonl`. View it rendered as Jira-style cards at
+  **`GET /admin/jira-preview`** — this is what the demo uses to show what
+  contact-center staff will see, with zero real Jira access. That route has
+  no auth yet; gate it before it carries real customer data.
+- **Real**: set `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`,
+  `JIRA_PROJECT_KEY` and issues are created for real via the Jira REST API
+  (`/rest/api/2/issue`, Basic Auth) — no other code change needed.
 
 ## Content workflow (content edits are deploys — §6)
 
@@ -97,6 +116,7 @@ WordPress's own Settings screen — no theme edits needed. See
 - Opening hours, eTumba registration steps, loan product specifics (intent YAMLs)
 - Retention periods (legal): `TRANSCRIPT_RETENTION_DAYS`, `TICKET_RETENTION_DAYS`
 - CORS: set `ALLOWED_ORIGINS` env var to the bank's domain in production
+- Real Jira project/token from IT (`JIRA_BASE_URL`/`JIRA_EMAIL`/`JIRA_API_TOKEN`/`JIRA_PROJECT_KEY`), and auth added to `/admin/jira-preview` before go-live
 - Legal sign-off of **all** answers; manual NVDA + keyboard-only pass (§3.5)
 
 ## Reports

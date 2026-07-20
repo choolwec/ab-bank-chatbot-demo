@@ -1,0 +1,37 @@
+intents:
+  - intent: technical_issue
+    label: "App or online banking not working"
+    category: technical
+    status: draft
+    phrases:
+      - "the app is not working"
+      - "app is not working"
+      - "app not working"
+      - "the app is down"
+      - "etumba app not working"
+      - "etumba is not working"
+      - "etumba is down"
+      - "myabz not working"
+      - "myabz is down"
+      - "mymbs is down"
+      - "cant access my account online"
+      - "online banking not working"
+      - "app keeps crashing"
+      - "the system is down"
+      - "cant use the app"
+      - "network error on the app"
+      - "page not loading"
+      - "app is offline"
+      - "having trouble with the app"
+      - "app wont open"
+    answer: |
+      Sounds like a technical/service problem rather than a forgotten PIN —
+      sorry about that.
+      A few things to try: check your internet/data connection, or for
+      eTumba you can use {ussd_code} instead of the app while it's down.
+      [CONFIRM: link to a live service-status page, if one exists.]
+      If it's still not working, our team can help directly.
+    buttons:
+      - {label: "Try eTumba via USSD", payload: "etumba_ussd"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "Find a branch", payload: "branch_locator"}

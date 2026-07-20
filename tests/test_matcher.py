@@ -57,6 +57,10 @@ def test_all_phrases_reach_their_intent():
         ("stollen card", "lost_stolen_card"),
         ("savngs account", "savings_account"),
         ("hie", "greeting"),
+        ("the app is not working", "technical_issue"),
+        ("myabz is down", "technical_issue"),
+        ("etumba is down", "technical_issue"),
+        ("mymbs is down", "technical_issue"),
     ],
 )
 def test_misspellings_and_zambian_english(query, expected):

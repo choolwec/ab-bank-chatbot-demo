@@ -1,4 +1,5 @@
 {
   "FREE_TEXT_ENABLED": true,
-  "WIDGET_ENABLED": true
+  "WIDGET_ENABLED": true,
+  "JIRA_ENABLED": true
 }

@@ -57,6 +57,26 @@ ALLOWED_ORIGINS = [
     if o.strip()
 ]
 
+# --- Jira handoff (contact-center integration) ---
+# Off by default: no real project/token exists yet. When turned on without
+# credentials, jira_export.py falls back to a MOCK issue log instead of
+# failing, so a demo can show "what would land in Jira" with zero setup.
+JIRA_BASE_URL = os.environ.get("JIRA_BASE_URL", "")
+JIRA_EMAIL = os.environ.get("JIRA_EMAIL", "")
+JIRA_API_TOKEN = os.environ.get("JIRA_API_TOKEN", "")
+JIRA_PROJECT_KEY = os.environ.get("JIRA_PROJECT_KEY", "")
+# Issue-key prefix used only in mock mode (e.g. "CC-7"); harmless placeholder.
+JIRA_MOCK_PROJECT_KEY = os.environ.get("JIRA_MOCK_PROJECT_KEY", "CC")
+
+
+def jira_enabled() -> bool:
+    return flag("JIRA_ENABLED", False)
+
+
+def jira_configured() -> bool:
+    return bool(JIRA_BASE_URL and JIRA_EMAIL and JIRA_API_TOKEN and JIRA_PROJECT_KEY)
+
+
 # --- Contact details, rendered into answers as {placeholders}. ---
 # Every [CONFIRM …] value must be replaced (env var or here) before launch.
 CONTACTS = {

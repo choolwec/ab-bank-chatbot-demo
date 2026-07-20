@@ -82,6 +82,13 @@ Intent schema is documented at the top of `knowledge/intents/smalltalk.yaml`.
   several). The dev default only allows localhost.
 - HTTPS terminates at your existing setup; the app itself serves plain HTTP.
 
+## Embedding on the WordPress site
+
+`wordpress-plugin/ab-bank-chatbot/` is a small plugin that adds the widget via
+WordPress's own Settings screen — no theme edits needed. See
+`wordpress-plugin/README.md`, including the WordPress.com plan-tier caveat
+(custom plugins need the Business plan or higher).
+
 ## Before launch — every `[CONFIRM …]` must be resolved
 
 - Emergency / card-block line, customer-care phone + email (`app/config.py` CONTACTS, or env vars)

@@ -3,6 +3,7 @@
 import re
 import sqlite3
 
+import pytest
 from conftest import chat
 
 from app import audit
@@ -77,6 +78,44 @@ def test_callback_flow_promises_one_working_day(client):
     text = _all_text(data)
     assert "one working day" in text
     assert re.search(r"CBK-\d{8}-[A-Z0-9]{4}", text)
+    # the closing question gets an explicit, unambiguous button
+    assert any(b["payload"] == "thanks_goodbye" for b in data["replies"][-1]["buttons"])
+
+
+def test_callback_flow_rejects_invalid_phone_and_reprompts(client):
+    sid = new_session(client)
+    chat(client, sid, payload="human_handoff")
+    chat(client, sid, message="Choolwe")
+    data = chat(client, sid, message="12345")  # not a Zambian number
+    assert "doesn't look like a valid number" in _all_text(data)
+    # still on the phone step — a valid number now must be accepted
+    data = chat(client, sid, message="0977123456")
+    assert "what would you like to discuss" in _all_text(data).lower()
+
+
+@pytest.mark.parametrize(
+    "phone",
+    ["0977123456", "260977123456", "+260977123456", "0977 123 456", "0977-123-456"],
+)
+def test_callback_flow_accepts_valid_phone_formats(client, phone):
+    sid = new_session(client)
+    chat(client, sid, payload="human_handoff")
+    chat(client, sid, message="Choolwe")
+    data = chat(client, sid, message=phone)
+    assert "what would you like to discuss" in _all_text(data).lower()
+
+
+def test_saying_no_after_callback_is_recognised_as_goodbye(client):
+    sid = new_session(client)
+    chat(client, sid, payload="human_handoff")
+    chat(client, sid, message="Choolwe")
+    chat(client, sid, message="0977123456")
+    chat(client, sid, message="Opening a business account")
+    chat(client, sid, payload="Morning")
+    data = chat(client, sid, message="no")
+    assert data["meta"]["action"] == "answer"
+    assert data["meta"]["intent"] == "thanks_goodbye"
+    assert "welcome" in _all_text(data).lower()
 
 
 def test_two_strike_rule_offers_human(client):

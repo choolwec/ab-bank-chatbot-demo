@@ -61,6 +61,10 @@ def test_all_phrases_reach_their_intent():
         ("myabz is down", "technical_issue"),
         ("etumba is down", "technical_issue"),
         ("mymbs is down", "technical_issue"),
+        ("no", "thanks_goodbye"),
+        ("nope", "thanks_goodbye"),
+        ("nothing else", "thanks_goodbye"),
+        ("i'm done", "thanks_goodbye"),
     ],
 )
 def test_misspellings_and_zambian_english(query, expected):

@@ -5,7 +5,13 @@ day. The transcript rides along so the customer never repeats themselves.
 """
 
 from .. import audit
-from .base import CANCEL_BUTTON, MENU_BUTTON, FormFlow
+from .base import CANCEL_BUTTON, DONE_BUTTON, MENU_BUTTON, FormFlow, is_valid_zambian_phone
+
+PHONE_RETRY_TEXT = (
+    "That doesn't look like a valid number — please send it as 09XXXXXXX "
+    "(10 digits), 260XXXXXXXXX (12 digits), or +260XXXXXXXXX, so our team "
+    "can actually reach you."
+)
 
 
 class LeadFlow(FormFlow):
@@ -20,6 +26,7 @@ class LeadFlow(FormFlow):
         ("topic", "And what would you like to discuss?"),
         ("time", "When is best to call — morning or afternoon?"),
     ]
+    validators = {"phone": (is_valid_zambian_phone, PHONE_RETRY_TEXT)}
 
     def _prompt(self, i):
         prompt = super()._prompt(i)
@@ -39,4 +46,4 @@ class LeadFlow(FormFlow):
             f"working day. Your reference is {ref}.\n"
             "Is there anything else I can help with in the meantime?"
         )
-        return [{"text": text, "buttons": [MENU_BUTTON]}]
+        return [{"text": text, "buttons": [DONE_BUTTON, MENU_BUTTON]}]

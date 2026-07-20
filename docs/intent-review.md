@@ -331,7 +331,7 @@ Follow-up buttons: Branches & agents · Open an account · eTumba · Loans · Ta
 ### Thanks / goodbye  `thanks_goodbye`
 
 - Status: **draft**
-- Trigger phrases (12): "thanks", "thank you", "thank u", "thanx", "zikomo", "natotela", "twalumba", "bye", "goodbye", "ok thanks", "that is all", "cheers"
+- Trigger phrases (27): "thanks", "thank you", "thank u", "thanx", "zikomo", "natotela", "twalumba", "bye", "goodbye", "ok thanks", "that is all", "cheers", "no", "nope", "no thanks", "no thank you", "nothing else", "that's all", "thats all", "no that's all", "im done", "i'm done", "no im good", "im good thanks", "all good thanks", "no more questions", "nothing more"
 
 Customer-facing answer:
 

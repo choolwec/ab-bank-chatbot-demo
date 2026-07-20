@@ -61,6 +61,21 @@ intents:
       - "ok thanks"
       - "that is all"
       - "cheers"
+      - "no"
+      - "nope"
+      - "no thanks"
+      - "no thank you"
+      - "nothing else"
+      - "that's all"
+      - "thats all"
+      - "no that's all"
+      - "im done"
+      - "i'm done"
+      - "no im good"
+      - "im good thanks"
+      - "all good thanks"
+      - "no more questions"
+      - "nothing more"
     answer: |
       You're welcome. Is there anything else I can help with? If not, thank
       you for chatting with AB Bank — goodbye for now.

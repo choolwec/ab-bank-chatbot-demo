@@ -2,7 +2,7 @@
 /**
  * Plugin Name: AB Bank Chatbot
  * Description: Embeds the AB Bank Zambia chat assistant widget on the site. Set the backend URL under Settings > AB Bank Chatbot.
- * Version: 1.0.0
+ * Version: 1.0.1
  */
 
 if (!defined('ABSPATH')) {

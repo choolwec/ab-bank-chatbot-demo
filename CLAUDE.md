@@ -109,7 +109,9 @@ calling the network. `GET /admin/jira-preview` renders those mock issues as
 Jira-style cards — this is what the demo uses to show "what will land in
 the contact center's Jira" without real Jira access. No auth on that route
 yet: fine pre-launch, must be gated before it carries real customer data.
-Once IT provisions a Jira API token, setting those four env vars flips
+Once those four env vars are set (see `docs/deployment-and-jira-setup.md`
+for where each one comes from — self-service via the contact-center team's
+own Jira login in most cases, not necessarily IT), setting them flips
 `_push_real()` on (plain REST v2 issue creation, Basic Auth) with no other
 code change.
 
@@ -136,11 +138,27 @@ widget self-hides if `/health` reports `widget_enabled: false` or is
 unreachable.
 
 ### WordPress plugin (`wordpress-plugin/`)
-A separate small PHP component (plain WordPress plugin format, no build
-step) that outputs the cross-domain widget `<script>` tag via WordPress's
-own Settings screen. Not part of the Python app or its test suite — see
-`wordpress-plugin/README.md`, including the WordPress.com plan-tier caveat
-(custom plugins need the Business plan or higher).
+A single flat file, `ab-bank-chatbot.php` (plain WordPress plugin format,
+no build step, deliberately no subfolder) that outputs the cross-domain
+widget `<script>` tag via WordPress's own Settings screen. Not part of the
+Python app or its test suite — see `wordpress-plugin/README.md`. Confirmed
+2026-07-22: the site is self-hosted WordPress (wordpress.org), not
+WordPress.com, so there's no plan-tier restriction on installing it.
+
+It was originally shipped as a zip of a subfolder
+(`ab-bank-chatbot/ab-bank-chatbot.php`) and activation failed with "plugin
+file does not exist" even though the name showed up correctly in the
+Plugins list. One confirmed real bug: the zip's internal path was stored
+with a Windows backslash instead of a forward slash (both Explorer's "Send
+to > Compressed folder" and PowerShell's `Compress-Archive` were observed
+doing this on this machine), which WordPress's Linux-hosted unzip doesn't
+treat as a directory separator. **That fix alone did not resolve it for
+the user**, so flattening to a single root-level file (this version)
+removes the folder-structure question entirely rather than relying on the
+zip being built correctly — see `wordpress-plugin/README.md`'s
+Troubleshooting section for the other suspects (stale leftover from the
+failed attempt, a host security scanner quarantining the file, PclZip
+fallback bugs) if this still fails.
 
 ## Invariants to preserve when changing code
 

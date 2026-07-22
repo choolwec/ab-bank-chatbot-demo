@@ -109,7 +109,16 @@ unconfirmed fact. After any content change, refresh it with:
 
 Nothing goes live until legal signs off every answer in that document.
 
-## 9. If something breaks
+## 9. Putting it on the internet, and connecting Jira
+
+Right now the bot only runs on your own computer (step 1) — fine for demos,
+but real website visitors need it running somewhere that's always on, and
+the contact-center handoff is still in mock mode. Both of those are
+one-time setup jobs, not day-to-day tasks, so they get their own document:
+**`docs/deployment-and-jira-setup.md`** (also available as a PDF in the
+same folder to hand to whoever ends up owning either piece).
+
+## 10. If something breaks
 
 1. Run the tests (step 4, line 4) — the error message names the file and
    line that's wrong; usually it's spacing in a `.yaml` file you just edited

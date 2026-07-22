@@ -82,7 +82,12 @@ the customer-facing flow). Two modes, decided automatically:
 
 Intent schema is documented at the top of `knowledge/intents/smalltalk.yaml`.
 
-## Deployment notes for IT (read before hosting)
+## Deployment notes (read before hosting)
+
+IT is not supporting this project (confirmed 2026-07-22) — see
+`docs/deployment-and-jira-setup.md` for the concrete no-IT hosting path
+(Render's free tier, already configured via `render.yaml`). The rules below
+apply regardless of who ends up hosting it:
 
 - **Run exactly ONE process, ONE worker.** Sessions and rate-limit counters
   live in process memory (a deliberate simplicity choice at <100 users/month).
@@ -103,10 +108,11 @@ Intent schema is documented at the top of `knowledge/intents/smalltalk.yaml`.
 
 ## Embedding on the WordPress site
 
-`wordpress-plugin/ab-bank-chatbot/` is a small plugin that adds the widget via
+`wordpress-plugin/ab-bank-chatbot.php` is a small single-file plugin that adds the widget via
 WordPress's own Settings screen — no theme edits needed. See
-`wordpress-plugin/README.md`, including the WordPress.com plan-tier caveat
-(custom plugins need the Business plan or higher).
+`wordpress-plugin/README.md`. Confirmed 2026-07-22: this is self-hosted
+WordPress (wordpress.org), so there's no plan-tier restriction on installing
+custom plugins.
 
 ## Before launch — every `[CONFIRM …]` must be resolved
 
@@ -116,7 +122,7 @@ WordPress's own Settings screen — no theme edits needed. See
 - Opening hours, eTumba registration steps, loan product specifics (intent YAMLs)
 - Retention periods (legal): `TRANSCRIPT_RETENTION_DAYS`, `TICKET_RETENTION_DAYS`
 - CORS: set `ALLOWED_ORIGINS` env var to the bank's domain in production
-- Real Jira project/token from IT (`JIRA_BASE_URL`/`JIRA_EMAIL`/`JIRA_API_TOKEN`/`JIRA_PROJECT_KEY`), and auth added to `/admin/jira-preview` before go-live
+- Real Jira project/token (`JIRA_BASE_URL`/`JIRA_EMAIL`/`JIRA_API_TOKEN`/`JIRA_PROJECT_KEY` — see `docs/deployment-and-jira-setup.md` for who actually needs to provide these, not necessarily IT), and auth added to `/admin/jira-preview` before go-live
 - Legal sign-off of **all** answers; manual NVDA + keyboard-only pass (§3.5)
 
 ## Reports

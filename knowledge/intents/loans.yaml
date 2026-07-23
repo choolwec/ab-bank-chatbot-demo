@@ -16,20 +16,23 @@ intents:
       - "do you give business loans"
       - "capital for my business"
     answer: |
-      We lend to Zambian micro, small and medium businesses — for stock,
-      equipment and working capital. Loan size and terms depend on your
-      business, and a loan officer assesses each application personally,
-      usually with a visit to your business. I don't quote rates in chat —
-      your loan officer gives you the full cost in writing before you sign.
-      [CONFIRM: product range and amounts.]
+      Business (Micro & SME) loans are available if your business:
+      - Has been operating for at least 12 months
+      - Is within our network — Lusaka, Kitwe, Ndola, Mumbwa, Solwezi, or
+        Chipata
+      - Has collateral and a guarantor
+      Interest: 3%-8% per month, over 4-30 months depending on the loan
+      amount. Processing takes about 7 working days once documentation is
+      complete. Loan approval always depends on assessment — I can't
+      guarantee an amount or timeline before your documents are in.
     buttons:
       - {label: "Loan requirements", payload: "loan_requirements"}
       - {label: "How to apply", payload: "loan_apply_how"}
-      - {label: "Agriculture loans", payload: "agri_loan"}
+      - {label: "SME overdraft", payload: "sme_overdraft"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
   - intent: agri_loan
-    label: "Agriculture loans"
+    label: "Loans for farming businesses"
     category: loans
     status: draft
     phrases:
@@ -45,14 +48,70 @@ intents:
       - "do you have loans for farmers"
       - "livestock loan"
     answer: |
-      Our agri loans support farmers — for inputs like seed and fertiliser,
-      for equipment, and for growing your farm business. Repayment is
-      designed around farming seasons where possible. [CONFIRM: product
-      details and repayment structures.] A loan officer will assess your farm
-      and explain the full cost before you sign anything.
+      We don't have a separate agriculture-specific loan product — a
+      farming business applies under our general Business (Micro & SME)
+      loan, on the same terms: 12+ months trading, within our branch
+      network, with collateral and a guarantor. A loan officer visits the
+      farm to assess the application, same as for any business.
     buttons:
+      - {label: "Business loan details", payload: "msme_loan"}
       - {label: "Loan requirements", payload: "loan_requirements"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: personal_loan
+    label: "Personal loans (government employees)"
+    category: loans
+    status: draft
+    phrases:
+      - "personal loan"
+      - "consumer loan"
+      - "loan for government employees"
+      - "civil servant loan"
+      - "salary loan"
+      - "personal loan interest rate"
+      - "how much personal loan can i get"
+      - "personal loan requirements"
+      - "loan for public service worker"
+      - "government worker loan"
+    answer: |
+      Personal loans are available to government employees only:
+      - Amount: ZMW 1,000 - ZMW 500,000
+      - Interest: up to 3.75% per month
+      - Tenure: 4-60 months
+      - No collateral needed, processed within 24 hours of full documents
+      Documents: signed pre-approval form (from
+      www.abbank.co.zm/personal-loan), valid ID, an introductory letter
+      from your employer, 2 latest pay slips, and 2 months' bank
+      statements.
+    buttons:
       - {label: "How to apply", payload: "loan_apply_how"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: sme_overdraft
+    label: "SME overdraft"
+    category: loans
+    status: draft
+    phrases:
+      - "sme overdraft"
+      - "business overdraft"
+      - "overdraft requirements"
+      - "how do i get an overdraft"
+      - "overdraft for my business"
+      - "overdraft arrangement fee"
+      - "overdraft amount"
+      - "does ab bank offer overdrafts"
+      - "overdraft collateral"
+      - "overdraft on my business account"
+    answer: |
+      SME overdraft requirements:
+      - Valid business registration and operating licences
+      - An active AB Bank account (or recent statements from another bank)
+      - Amount is based on turnover — typically up to 30% of your average
+        monthly turnover
+      - Collateral: term deposit, landed property, or motor vehicle
+      - Arrangement fee: 5%
+    buttons:
       - {label: "Business loans", payload: "msme_loan"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
@@ -72,16 +131,66 @@ intents:
       - "who qualifies for a loan"
       - "can i get a loan without collateral"
     answer: |
-      For most loans you will need:
-      - your NRC
-      - a running business or farm that a loan officer can visit
-      - [CONFIRM: minimum months in operation, records required, and the
-        security/collateral policy per product]
-      You don't need a perfect paper trail — our loan officers assess real
-      businesses as they are. The best first step is to speak to one.
+      For a business loan you'll typically need:
+      - Age 21-65, valid & original ID (NRC, Driving Licence, or Passport)
+      - A running business, 12+ months old, that a loan officer can visit
+      - Proof of residence, and — if married — your spouse involved in
+        the process
+      - A guarantor (in business or formal employment), plus collateral
+      Personal loans (government employees only) don't need collateral —
+      see the personal loan details for that document list instead.
     buttons:
       - {label: "How to apply", payload: "loan_apply_how"}
+      - {label: "Personal loan details", payload: "personal_loan"}
       - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: guarantor_definition
+    label: "What is a guarantor?"
+    category: loans
+    status: draft
+    phrases:
+      - "what is a guarantor"
+      - "who can be my guarantor"
+      - "guarantor requirements"
+      - "do i need a guarantor"
+      - "who qualifies as a guarantor"
+      - "can my friend be my guarantor"
+      - "guarantor for a loan"
+      - "what does a guarantor do"
+      - "explain guarantor"
+      - "guarantor meaning"
+    answer: |
+      A guarantor gives a guarantee for loan repayment. They must be
+      either in formal employment or have a running business of their own.
+    buttons:
+      - {label: "Loan requirements", payload: "loan_requirements"}
+      - {label: "Collateral", payload: "collateral_definition"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: collateral_definition
+    label: "What counts as collateral?"
+    category: loans
+    status: draft
+    phrases:
+      - "what is collateral"
+      - "what can i use as collateral"
+      - "collateral requirements"
+      - "do i need collateral for a loan"
+      - "what counts as collateral"
+      - "can i use my car as collateral"
+      - "can i use my house as collateral"
+      - "collateral assessment"
+      - "explain collateral"
+      - "collateral meaning"
+    answer: |
+      Collateral can include household goods, fixed assets, and/or a
+      mortgage (building, land, or motor vehicle). It's assessed at your
+      premises by your Business Officer. Personal loans (government
+      employees only) don't require collateral.
+    buttons:
+      - {label: "Guarantor", payload: "guarantor_definition"}
+      - {label: "Loan requirements", payload: "loan_requirements"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
   - intent: loan_apply_how
@@ -104,9 +213,10 @@ intents:
       Applying is straightforward:
       1. Visit your nearest branch, or request a callback and we'll contact you
       2. A loan officer discusses your business and what you need
-      3. The officer visits your business or farm to assess the application
+      3. For business loans, the officer visits your business or farm to assess it
       4. If approved, you get the full terms and cost in writing before signing
-      [CONFIRM: typical turnaround time.]
+      Business loans: ~7 working days once documents are complete. Personal
+      loans (government employees): within 24 hours.
     buttons:
       - {label: "Loan requirements", payload: "loan_requirements"}
       - {label: "Find a branch", payload: "branch_locator"}

@@ -17,13 +17,18 @@ intents:
       - "banking accounts you offer"
     answer: |
       We offer these main account types:
-      - Savings account — for keeping money safe and saving towards a goal
-      - Current account — for everyday banking and frequent transactions
-      - Business account — for MSMEs and business owners
+      - Tamanga — everyday current account (ZMW 36/month)
+      - Tamanga Plus — premium current account with Online Banking (ZMW 135/month)
+      - Mukula Plus — corporate/business current account (ZMW 200/month)
+      - Savings account — 5% interest per annum
+      - Savings Plan account — locked for withdrawals, up to 7% interest
+      - Kids Savings account — for under-16s, 7% interest
+      - Term Deposit Account — fix funds 30-365 days, 9.3%-16% interest
+      - Joint account (AND or OR)
       Which one would you like to know more about?
     buttons:
       - {label: "Savings account", payload: "savings_account"}
-      - {label: "Current account", payload: "current_account"}
+      - {label: "Current account (Tamanga)", payload: "current_account"}
       - {label: "Business account", payload: "business_account"}
       - {label: "How to open an account", payload: "account_opening_how"}
 
@@ -43,19 +48,20 @@ intents:
       - "open a savings account"
       - "is my money safe in savings"
     answer: |
-      A savings account helps you keep money safe and build towards a goal,
-      with access when you need it. For current interest rates and charges I
-      point you to the official tariff guide, so you always get up-to-date
-      figures: {tariff_url}
-      To open one, visit any branch — I can show you what to bring.
+      Our Savings account lets you deposit and withdraw at any time:
+      - Minimum balance: ZMW 100
+      - Interest: 5% per annum, credited monthly
+      - No opening fees, no monthly/maintenance fees
+      To open one, visit any branch with your NRC/passport, proof of
+      residence, and TPIN certificate — I can show you the full list.
     buttons:
       - {label: "What you need to open", payload: "account_opening_requirements"}
-      - {label: "How to open", payload: "account_opening_how"}
+      - {label: "Savings Plan account", payload: "savings_plan_account"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Fees & charges", payload: "fees_charges"}
 
   - intent: current_account
-    label: "Current account"
+    label: "Current account (Tamanga)"
     category: accounts
     status: draft
     phrases:
@@ -69,19 +75,52 @@ intents:
       - "how does a current account work"
       - "open a current account"
       - "account for salary"
+      - "tamanga"
+      - "what is tamanga"
     answer: |
-      A current account is designed for everyday banking — deposits,
-      withdrawals and payments — with no limit on how often you transact.
-      Charges are listed in the official tariff guide: {tariff_url}
-      Would you like to know what you need to open one?
+      Tamanga is our everyday current account, available in ZMW, USD, or
+      EURO:
+      - Free account opening, no minimum balance
+      - Free cash and cheque deposits, unlimited fee-free withdrawals
+      - National and international transfers
+      - Monthly maintenance fee: ZMW 36
+      Would you like to know what you need to open one, or hear about
+      Tamanga Plus (our premium tier with Online Banking)?
     buttons:
+      - {label: "Tamanga Plus (premium)", payload: "tamanga_plus_account"}
       - {label: "What you need to open", payload: "account_opening_requirements"}
-      - {label: "How to open", payload: "account_opening_how"}
       - {label: "Fees & charges", payload: "fees_charges"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
+  - intent: tamanga_plus_account
+    label: "Tamanga Plus (premium current account)"
+    category: accounts
+    status: draft
+    phrases:
+      - "tamanga plus"
+      - "premium current account"
+      - "difference between tamanga and tamanga plus"
+      - "cheque book account"
+      - "online banking account"
+      - "upgrade my account"
+      - "premium account with online banking"
+      - "account with cheque book"
+      - "myabz account"
+      - "which account gets online banking"
+    answer: |
+      Tamanga Plus has everything Tamanga has, plus a cheque book and
+      Online Banking (MyABZ) access. Monthly maintenance fee: ZMW 135.
+      If you already have a Tamanga account, a branch can upgrade you to
+      Tamanga Plus so you can register for Online Banking and get
+      statements without visiting a branch each time.
+    buttons:
+      - {label: "Tamanga (standard)", payload: "current_account"}
+      - {label: "Bank statements", payload: "bank_statement_request"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
   - intent: business_account
-    label: "Business account"
+    label: "Business account (Mukula Plus)"
     category: accounts
     status: draft
     phrases:
@@ -95,15 +134,195 @@ intents:
       - "business banking"
       - "open account for business"
       - "corporate account"
+      - "mukula plus"
+      - "what is mukula plus"
     answer: |
-      Our business accounts are built for Zambian MSMEs — traders, shops and
-      growing businesses — for daily takings, payments, and building a banking
-      record (which also helps when you apply for a business loan).
-      Requirements differ slightly from personal accounts, so our team can
-      guide you through it.
+      Mukula Plus is our corporate/business current account — for limited
+      companies, sole traders/partnerships, and clubs/NGOs/churches/
+      associations, in ZMW, USD, or EURO:
+      - No minimum balance, free cash and cheque deposits
+      - Cheque book, Online Banking, salary processing
+      - Free account balance and statements for ongoing months
+      - Monthly maintenance fee: ZMW 200
+      Requirements differ by entity type (limited company vs. sole trader
+      vs. club/NGO) — I can show you the exact document list.
+    buttons:
+      - {label: "Documents needed by entity type", payload: "business_account_requirements"}
+      - {label: "Business loans", payload: "msme_loan"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: business_account_requirements
+    label: "Business account documents by entity type"
+    category: accounts
+    status: draft
+    phrases:
+      - "documents to open a company account"
+      - "requirements for business account"
+      - "pacra requirements"
+      - "ngo account requirements"
+      - "church account requirements"
+      - "documents for limited company account"
+      - "sole trader account requirements"
+      - "what does my club need to open an account"
+      - "requirements for a corporate account"
+      - "documents for opening a business account"
+    answer: |
+      Requirements vary by entity type:
+      - Limited company: certificate of share capital, certificate of
+        incorporation, TPIN certificate, Form 3, articles of association,
+        a PACRA print-out (stamped, under 30 days old), board resolution,
+        and proof of address/ID for the company and each signatory.
+      - Sole trader: certificate of registration, ZRA tax registration
+        certificate, PACRA form 3, a PACRA print-out (stamped, under 30
+        days old), reference form, and the owner's ID.
+      - Clubs/churches/NGOs/associations: tax exemption certificate,
+        articles of association/constitution, board resolution, and proof
+        of address/ID for the organization and each signatory.
+      All documents must be original. A branch can confirm the exact list
+      for your specific case.
+    buttons:
+      - {label: "Business account overview", payload: "business_account"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: savings_plan_account
+    label: "Savings Plan account"
+    category: accounts
+    status: draft
+    phrases:
+      - "savings plan account"
+      - "blocked savings"
+      - "savings plan"
+      - "locked savings account"
+      - "savings account i cant withdraw from"
+      - "fixed savings for goal"
+      - "savings plan interest"
+      - "what is a savings plan"
+      - "restricted withdrawal savings"
+      - "savings plan requirements"
+    answer: |
+      The Savings Plan account lets you deposit any time, but withdrawals
+      are blocked — good for a savings goal you don't want to dip into:
+      - Initial deposit: ZMW 150
+      - Interest: up to 7% per annum
+      - No maintenance fees
+      Same opening requirements as any personal account (NRC/passport,
+      proof of residence, TPIN certificate).
+    buttons:
+      - {label: "Savings account (flexible)", payload: "savings_account"}
+      - {label: "Kids Savings account", payload: "kids_savings_account"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: kids_savings_account
+    label: "Kids Savings account"
+    category: accounts
+    status: draft
+    phrases:
+      - "kids savings"
+      - "childrens account"
+      - "savings account for my child"
+      - "minor account"
+      - "account for my kid"
+      - "savings for my son"
+      - "savings for my daughter"
+      - "under 16 bank account"
+      - "guardian savings account"
+      - "child savings account requirements"
+    answer: |
+      Kids Savings is a joint account opened for a minor (under 16) by
+      their guardian:
+      - Minimum balance: ZMW 10
+      - Interest: 7% per annum, no monthly charges
+      - Funds can be blocked for a period you choose
+      To open, bring your own ID/proof of residence/TPIN certificate plus
+      the child's document (under-5 card, birth certificate, or birth
+      record) to any branch.
+    buttons:
+      - {label: "Savings account (adult)", payload: "savings_account"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: term_deposit_account
+    label: "Term Deposit Account (TDA)"
+    category: accounts
+    status: draft
+    phrases:
+      - "term deposit"
+      - "fixed deposit"
+      - "tda"
+      - "investment account"
+      - "fix my money"
+      - "fixed term deposit"
+      - "how do i invest with ab bank"
+      - "lock my money for interest"
+      - "term deposit interest rate"
+      - "investment account requirements"
+    answer: |
+      A Term Deposit Account (TDA) fixes your money for a chosen term to
+      earn a higher interest rate:
+      - Term: 30-365 days
+      - Minimum investment: ZMW 10,000
+      - Interest: approximately 9.3%-16% per annum, depending on amount
+        and term
+      You need an active Savings or Current account first — funds move
+      from that account into the TDA. Would you like to open one?
     buttons:
       - {label: "What you need to open", payload: "account_opening_requirements"}
-      - {label: "Business loans", payload: "msme_loan"}
+      - {label: "Types of accounts", payload: "account_types_overview"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: joint_account
+    label: "Joint accounts"
+    category: accounts
+    status: draft
+    phrases:
+      - "joint account"
+      - "joint and account"
+      - "joint or account"
+      - "open account with my spouse"
+      - "account with two signatories"
+      - "shared bank account"
+      - "account with my husband"
+      - "account with my wife"
+      - "joint account types"
+      - "open a joint account"
+    answer: |
+      We offer two types of joint account:
+      - Joint AND — all signatories must be present to transact (except
+        cash deposits, which anyone can make)
+      - Joint OR — any signatory can transact alone
+      All joint account holders must be physically present at account
+      opening, each with full ID/proof of residence/TPIN documentation.
+    buttons:
+      - {label: "What you need to open", payload: "account_opening_requirements"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: foreign_national_account
+    label: "Account opening for foreign nationals"
+    category: accounts
+    status: draft
+    phrases:
+      - "can a foreigner open an account"
+      - "foreign national account"
+      - "im not zambian can i open an account"
+      - "expat bank account"
+      - "account for foreigners"
+      - "i have a work permit can i open an account"
+      - "non zambian account opening"
+      - "account for expats"
+      - "im a foreigner"
+      - "can i open an account without an nrc"
+    answer: |
+      Yes — foreign nationals can open an account. Visit any branch with:
+      - A valid passport (with visa)
+      - A valid Zambian permit (work, residence, investor, spousal, or
+        study permit)
+      - Proof of residential address in Zambia
+    buttons:
+      - {label: "Types of accounts", payload: "account_types_overview"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
@@ -123,15 +342,20 @@ intents:
       - "papers needed to open account"
       - "requirements to open a bank account"
     answer: |
-      To open a personal account you will typically need:
-      - your green National Registration Card (NRC) or a valid passport
-      - [CONFIRM: proof of address / photo / minimum opening deposit — full
-        list per account type, from branch operations]
-      Business accounts need additional documents for the business itself.
-      Bring these to any branch and the team will help you open the account.
+      To open a personal account, visit any branch with:
+      - Original valid ID (NRC, Passport, or Driving Licence)
+      - Proof of residence (a utility bill)
+      - TPIN certificate
+      - A completed reference form — signed by a professional (lawyer,
+        accountant, clergy), your employer, an existing AB Bank customer,
+        or a recognized customary authority (chief, headman, court clerk,
+        market association chairperson)
+      Business accounts need additional entity-specific documents.
+      Account opening can't be completed without full documentation.
     buttons:
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Types of accounts", payload: "account_types_overview"}
+      - {label: "Business account documents", payload: "business_account_requirements"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
   - intent: account_opening_how
@@ -150,11 +374,83 @@ intents:
       - "help me open an account"
       - "how long does it take to open an account"
     answer: |
-      Opening an account is done at any of our branches — the team will take
-      you through it, usually the same day, as long as you bring the right
-      documents. [CONFIRM: whether online/remote opening is available.]
+      Accounts are opened at any branch only — there's no online/remote
+      account opening. Bring the right documents and it's usually done
+      the same day.
       Would you like the list of documents, or the nearest branch?
     buttons:
       - {label: "What to bring", payload: "account_opening_requirements"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: bank_statement_request
+    label: "Getting a bank statement"
+    category: accounts
+    status: draft
+    phrases:
+      - "how do i get a bank statement"
+      - "bank statement"
+      - "account statement"
+      - "print my statement"
+      - "statement request"
+      - "i need my statement"
+      - "download my statement"
+      - "how to get statement online"
+      - "statement for tamanga account"
+      - "get my transaction history"
+    answer: |
+      - Mukula Plus & Tamanga Plus customers: get statements anytime via
+        Online Banking (MyABZ) at https://ob.abbank.co.zm/landing/auth
+      - Tamanga & Savings customers: statements require a branch visit,
+        unless upgraded to a Plus tier (which unlocks Online Banking)
+      You can also call the Contact Centre on 888 (not toll-free) or visit
+      a branch either way.
+    buttons:
+      - {label: "Upgrade to Tamanga Plus", payload: "tamanga_plus_account"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: account_reactivation
+    label: "Reactivating a dormant account"
+    category: accounts
+    status: draft
+    phrases:
+      - "reactivate my account"
+      - "dormant account"
+      - "my account is dormant"
+      - "activate my old account"
+      - "reopen my account"
+      - "my account has been inactive"
+      - "how do i reactivate my bank account"
+      - "account reactivation requirements"
+      - "wake up my dormant account"
+      - "restart my inactive account"
+    answer: |
+      Dormant accounts must be reactivated in person at a branch — bring
+      your original ID.
+    buttons:
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: sort_swift_code
+    label: "Sort code / SWIFT code"
+    category: accounts
+    status: draft
+    phrases:
+      - "swift code"
+      - "sort code"
+      - "bank swift code"
+      - "what is your swift code"
+      - "branch sort code"
+      - "swift code for international transfer"
+      - "ab bank swift code"
+      - "sort code for my branch"
+      - "routing code"
+      - "bic code"
+    answer: |
+      SWIFT code for all AB Bank Zambia branches: ABBAZMLU
+      Sort codes differ by branch — tell me your branch and I'll confirm
+      it, or check the branch list.
+    buttons:
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Talk to a person", payload: "human_handoff"}

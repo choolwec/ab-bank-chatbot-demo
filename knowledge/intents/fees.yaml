@@ -16,11 +16,12 @@ intents:
       - "how much does it cost"
       - "ledger fees"
     answer: |
-      All our fees and charges are published in the official tariff guide:
-      {tariff_url}
-      I deliberately don't quote figures in chat — the guide is always the
-      current, correct source. Tell me what you're looking for and I can
-      point you to the right place, or our team can walk you through it.
+      Monthly maintenance fees: Tamanga ZMW 36, Tamanga Plus ZMW 135,
+      Mukula Plus (business) ZMW 200. Cash deposits and withdrawals are
+      free on all three. Savings, Savings Plan, and Kids Savings accounts
+      have no monthly fees.
+      For anything not listed here, the full tariff guide has the current
+      figure: {tariff_url}
     buttons:
       - {label: "eTumba fees", payload: "etumba_fees"}
       - {label: "Types of accounts", payload: "account_types_overview"}

@@ -1,20 +1,130 @@
 {
-  "_note": "PLACEHOLDER DATA. Every branch entry must be verified and completed by ops before launch (build plan §3.5). Keep 'verified' false until confirmed.",
+  "_note": "Primary source: Branch Staff FAQ Document + UPDATED - SOCIAL MEDIA RESPONSE TEMPLATE 12.08.2025 (source='docs'). A few fields (address wording, phone numbers) are cross-checked against the Bank of Zambia's Nov 2025 branch-network filing (source='boz') where the two priority docs were silent or slightly worded differently — noted per-branch. 'verified: false' means a human still needs to confirm before this reaches a customer, even where a figure/address is present. Ops must resolve the branch-count discrepancy noted below before launch.",
+  "_discrepancy_note": "The Social Media Response Template's intro line says AB Bank has '9 branches and 1 satellite branch' (as of 12 Aug 2025), but the same document's own branch/sort-code listing plus the Branch Staff FAQ enumerate 10 full branches (Cairo, Acacia Premium/Head Office, Chilenje, Matero, Kalingalinga, Chelston, Kitwe, Ndola, Chipata, Solwezi) plus 1 satellite (Mumbwa) = 11 locations. The Bank of Zambia's Nov 2025 filing lists a 12th location (Chongwe, a promotional office) not present in either priority document at all. Likely explanation: Solwezi and/or Chongwe opened after the '9+1' headline figure was last updated. Do not quote a branch count to customers until ops confirms the current total.",
+  "swift_code": "ABBAZMLU",
   "branches": [
     {
-      "name": "Head Office & Main Branch",
+      "name": "Cairo Branch",
       "city": "Lusaka",
-      "address": "[CONFIRM: street address]",
+      "address": "7393 Chainda Place, Off Cairo Road, Town Center, Lusaka",
+      "phone": "+260 211 220836/38",
+      "sort_code": "210001",
+      "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
+      "source": "docs",
+      "verified": false
+    },
+    {
+      "name": "Acacia Premium Branch / Head Office",
+      "city": "Lusaka",
+      "address": "Acacia Park, corner of Great East Road and Thabo Mbeki Road, Stand No. 22768/227682, Lusaka (opposite Mint Café)",
       "phone": "[CONFIRM: branch phone]",
-      "hours": "[CONFIRM: hours]",
+      "sort_code": "[CONFIRM: not listed in either priority document]",
+      "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
+      "note": "Bank of Zambia's Nov 2025 filing lists 'Acacia Branch' and 'Head Office' as two separate register entries at this same address — likely one physical location serving both roles.",
+      "source": "docs",
+      "verified": false
+    },
+    {
+      "name": "Chilenje Branch",
+      "city": "Lusaka",
+      "address": "Base Building, Chilenje Shopping Mall, Muramba Road, Chilenje South, Lusaka",
+      "phone": "+260 211 267706/7",
+      "sort_code": "210002",
+      "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
+      "source": "docs",
+      "verified": false
+    },
+    {
+      "name": "Matero Branch",
+      "city": "Lusaka",
+      "address": "Matero Mall, Shop No. 7, Commonwealth Road, Matero, Lusaka",
+      "phone": "+260 211 244647/9",
+      "sort_code": "210003",
+      "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
+      "note": "Bank of Zambia's Nov 2025 filing describes this address as 'B and J Building after Post Office, Commonwealth Road' rather than 'Matero Mall Shop No. 7' — possibly the same building described differently, or a relocation not yet reflected in one of the two sources. Confirm current address with ops.",
+      "source": "docs",
+      "verified": false
+    },
+    {
+      "name": "Kalingalinga Branch",
+      "city": "Lusaka",
+      "address": "Alick Nkhata Road, after Friday's Corner, Kalingalinga, Lusaka",
+      "phone": "+260 211 267988/9/90",
+      "sort_code": "210004",
+      "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
+      "source": "docs",
+      "verified": false
+    },
+    {
+      "name": "Chelston Branch",
+      "city": "Lusaka",
+      "address": "Chelston Bazaar Complex (next to Post Office), Chelston, Lusaka",
+      "phone": "+260 211 285811/2",
+      "sort_code": "210005",
+      "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
+      "source": "docs",
       "verified": false
     },
     {
       "name": "Kitwe Branch",
       "city": "Kitwe",
-      "address": "[CONFIRM: street address]",
+      "address": "38 Chisokone Avenue, Chisokone Mall, next to Chisokone Market, Kitwe",
+      "phone": "+260 212 220834/35",
+      "sort_code": "210207",
+      "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
+      "source": "docs",
+      "verified": false
+    },
+    {
+      "name": "Ndola Branch",
+      "city": "Ndola",
+      "address": "Rekay's Mall, President Avenue, Ndola",
       "phone": "[CONFIRM: branch phone]",
-      "hours": "[CONFIRM: hours]",
+      "sort_code": "210108",
+      "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
+      "source": "docs",
+      "verified": false
+    },
+    {
+      "name": "Chipata Branch",
+      "city": "Chipata",
+      "address": "Stand 1502, Luangwa Road, between Natsave and Investrust",
+      "phone": "[CONFIRM: branch phone]",
+      "sort_code": "211109",
+      "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
+      "source": "docs",
+      "verified": false
+    },
+    {
+      "name": "Solwezi Branch",
+      "city": "Solwezi",
+      "address": "Stand No. 18, Kapiji Mall, Solwezi",
+      "phone": "[CONFIRM: branch phone]",
+      "sort_code": "212813",
+      "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
+      "source": "docs",
+      "verified": false
+    },
+    {
+      "name": "Mumbwa Satellite Branch",
+      "city": "Mumbwa",
+      "address": "DT Complex, along Independence Avenue, opposite Council offices, Mumbwa",
+      "phone": "[CONFIRM: branch phone]",
+      "sort_code": null,
+      "hours": "[CONFIRM: satellite offices may keep different hours than full branches]",
+      "note": "Called a 'satellite branch' in the Branch Staff FAQ / Social Media Template; Bank of Zambia's filing labels it 'Promotional Offices'.",
+      "source": "docs",
+      "verified": false
+    },
+    {
+      "name": "Chongwe Promotional Office",
+      "city": "Chongwe",
+      "address": "Subdivision of Chieftainess Nkomesha's Chiefdom, opposite Jatambo Private School, Great East Road, Chongwe",
+      "phone": "[CONFIRM: branch phone]",
+      "sort_code": null,
+      "hours": "[CONFIRM]",
+      "note": "NOT mentioned in either priority document (Branch Staff FAQ or Social Media Template). Found only in the Bank of Zambia's Nov 2025 branch-network filing, which post-dates both priority documents (Aug 2025). Flag for ops/branch-network sign-off before including in a live branch locator — may be a newly opened location the priority docs simply predate.",
+      "source": "boz_only_unconfirmed",
       "verified": false
     }
   ],

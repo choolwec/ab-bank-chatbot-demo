@@ -53,9 +53,13 @@ intents:
       - "opening times"
       - "are you open now"
     answer: |
-      Our branches are open [CONFIRM: weekday hours] on weekdays, and
-      [CONFIRM: Saturday hours or closed] on Saturdays.
-      Remember, eTumba on {ussd_code} works 24 hours a day.
+      Branches: Monday-Friday 08:00-15:00, Saturday 09:00-12:30. Closed
+      Sundays and public holidays.
+      Contact Centre: Monday-Friday 08:00-17:00, Saturday morning only
+      [CONFIRM: our two source documents disagree on the exact Saturday
+      start time — 09:00 vs 08:30 — so ask the team to confirm before we
+      quote one].
+      eTumba on {ussd_code} works 24 hours a day.
     buttons:
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Contact details", payload: "contact_details"}
@@ -78,9 +82,12 @@ intents:
       - "your contacts"
     answer: |
       You can reach AB Bank Zambia on:
-      Phone: {contact_phone}
+      Contact Centre: {contact_phone}
+      WhatsApp: {whatsapp_number}
       Email: {contact_email}
       Website: {website_url}
+      You can also message us on Facebook, LinkedIn, or Instagram, or drop
+      a written note in any branch's suggestion box.
       Or ask me for a callback and our team will phone you within one
       working day.
     buttons:

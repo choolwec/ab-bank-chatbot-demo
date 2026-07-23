@@ -117,6 +117,34 @@ intents:
       - {label: "Loans", payload: "msme_loan"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
+  - intent: about_ab_bank
+    label: "About AB Bank"
+    category: smalltalk
+    status: draft
+    phrases:
+      - "who is ab bank"
+      - "what is ab bank"
+      - "tell me about ab bank"
+      - "is ab bank licensed"
+      - "is ab bank regulated"
+      - "how long has ab bank been operating"
+      - "how many branches do you have"
+      - "what services does ab bank offer"
+      - "is ab bank a real bank"
+      - "about your bank"
+    answer: |
+      AB Bank is a licensed local commercial bank operating in Zambia,
+      regulated by the Bank of Zambia. We provide banking and credit
+      solutions to individuals, SMEs, corporates, NGOs, churches, and
+      associations through our branch network — current and savings
+      accounts, personal and business loans, digital/mobile banking
+      (eTumba), and local and international transfers.
+    buttons:
+      - {label: "Types of accounts", payload: "account_types_overview"}
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Loans", payload: "msme_loan"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
   - intent: human_handoff
     label: "Talk to a person"
     category: smalltalk

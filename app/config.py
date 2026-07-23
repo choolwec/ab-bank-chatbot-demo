@@ -78,24 +78,37 @@ def jira_configured() -> bool:
 
 
 # --- Contact details, rendered into answers as {placeholders}. ---
-# Every [CONFIRM …] value must be replaced (env var or here) before launch.
+# Sourced from the Branch Staff FAQ Document + Social Media Response
+# Template (12.08.2025) — see knowledge/faq/fees-and-contact.md for the
+# per-fact citations. Remaining [CONFIRM …] values must be replaced (env
+# var or here) before launch.
 CONTACTS = {
     "bank_name": "AB Bank Zambia",
+    # No 24hr line was found in either source document or in web research —
+    # the Contact Centre's own confirmed hours don't cover evenings/Sundays/
+    # holidays, so this is a real gap, not just an unconfirmed number.
     "emergency_phone": os.environ.get(
-        "ABZ_EMERGENCY_PHONE", "[CONFIRM: 24hr emergency / card-block line]"
+        "ABZ_EMERGENCY_PHONE",
+        "[CONFIRM: no 24hr emergency/card-block line found — confirm "
+        "whether one exists, or whether 888 is the only route even "
+        "outside Contact Centre hours]",
     ),
     "contact_phone": os.environ.get(
-        "ABZ_CONTACT_PHONE", "[CONFIRM: customer care line]"
+        "ABZ_CONTACT_PHONE", "888 (not toll-free)"
     ),
     "contact_email": os.environ.get(
-        "ABZ_CONTACT_EMAIL", "[CONFIRM: customer care email]"
+        "ABZ_CONTACT_EMAIL", "contact@abbank.co.zm"
     ),
     "website_url": os.environ.get(
-        "ABZ_WEBSITE_URL", "[CONFIRM: official website URL]"
+        "ABZ_WEBSITE_URL", "https://www.abbank.co.zm"
     ),
+    # Best candidate found via web search (AB Bank's own site blocked
+    # automated fetches — see knowledge/faq/company.md) — NOT independently
+    # content-verified. Confirm with a normal browser before launch.
     "tariff_url": os.environ.get(
-        "ABZ_TARIFF_URL", "[CONFIRM: link to current tariff guide]"
+        "ABZ_TARIFF_URL", "https://www.abbank.co.zm/quick-links/"
     ),
+    "whatsapp_number": "0769651262",
     "ussd_code": "*888#",
 }
 

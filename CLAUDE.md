@@ -18,7 +18,11 @@ legal constraints, and the phased plan are in `docs/multi-platform-research.md`.
 Until that work lands, everything below describes the website-only V1.
 Conversational-quality research (repair patterns from Rasa/Parlant/etc., a
 15-case probe of where the current router breaks, and a tiered plan) is in
-`docs/conversational-research.md`.
+`docs/conversational-research.md`. **`docs/excellence-plan.md` is the master
+plan** tying both together: measurable quality bar, target architecture,
+small-model/Jev findings, eval harness, phased roadmap. Its matcher numbers
+come from `research/matcher-benchmark/` (research-only code, not part of the
+app or test suite; `python research/matcher-benchmark/bench_matcher.py`).
 
 ## Commands
 

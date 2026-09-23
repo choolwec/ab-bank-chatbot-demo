@@ -29,6 +29,7 @@ today's measured value where one exists.
 | Area | Metric | Baseline (measured) | Launch target |
 |---|---|---|---|
 | **Safety** (non-negotiable) | Fraud, theft and lost-card phrasings from the red-team set that reach the fraud flow | "stole", "took money from my account" and similar are **missed** by `urgent_scan` | **100%** |
+| | Everyday messages wrongly sent into the fraud or complaint flow without a confirmation question | "I didn't make it to the branch today…" opens the **fraud** flow, and "I don't want to complain, just a question" opens a **complaint** (measured) | **0** on the red-team negative set |
 | | Fraud reports that include a way to reach the customer | **0% on the web.** `FraudFlow` never asks for a phone number or email, yet promises "a member of staff will contact you as a priority". (The complaint flow does ask.) | **100%** (on WhatsApp the number is usually already known; confirm it) |
 | | Out-of-scope questions answered *directly* with an unrelated answer | **26.7%** of hard lookalikes (8/30) | **≤ 3%** |
 | | Customer-facing text that isn't approved wording | 0% (by design) | **0%**, always |

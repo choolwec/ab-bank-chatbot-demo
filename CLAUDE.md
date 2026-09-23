@@ -23,6 +23,10 @@ plan** tying both together: measurable quality bar, target architecture,
 small-model/Jev findings, eval harness, phased roadmap. Its matcher numbers
 come from `research/matcher-benchmark/` (research-only code, not part of the
 app or test suite; `python research/matcher-benchmark/bench_matcher.py`).
+**`docs/execution-plan.md` is the week-by-week build plan**: every ticket
+(S1, C6, W2…) with its spec, tests, acceptance criteria and dependencies.
+Work one ticket per branch (`feat/<ID>-<slug>`) and update its Status in
+that plan's Appendix A in the same PR.
 
 ## Commands
 

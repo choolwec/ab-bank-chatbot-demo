@@ -1,5 +1,7 @@
 # AB Bank Zambia Chatbot — V1 (deterministic core)
 
+[![CI](https://github.com/choolwec/ab-bank-chatbot-demo/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/choolwec/ab-bank-chatbot-demo/actions/workflows/ci.yml)
+
 Customer-facing website assistant: **informational, lead-generating, complaint-routing**.
 Deliberately *not* transactional, no account access, no LLM in V1. Built to the spec in
 `../technical-build-plan.md` (§3) — every design rule there maps to code here.

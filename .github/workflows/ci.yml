@@ -1,0 +1,36 @@
+# E1: every push and pull request runs the full suite. Content edits are
+# deploys (CLAUDE.md), so a red build here means "do not release".
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Test suite (includes the E3 evaluation gates)
+        run: pytest -q
+
+      - name: Matcher benchmark (informational)
+        continue-on-error: true
+        run: python research/matcher-benchmark/bench_matcher.py

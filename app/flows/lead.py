@@ -13,6 +13,7 @@ from .base import (
     FormFlow,
     clean_phone,
     is_valid_zambian_phone,
+    read_back,
 )
 
 
@@ -23,11 +24,14 @@ class LeadFlow(FormFlow):
     validators = {"phone": is_valid_zambian_phone}
 
     def message_keys(self):
-        return super().message_keys() + ["lead.finish"]
+        return super().message_keys() + ["lead.finish", "read_back"]
 
     def store_value(self, field, value):
         # One canonical form for the contact centre: "0977123456".
         return clean_phone(value) if field == "phone" else value
+
+    def acknowledge(self, field, value):
+        return msg("read_back", value=read_back(value)) if field == "phone" else None
 
     def _prompt(self, i):
         prompt = super()._prompt(i)

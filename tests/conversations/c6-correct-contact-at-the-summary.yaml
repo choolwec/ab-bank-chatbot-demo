@@ -1,0 +1,11 @@
+id: c6-correct-contact-at-the-summary
+turns:
+  - say: I want to complain
+  - say: Service at a branch
+  - say: nobody helped me
+  - say: "0977123456"
+    expect: {text_contains: ["Got it: 0977 123 456", shall i send it]}
+  - say: sorry, wrong number, it should be 0966123456
+    expect: {text_contains: ["updated your contact to 0966 123 456", "0966 123 456", shall i send it]}
+  - payload: confirm_yes
+    expect: {ticket_created: complaint}

@@ -1,8 +1,13 @@
 id: c3-no-at-the-summary-edits
+# "no" to "Shall I send it?" means "Change something".
 turns:
   - say: I want to complain
   - say: Service at a branch
   - say: nobody helped me
   - say: skip
   - say: "no"
-    expect: {active_flow: complaint, flow_step: contact}
+    expect: {active_flow: complaint, text_contains: [which part], last_buttons_include: ["change:contact"]}
+  - say: details                  # a typed option label (C3)
+    expect: {text_contains: [please describe what happened]}
+  - say: nobody helped me for two hours
+    expect: {text_contains: [nobody helped me for two hours, shall i send it]}

@@ -6,6 +6,6 @@ turns:
   - say: a loan
   - say: morning
   - say: repeat
-    expect: {action: repeat, text_contains: [shall i submit this]}
+    expect: {action: repeat, text_contains: [shall i send it]}
   - say: "yes"
     expect: {ticket_created: callback}

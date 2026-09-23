@@ -5,6 +5,6 @@ turns:
   - say: "0977123456"
   - say: a loan
   - say: "2"                    # Morning / Afternoon / Back to menu
-    expect: {flow_data_has: {time: Afternoon}, text_contains: [shall i submit this]}
+    expect: {flow_data_has: {time: Afternoon}, text_contains: [shall i send it]}
   - say: yes please
     expect: {ticket_created: callback, active_flow: null}

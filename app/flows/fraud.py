@@ -3,6 +3,9 @@
 Fires on intent OR the urgent keyword scan, from any point in a conversation.
 Creates an urgent ticket with the transcript attached. The bot NEVER marks
 these resolved — a person closes the case.
+
+No "Shall I send it?" step (C7): speed matters more here than polish, so the
+finish message shows what was sent instead.
 """
 
 from .. import audit
@@ -10,26 +13,18 @@ from ..messages import msg
 from .base import (
     HUMAN_BUTTON,
     MENU_BUTTON,
+    SKIPPED,
     FormFlow,
-    clean_phone,
-    format_phone,
-    is_skip,
-    is_valid_email,
-    is_valid_zambian_phone,
+    is_valid_contact,
+    read_back,
+    store_contact,
 )
-
-SKIPPED = "skipped"
-
-
-def _valid_contact(text):
-    return is_valid_zambian_phone(text) or is_valid_email(text) or is_skip(text)
 
 
 class FraudFlow(FormFlow):
     name = "fraud"
-    require_confirmation = True
     steps = ["what_happened", "when", "channel", "contact"]
-    validators = {"contact": _valid_contact}
+    validators = {"contact": is_valid_contact}
 
     def message_keys(self):
         return super().message_keys() + [
@@ -42,23 +37,23 @@ class FraudFlow(FormFlow):
         return [{"text": msg(key), "buttons": []}]
 
     def store_value(self, field, value):
-        if field != "contact":
-            return value
-        if is_skip(value):
-            return SKIPPED
-        return clean_phone(value) if is_valid_zambian_phone(value) else value.strip()
+        return store_contact(value) if field == "contact" else value
 
     def acknowledge(self, field, value):
         if field != "contact":
             return None
         if value == SKIPPED:
             return msg("fraud.contact_skipped")
-        if is_valid_zambian_phone(value):
-            return msg("read_back", value=format_phone(value))
-        return msg("read_back", value=value)
+        return msg("read_back", value=read_back(value))
 
     def finish(self, session):
         data = dict(session.flow_state.get("data", {}))
         data["kind"] = session.flow_state.get("kind") or "fraud"
+        summary = self.summary(session)
         ref = audit.create_ticket("fraud", data, session.transcript)
-        return [{"text": msg("fraud.finish", ref=ref), "buttons": [HUMAN_BUTTON, MENU_BUTTON]}]
+        return [
+            {
+                "text": msg("fraud.finish", ref=ref, summary=summary),
+                "buttons": [HUMAN_BUTTON, MENU_BUTTON],
+            }
+        ]

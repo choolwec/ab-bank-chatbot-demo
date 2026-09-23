@@ -38,8 +38,7 @@ def test_fraud_urgent_fires_mid_conversation_with_transcript(client):
     chat(client, sid, message="Someone called pretending to be the bank")
     chat(client, sid, message="today")
     chat(client, sid, message="eTumba")
-    chat(client, sid, message="0977123456")
-    data = chat(client, sid, payload="confirm_yes")
+    data = chat(client, sid, message="0977123456")  # C7: fraud finishes here
     match = re.search(r"FRD-\d{8}-[A-Z0-9]{4}", _all_text(data))
     assert match, _all_text(data)
     # never bot-resolved: ticket open, transcript attached (§1 rules 3 & 7)
@@ -176,8 +175,7 @@ def test_fraud_flow_captures_a_callback_number(client):
     chat(client, sid, message="eTumba")
     data = chat(client, sid, message="not a phone number")
     assert "doesn't look like a valid number" in _all_text(data)
-    chat(client, sid, message="0977123456")
-    data = chat(client, sid, payload="confirm_yes")
+    data = chat(client, sid, message="0977123456")
     match = re.search(r"FRD-\d{8}-[A-Z0-9]{4}", _all_text(data))
     assert match, _all_text(data)
     con = sqlite3.connect(audit.DB_FILE)
@@ -188,25 +186,36 @@ def test_fraud_flow_captures_a_callback_number(client):
     assert "0977123456" in fields
 
 
-def test_confirm_step_shows_summary_and_allows_edit(client):
+def test_confirm_step_shows_summary_and_allows_changing_any_field(client):
+    """C7: "Here's what I'll send" with [Send it] [Change something]; any
+    field can be changed, then the summary comes back."""
     sid = new_session(client)
     chat(client, sid, message="I want to complain")
     chat(client, sid, message="Service at a branch")
     chat(client, sid, message="I waited two hours and nobody helped me")
     data = chat(client, sid, message="skip")
     summary_text = _all_text(data)
-    assert "waited two hours" in summary_text
-    assert any(b["payload"] == "confirm_yes" for b in data["replies"][-1]["buttons"])
-    assert any(b["payload"] == "confirm_edit" for b in data["replies"][-1]["buttons"])
+    assert "here's what i'll send" in summary_text.lower()
+    assert "Service at a branch · I waited two hours" in summary_text
+    payloads = [b["payload"] for b in data["replies"][-1]["buttons"]]
+    assert "confirm_yes" in payloads and "confirm_change" in payloads
 
-    # Editing goes back to the last field instead of submitting.
-    data = chat(client, sid, payload="confirm_edit")
-    assert "best phone number or email" in _all_text(data).lower()
-    data = chat(client, sid, message="skip")
-    assert any(b["payload"] == "confirm_yes" for b in data["replies"][-1]["buttons"])
+    data = chat(client, sid, payload="confirm_change")
+    payloads = [b["payload"] for b in data["replies"][-1]["buttons"]]
+    assert {"change:topic", "change:details", "change:contact"} <= set(payloads)
+
+    data = chat(client, sid, payload="change:topic")  # the FIRST field
+    assert "what is your complaint about" in _all_text(data).lower()
+    data = chat(client, sid, message="An eTumba transfer")
+    assert "An eTumba transfer · I waited two hours" in _all_text(data)
 
     data = chat(client, sid, payload="confirm_yes")
-    assert re.search(r"CMP-\d{8}-[A-Z0-9]{4}", _all_text(data))
+    ref = re.search(r"CMP-\d{8}-[A-Z0-9]{4}", _all_text(data))
+    assert ref
+    con = sqlite3.connect(audit.DB_FILE)
+    fields = con.execute("SELECT fields FROM tickets WHERE ref = ?", (ref.group(0),)).fetchone()[0]
+    con.close()
+    assert "An eTumba transfer" in fields and "Service at a branch" not in fields
 
 
 def test_faq_question_mid_flow_is_answered_and_flow_resumes(client):
@@ -280,8 +289,7 @@ def test_refresh_mid_fraud_flow_resumes_not_wipes(client):
     # The flow continues from the same step and the pre-refresh answer survives.
     chat(client, sid, message="today")
     chat(client, sid, message="card")
-    chat(client, sid, message="0977123456")
-    data = chat(client, sid, payload="confirm_yes")
+    data = chat(client, sid, message="0977123456")
     match = re.search(r"FRD-\d{8}-[A-Z0-9]{4}", _all_text(data))
     assert match, _all_text(data)
     con = sqlite3.connect(audit.DB_FILE)
@@ -345,7 +353,6 @@ def test_fraud_contact_is_read_back_formatted(bot):
     b.say("12345")  # rejected first
     b.say("260 977 123 456")
     assert "Got it: 0977 123 456." in b.text
-    b.tap("confirm_yes")
     assert _ticket_fields(_ref(b.text))["contact"] == "260977123456"
 
 
@@ -354,7 +361,6 @@ def test_fraud_contact_accepts_email(bot):
     _fraud_to_contact_step(b)
     b.say("mary.banda@example.com")
     assert "Got it: mary.banda@example.com." in b.text
-    b.tap("confirm_yes")
     assert _ticket_fields(_ref(b.text))["contact"] == "mary.banda@example.com"
 
 
@@ -364,7 +370,6 @@ def test_fraud_contact_skip_states_the_consequence(bot):
     b.say("skip")
     assert "can't call you back" in b.text
     assert "888" in b.text  # {contact_phone} rendered
-    b.tap("confirm_yes")
     assert _ticket_fields(_ref(b.text))["contact"] == "skipped"
 
 
@@ -374,3 +379,54 @@ def test_internal_yes_no_keys_never_reach_the_widget(client):
     data = chat(client, sid, message="what is etumba")
     for reply in data["replies"]:
         assert set(reply) == {"text", "buttons"}, reply
+
+
+# --- C7: confirm before sending, read values back ---
+
+
+@pytest.mark.parametrize(
+    "raw,shown",
+    [("0977123456", "0977 123 456"), ("260977123456", "0977 123 456"),
+     ("+260977123456", "0977 123 456"), ("0977-123-456", "0977 123 456"),
+     ("mary@example.com", "mary@example.com")],
+)
+def test_read_back_formats_phone_numbers(raw, shown):
+    from app.flows.base import read_back
+
+    assert read_back(raw) == shown
+
+
+def test_fraud_has_no_confirm_step_and_finish_shows_the_summary(bot):
+    b = bot()
+    b.say("someone stole money from my etumba")
+    b.say("they sent K500 from my wallet")
+    b.say("yesterday")
+    b.say("eTumba")
+    b.say("0977123456")
+    assert b.session.active_flow is None  # ticket raised, no "Shall I send it?"
+    assert "What you told me: they sent K500 from my wallet · yesterday · eTumba · 0977 123 456" in b.text
+    assert "Got it: 0977 123 456." in b.text
+    assert len(b.last[0]) == 1  # read-back and finish share one bubble
+
+
+def test_callback_summary_reads_the_phone_back(bot):
+    b = bot()
+    b.tap("human_handoff")
+    b.say("Mary Banda")
+    b.say("0977123456")
+    assert "Got it: 0977 123 456." in b.text
+    assert len(b.last[0]) == 1  # read-back rides on the next prompt
+    b.say("a loan")
+    b.tap("Morning")
+    assert "Mary Banda · 0977 123 456 · a loan · Morning" in b.text
+
+
+def test_pre_c7_edit_button_still_works(bot):
+    """A widget left open across the deploy still shows the old button."""
+    b = bot()
+    b.say("I want to complain")
+    b.say("Service at a branch")
+    b.say("nobody helped me")
+    b.say("skip")
+    b.tap("confirm_edit")
+    assert "which part" in b.text.lower()

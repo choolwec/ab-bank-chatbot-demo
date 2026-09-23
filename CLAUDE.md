@@ -127,14 +127,18 @@ flow object, so one flow instance is stateless and shared across sessions.
 Fraud/complaint flows always end in a ticket (`audit.create_ticket`) that
 only a human closes — the bot never marks its own case resolved.
 
-Fraud/complaint/lead (`require_confirmation = True`) show a summary of
-collected fields with Confirm/Edit-last/Cancel buttons before `finish()` is
-called — added 2026-07-25 after reviewing external banking-chatbot repos,
-since a typo'd detail previously went straight to a human ticket with no
-chance to fix it. The fraud flow also now has a mandatory `contact` step
-(validated Zambian phone) — it used to promise "a member of staff will
-contact you" while collecting no way to actually reach the customer, a real
-bug found in the same review.
+Complaint and callback flows (`require_confirmation = True`, ticket C7) end
+with "Here's what I'll send: Mary Banda · 0977 123 456 · a loan · Morning"
+and **[Send it] [Change something]**. "Change something" offers one button
+per field, re-asks just that field, then shows the summary again. The
+**fraud flow deliberately has no confirmation step**, so a report goes out
+as fast as possible; its finish message shows the summary instead. That
+reverses the 2026-07-25 behaviour on purpose, per the execution plan.
+Read-backs ("Got it: 0977 123 456.") ride on the same bubble as the next
+prompt (`base._with_ack`), for the message budget. The fraud flow has a
+mandatory `contact` step (phone, email or an explicit "skip" with the
+consequence stated). It used to promise "a member of staff will contact
+you" while collecting no way to reach the customer.
 
 **Digressions and corrections (C6).** Every in-flow message is classified
 before it is stored. A **digression** (`router._digression`) is an

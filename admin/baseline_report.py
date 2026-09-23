@@ -31,7 +31,6 @@ PATHS = {
         ("say", "yesterday"),
         ("say", "eTumba"),
         ("say", "0977123456"),
-        ("tap", "confirm_yes"),
     ],
     "Lost card": [
         ("say", "i lost my card"),
@@ -39,7 +38,6 @@ PATHS = {
         ("say", "today"),
         ("say", "card"),
         ("say", "0977123456"),
-        ("tap", "confirm_yes"),
     ],
     "Complaint": [
         ("say", "I want to complain"),

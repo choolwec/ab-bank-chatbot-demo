@@ -93,12 +93,15 @@ messages:
   # --- Shared flow texts ------------------------------------------------------------
   confirm.summary:
     status: draft
-    fills: [lines]
+    fills: [summary]
     text: |-
-      Here's what I've got:
-      {lines}
+      Here's what I'll send:
+      {summary}
 
-      Shall I submit this?
+      Shall I send it?
+  confirm.change:
+    status: draft
+    text: Which part would you like to change?
   read_back:
     status: draft
     fills: [value]
@@ -154,9 +157,10 @@ messages:
     text: Without a number we can't call you back. Please call {contact_phone} so our team can help you.
   fraud.finish:
     status: draft
-    fills: [ref]
+    fills: [ref, summary]
     text: |-
       Thank you. I've raised an urgent case for our team — your reference is {ref}. A member of staff will contact you as a priority.
+      What you told me: {summary}
       This case stays open until a person from the bank has resolved it with you — I won't close it myself.
       For immediate help at any time, call {emergency_phone}.
 
@@ -173,6 +177,9 @@ messages:
   complaint.step.contact:
     status: draft
     text: What's the best phone number or email for updates on this complaint? (Type 'skip' if you'd rather not — it is logged either way.)
+  complaint.retry.contact:
+    status: draft
+    text: That doesn't look like a phone number or email address — please send it as 09XXXXXXX (10 digits), 260XXXXXXXXX (12 digits), +260XXXXXXXXX, or an email address. Or type 'skip'.
   complaint.finish:
     status: draft
     fills: [ref]

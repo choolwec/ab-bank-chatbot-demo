@@ -875,7 +875,7 @@ Customer-facing answer:
 Follow-up buttons: Contact details · Find a branch · Talk to a person
 
 
-## System messages (64 texts)
+## System messages (66 texts)
 
 Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts, retries, confirmations. Source: `knowledge/system_messages.yaml`. `{placeholders}` are filled in by the bot (contact details from `app/config.py`, or the values listed).
 
@@ -1010,12 +1010,18 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 ### `confirm.summary`
 
 - Status: **draft**
-- Filled in by the bot: `{lines}`
+- Filled in by the bot: `{summary}`
 
-> Here's what I've got:
-> {lines}
+> Here's what I'll send:
+> {summary}
 > 
-> Shall I submit this?
+> Shall I send it?
+
+### `confirm.change`
+
+- Status: **draft**
+
+> Which part would you like to change?
 
 ### `read_back`
 
@@ -1146,9 +1152,10 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 ### `fraud.finish`
 
 - Status: **draft**
-- Filled in by the bot: `{ref}`
+- Filled in by the bot: `{ref}`, `{summary}`
 
 > Thank you. I've raised an urgent case for our team — your reference is {ref}. A member of staff will contact you as a priority.
+> What you told me: {summary}
 > This case stays open until a person from the bank has resolved it with you — I won't close it myself.
 > For immediate help at any time, call {emergency_phone}.
 
@@ -1176,6 +1183,12 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Status: **draft**
 
 > What's the best phone number or email for updates on this complaint? (Type 'skip' if you'd rather not — it is logged either way.)
+
+### `complaint.retry.contact`
+
+- Status: **draft**
+
+> That doesn't look like a phone number or email address — please send it as 09XXXXXXX (10 digits), 260XXXXXXXXX (12 digits), +260XXXXXXXXX, or an email address. Or type 'skip'.
 
 ### `complaint.finish`
 

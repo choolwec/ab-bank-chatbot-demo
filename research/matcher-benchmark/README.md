@@ -5,7 +5,8 @@ well the free-text matcher handles **phrasings nobody on the team wrote**, and
 how well it **declines questions the bot doesn't cover**. For a bank, the second
 of those matters more.
 
-- `heldout_v0.py` holds the test set.
+- `tests/eval/heldout.yaml` holds the test set (moved from `heldout_v0.py`
+  by ticket E3; the CI evaluation gates read the same file).
   - 91 in-scope customer phrasings, written from each intent's *label and topic*
     rather than copied from the YAML `phrases:`. They include misspellings and
     Zambian English.

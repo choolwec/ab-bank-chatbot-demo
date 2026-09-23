@@ -1,0 +1,13 @@
+# E3 evaluation gates, checked by tests/test_eval_gates.py on every build.
+#
+# RATCHET RULE: when a change improves a metric, the same commit tightens its
+# gate to the new value. A gate is never loosened without a written reason in
+# the commit message (and a line in the history below).
+#
+# History:
+#   2026-09-23  baseline (E3), commit before any matcher change
+gates:
+  right_direct_min: 0.538
+  wrong_direct_max: 0.044
+  oos_direct_max: 0.267
+  one_tap_min: 0.923

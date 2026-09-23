@@ -55,6 +55,7 @@ Admin scripts:
 ```powershell
 .venv\Scripts\python -m admin.report --days 7   # weekly metrics + top unmatched utterances
 .venv\Scripts\python -m admin.legal_export       # regenerate docs/intent-review.md for legal sign-off
+.venv\Scripts\python -m admin.eval_report        # held-out accuracy vs the E3 gates
 ```
 
 Kill switches — take effect immediately, no restart: edit `flags.json`, or
@@ -94,6 +95,15 @@ Fully local, no external API: TF-IDF over character n-grams
 against its `phrases:` list from `knowledge/intents/*.yaml`.
 `HIGH_CONFIDENCE`/`MEDIUM_CONFIDENCE` thresholds in `app/config.py` decide
 between a direct answer, a "did you mean…?" suggestion, or a fallback/strike.
+
+**Evaluation gates (E3).** `tests/test_eval_gates.py` scores the matcher on
+the held-out set `tests/eval/heldout.yaml` at the production thresholds and
+fails the build if any metric crosses `tests/eval/gates.yaml` (right/wrong
+direct answers, out-of-scope answered directly, one-tap reach).
+`python -m admin.eval_report` prints the same numbers with the failing items.
+Ratchet rule: an improvement tightens its gate in the same commit; a gate is
+never loosened without a written reason. Never copy held-out phrasings into
+intent `phrases:` (a test enforces this).
 
 ### Priority flows (`app/flows/`)
 Fraud, complaint, lead-capture, and branch-locator are deterministic

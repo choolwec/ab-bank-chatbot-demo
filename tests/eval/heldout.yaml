@@ -1,0 +1,226 @@
+# E3 held-out evaluation set (moved from research/matcher-benchmark/heldout_v0.py).
+#
+# Customer phrasings NOT copied from the YAML phrases: written from each
+# intent's label/topic, in the register real customers use (Zambian English,
+# misspellings, run-on text). out_of_scope = questions the bot does NOT
+# cover; many deliberately look like banking questions ("hard OOS"), since a
+# confident wrong answer to one of those is the dangerous failure.
+#
+# NEVER copy these into an intent's phrases: -- that turns a held-out test
+# into a training example and makes the E3 gates meaningless. Add new
+# phrasings here, and new phrases to the YAML, separately.
+
+in_scope:
+- text: which accounts do you have
+  intent: account_types_overview
+- text: what kind of accounts can i open with you
+  intent: account_types_overview
+- text: i want to start saving money with you
+  intent: savings_account
+- text: do you have an account just for keeping savings
+  intent: savings_account
+- text: tell me about tamanga
+  intent: current_account
+- text: i need an everyday account for my salary
+  intent: current_account
+- text: whats the difference with tamanga plus
+  intent: tamanga_plus_account
+- text: benefits of your premium account
+  intent: tamanga_plus_account
+- text: i need an account for my shop
+  intent: business_account
+- text: i run a small business and want a business account
+  intent: business_account
+- text: what papers does a company need to open an account
+  intent: business_account_requirements
+- text: documents for a business account for a limited company
+  intent: business_account_requirements
+- text: i want to save a fixed amount every month
+  intent: savings_plan_account
+- text: can i open an account for my child
+  intent: kids_savings_account
+- text: savings account for my son who is 8
+  intent: kids_savings_account
+- text: fixed deposit interest
+  intent: term_deposit_account
+- text: i want to lock my money for 6 months and earn interest
+  intent: term_deposit_account
+- text: can me and my wife share one account
+  intent: joint_account
+- text: i am not zambian can i open an account
+  intent: foreign_national_account
+- text: account for a foreigner with a passport
+  intent: foreign_national_account
+- text: what do i need to bring to open an account
+  intent: account_opening_requirements
+- text: which documents for opening acc
+  intent: account_opening_requirements
+- text: can i open an account online from home
+  intent: account_opening_how
+- text: hw do i opn an acount
+  intent: account_opening_how
+- text: i need my statement for the last 3 months
+  intent: bank_statement_request
+- text: how do i get a bank statement for my visa application
+  intent: bank_statement_request
+- text: my account is dormant
+  intent: account_reactivation
+- text: i havent used my account for a long time how do i activate it again
+  intent: account_reactivation
+- text: what is your swift code
+  intent: sort_swift_code
+- text: branch code for cairo road branch
+  intent: sort_swift_code
+- text: what is this etumba thing
+  intent: etumba_what_is
+- text: tell me about your mobile wallet
+  intent: etumba_what_is
+- text: how do i sign up for etumba
+  intent: etumba_register
+- text: i want to join etumba
+  intent: etumba_register
+- text: what code do i dial for etumba
+  intent: etumba_ussd
+- text: how to use star 888
+  intent: etumba_ussd
+- text: how much does etumba charge to send money
+  intent: etumba_fees
+- text: etumba charges
+  intent: etumba_fees
+- text: where can i withdraw my etumba money
+  intent: etumba_cash_in_out
+- text: how do i put cash into etumba
+  intent: etumba_cash_in_out
+- text: move money from my bank account to etumba
+  intent: etumba_pull_push_funds
+- text: send from my ab bank account to my wallet
+  intent: etumba_pull_push_funds
+- text: send money from etumba to airtel money
+  intent: etumba_transfer_mobile_money
+- text: can i send to someone on mtn mobile money
+  intent: etumba_transfer_mobile_money
+- text: what is yaka
+  intent: yaka_savings
+- text: i bought zesco units but no token came
+  intent: zesco_token
+- text: electricity token not received
+  intent: zesco_token
+- text: i sent money to the wrong number
+  intent: etumba_reversal
+- text: reverse a transaction i sent by mistake
+  intent: etumba_reversal
+- text: how do i see how much is in my wallet
+  intent: etumba_balance_check
+- text: what are your bank charges
+  intent: fees_charges
+- text: monthly fee for an account
+  intent: fees_charges
+- text: loan for my business
+  intent: msme_loan
+- text: i need capital to grow my shop
+  intent: msme_loan
+- text: do you give loans to farmers
+  intent: agri_loan
+- text: i want money to buy fertilizer for my farm
+  intent: agri_loan
+- text: im a teacher can i get a loan
+  intent: personal_loan
+- text: salary based loan for civil servants
+  intent: personal_loan
+- text: overdraft facility for my company
+  intent: sme_overdraft
+- text: what do i need to get a loan
+  intent: loan_requirements
+- text: requirements for borrowing money
+  intent: loan_requirements
+- text: who can be my guarantor
+  intent: guarantor_definition
+- text: what does guarantor mean
+  intent: guarantor_definition
+- text: what security do you need for a loan
+  intent: collateral_definition
+- text: can i use my car as collateral
+  intent: collateral_definition
+- text: how do i apply for a loan
+  intent: loan_apply_how
+- text: where do i go to apply for credit
+  intent: loan_apply_how
+- text: where is your branch in ndola
+  intent: branch_locator
+- text: nearest branch to me
+  intent: branch_locator
+- text: where can i find an etumba agent near me
+  intent: agent_locator
+- text: what time do you open on saturday
+  intent: opening_hours
+- text: are you open on sunday
+  intent: opening_hours
+- text: whats your phone number
+  intent: contact_details
+- text: how can i call you
+  intent: contact_details
+- text: hello there
+  intent: greeting
+- text: good morning bank
+  intent: greeting
+- text: thank you so much
+  intent: thanks_goodbye
+- text: ok bye
+  intent: thanks_goodbye
+- text: what can you help me with
+  intent: bot_capabilities
+- text: are you a robot
+  intent: bot_capabilities
+- text: who owns ab bank
+  intent: about_ab_bank
+- text: tell me about your bank
+  intent: about_ab_bank
+- text: i want to speak to someone
+  intent: human_handoff
+- text: connect me to a real agent
+  intent: human_handoff
+- text: the app is not opening
+  intent: technical_issue
+- text: internet banking is down
+  intent: technical_issue
+- text: i forgot my pin
+  intent: credential_trouble
+- text: locked out of online banking forgot password
+  intent: credential_trouble
+- text: someone called me pretending to be from the bank
+  intent: fraud_scam
+- text: my card is lost
+  intent: lost_stolen_card
+- text: i am not happy with how i was treated at the branch
+  intent: complaint
+out_of_scope:
+- text: who won the football match yesterday
+- text: what is the weather in lusaka today
+- text: tell me a joke
+- text: can you help me with my homework
+- text: book me a flight to johannesburg
+- text: what is the capital of france
+- text: recommend a good restaurant
+- text: i need a lawyer
+- text: how do i open a facebook account
+- text: what documents do i need for a driving licence
+- text: how do i register a company with pacra
+- text: what is the fee for renewing my nrc
+- text: where is the nearest hospital
+- text: what time does shoprite close
+- text: what is the airtel money code
+- text: send me my zesco bill
+- text: what is the dollar exchange rate today
+- text: can i buy bitcoin with you
+- text: i want to buy shares on the stock exchange
+- text: is bank of zambia raising interest rates
+- text: how do i apply for a job at airtel
+- text: my whatsapp is not working
+- text: how do i reset my facebook password
+- text: what is the price of maize
+- text: how much is a bag of cement
+- text: how do i apply for a passport
+- text: can you recommend a good phone to buy
+- text: what are the napsa contribution rates
+- text: how do i get a birth certificate
+- text: how do i get a tpin from zra

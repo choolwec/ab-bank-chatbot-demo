@@ -21,7 +21,13 @@ sys.path[:0] = [str(HERE), str(ROOT)]
 
 from app import config  # noqa: E402
 from app.matcher import Matcher  # noqa: E402
-from heldout_v0 import IN_SCOPE, OUT_OF_SCOPE  # noqa: E402
+import yaml  # noqa: E402
+
+# The held-out set moved to tests/eval/heldout.yaml (ticket E3), where the
+# CI evaluation gates read it too.
+_HELDOUT = yaml.safe_load((ROOT / "tests" / "eval" / "heldout.yaml").read_text(encoding="utf-8"))
+IN_SCOPE = [(c["text"], c["intent"]) for c in _HELDOUT["in_scope"]]
+OUT_OF_SCOPE = [c["text"] for c in _HELDOUT["out_of_scope"]]
 
 matcher = Matcher()
 intents = sorted(set(matcher._owners))

@@ -230,7 +230,7 @@ This harness is what stops quality from slipping.
    pilot transcripts, social-media and contact-centre staff ("how do customers
    actually say this?"), and BANKING77 queries mapped to our intents (CC BY 4.0,
    commercial use allowed with attribution). It starts from
-   `research/matcher-benchmark/heldout_v0.py`.
+   `tests/eval/heldout.yaml` (originally `research/matcher-benchmark/heldout_v0.py`).
 2. **Out-of-scope set** of at least 300. Generic questions, hard lookalikes (as
    in v0), and CLINC150's out-of-scope queries **[VERIFY licence]**. This is the
    set that protects the bank.

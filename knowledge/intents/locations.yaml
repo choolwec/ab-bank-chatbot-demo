@@ -60,6 +60,8 @@ intents:
       start time — 09:00 vs 08:30 — so ask the team to confirm before we
       quote one].
       eTumba on {ussd_code} works 24 hours a day.
+    answer_simple: >-
+      Our branches are open Monday to Friday, 08:00 to 15:00, and on Saturday mornings. They are closed on Sundays and public holidays.
     buttons:
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Contact details", payload: "contact_details"}

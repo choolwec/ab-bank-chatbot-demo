@@ -48,6 +48,10 @@ def build_doc() -> str:
                     confirms.append((item["intent"], hit))
                 sections.append("\nCustomer-facing answer:\n")
                 sections.append("> " + answer.replace("\n", "\n> "))
+            simple = (item.get("answer_simple") or "").strip()
+            if simple:
+                sections.append('\nPlainer version (sent for "what do you mean?"):\n')
+                sections.append("> " + simple.replace("\n", "\n> "))
             buttons = item.get("buttons", [])
             if buttons:
                 sections.append(

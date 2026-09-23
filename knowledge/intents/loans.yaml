@@ -25,6 +25,8 @@ intents:
       amount. Processing takes about 7 working days once documentation is
       complete. Loan approval always depends on assessment — I can't
       guarantee an amount or timeline before your documents are in.
+    answer_simple: >-
+      We lend to businesses that are at least 12 months old. You need something valuable as security (collateral), and a person who agrees to repay if you can't (a guarantor).
     buttons:
       - {label: "Loan requirements", payload: "loan_requirements"}
       - {label: "How to apply", payload: "loan_apply_how"}
@@ -139,6 +141,8 @@ intents:
       - A guarantor (in business or formal employment), plus collateral
       Personal loans (government employees only) don't need collateral —
       see the personal loan details for that document list instead.
+    answer_simple: >-
+      For a business loan, bring your ID and proof of where you live. Your business must be at least 12 months old. You also need a guarantor and collateral.
     buttons:
       - {label: "How to apply", payload: "loan_apply_how"}
       - {label: "Personal loan details", payload: "personal_loan"}
@@ -217,6 +221,8 @@ intents:
       4. If approved, you get the full terms and cost in writing before signing
       Business loans: ~7 working days once documents are complete. Personal
       loans (government employees): within 24 hours.
+    answer_simple: >-
+      Go to a branch, or ask us to call you. A loan officer will talk with you about your business. If the loan is approved, you get all the costs in writing before you sign.
     buttons:
       - {label: "Loan requirements", payload: "loan_requirements"}
       - {label: "Find a branch", payload: "branch_locator"}

@@ -40,6 +40,10 @@ Customer-facing answer:
 > - Joint account (AND or OR)
 > Which one would you like to know more about?
 
+Plainer version (sent for "what do you mean?"):
+
+> We have everyday accounts (Tamanga and Tamanga Plus), a business account (Mukula Plus), and savings accounts for adults and for children. Tell me which one you'd like to know about.
+
 Follow-up buttons: Savings account · Current account (Tamanga) · Business account · How to open an account
 
 ### Savings account  `savings_account`
@@ -55,6 +59,10 @@ Customer-facing answer:
 > - No opening fees, no monthly/maintenance fees
 > To open one, visit any branch with your NRC/passport, proof of
 > residence, and TPIN certificate — I can show you the full list.
+
+Plainer version (sent for "what do you mean?"):
+
+> A Savings account keeps your money safe and pays you 5% interest a year. You need at least ZMW 100 in it. There is no monthly fee.
 
 Follow-up buttons: What you need to open · Savings Plan account · Find a branch · Fees & charges
 
@@ -73,6 +81,10 @@ Customer-facing answer:
 > - Monthly maintenance fee: ZMW 36
 > Would you like to know what you need to open one, or hear about
 > Tamanga Plus (our premium tier with Online Banking)?
+
+Plainer version (sent for "what do you mean?"):
+
+> Tamanga is an everyday account for your money. It costs ZMW 36 a month. Opening it is free, and taking out cash is free.
 
 Follow-up buttons: Tamanga Plus (premium) · What you need to open · Fees & charges · Talk to a person
 
@@ -235,6 +247,10 @@ Customer-facing answer:
 > Business accounts need additional entity-specific documents.
 > Account opening can't be completed without full documentation.
 
+Plainer version (sent for "what do you mean?"):
+
+> To open an account, bring: your ID (NRC, passport or driving licence), a utility bill that shows where you live, your TPIN certificate, and a reference form signed by someone who knows you.
+
 Follow-up buttons: Find a branch · Types of accounts · Business account documents · Talk to a person
 
 ### How to open an account  `account_opening_how`
@@ -248,6 +264,10 @@ Customer-facing answer:
 > account opening. Bring the right documents and it's usually done
 > the same day.
 > Would you like the list of documents, or the nearest branch?
+
+Plainer version (sent for "what do you mean?"):
+
+> You open an account at a branch. Bring your documents with you. It is usually done on the same day.
 
 Follow-up buttons: What to bring · Find a branch · Talk to a person
 
@@ -309,6 +329,10 @@ Customer-facing answer:
 > Cash in/out at any AB Bank branch, or at Kazang, 543 Konse Konse and
 > Zoona agents countrywide.
 
+Plainer version (sent for "what do you mean?"):
+
+> eTumba is a wallet on your phone. You can send money, buy airtime and pay bills with it. You don't need a smartphone or the internet — just dial {ussd_code}.
+
 Follow-up buttons: Register for eTumba · eTumba fees · Find an agent · Talk to a person
 
 ### Register for eTumba  `etumba_register`
@@ -324,6 +348,10 @@ Customer-facing answer:
 > account — for that, visit any branch with your original ID
 > (NRC/Passport/Driving Licence) to link the two.
 
+Plainer version (sent for "what do you mean?"):
+
+> You can join eTumba in two ways: get the eTumba app, or dial {ussd_code}. To connect it to your AB Bank account, take your ID to any branch.
+
 Follow-up buttons: What is eTumba? · eTumba fees · Find an agent · Talk to a person
 
 ### Using *888#  `etumba_ussd`
@@ -337,6 +365,10 @@ Customer-facing answer:
 > you can register, check your balance, send money, buy airtime, pay
 > ZESCO/water, and save via Yaka — it all happens securely on your
 > phone, so I never see your balance or PIN.
+
+Plainer version (sent for "what do you mean?"):
+
+> Dial {ussd_code} on your phone. A menu opens. Choose what you want to do, like checking your balance or sending money.
 
 Follow-up buttons: Register for eTumba · Transfers to mobile money · Cash in / cash out · Talk to a person
 
@@ -352,6 +384,10 @@ Customer-facing answer:
 > statutory Mobile Money Transaction Levy (a government charge, not an
 > AB Bank fee). All other eTumba charges are listed in the tariff
 > guide: {tariff_url}
+
+Plainer version (sent for "what do you mean?"):
+
+> When you send money from eTumba, the government charges a small levy. It is not an AB Bank fee. Our other charges are in the tariff guide: {tariff_url}
 
 Follow-up buttons: What is eTumba? · Register for eTumba · Talk to a person
 
@@ -465,6 +501,10 @@ Customer-facing answer:
 > follow the balance-enquiry option, or open the eTumba app. For your
 > security I can't look up or display your balance here.
 
+Plainer version (sent for "what do you mean?"):
+
+> Dial {ussd_code} and choose the balance option, or open the eTumba app. I can't see your balance here — that keeps your money safe.
+
 Follow-up buttons: Using *888# · Talk to a person
 
 
@@ -483,6 +523,10 @@ Customer-facing answer:
 > have no monthly fees.
 > For anything not listed here, the full tariff guide has the current
 > figure: {tariff_url}
+
+Plainer version (sent for "what do you mean?"):
+
+> Tamanga costs ZMW 36 a month, Tamanga Plus ZMW 135 and Mukula Plus ZMW 200. Savings accounts have no monthly fee. Other charges are in the tariff guide: {tariff_url}
 
 Follow-up buttons: eTumba fees · Types of accounts · Talk to a person
 
@@ -505,6 +549,10 @@ Customer-facing answer:
 > amount. Processing takes about 7 working days once documentation is
 > complete. Loan approval always depends on assessment — I can't
 > guarantee an amount or timeline before your documents are in.
+
+Plainer version (sent for "what do you mean?"):
+
+> We lend to businesses that are at least 12 months old. You need something valuable as security (collateral), and a person who agrees to repay if you can't (a guarantor).
 
 Follow-up buttons: Loan requirements · How to apply · SME overdraft · Talk to a person
 
@@ -575,6 +623,10 @@ Customer-facing answer:
 > Personal loans (government employees only) don't need collateral —
 > see the personal loan details for that document list instead.
 
+Plainer version (sent for "what do you mean?"):
+
+> For a business loan, bring your ID and proof of where you live. Your business must be at least 12 months old. You also need a guarantor and collateral.
+
 Follow-up buttons: How to apply · Personal loan details · Find a branch · Talk to a person
 
 ### What is a guarantor?  `guarantor_definition`
@@ -618,6 +670,10 @@ Customer-facing answer:
 > Business loans: ~7 working days once documents are complete. Personal
 > loans (government employees): within 24 hours.
 
+Plainer version (sent for "what do you mean?"):
+
+> Go to a branch, or ask us to call you. A loan officer will talk with you about your business. If the loan is approved, you get all the costs in writing before you sign.
+
 Follow-up buttons: Loan requirements · Find a branch · Request a callback
 
 
@@ -649,6 +705,10 @@ Customer-facing answer:
 > start time — 09:00 vs 08:30 — so ask the team to confirm before we
 > quote one].
 > eTumba on {ussd_code} works 24 hours a day.
+
+Plainer version (sent for "what do you mean?"):
+
+> Our branches are open Monday to Friday, 08:00 to 15:00, and on Saturday mornings. They are closed on Sundays and public holidays.
 
 Follow-up buttons: Find a branch · Contact details · Talk to a person
 
@@ -797,7 +857,7 @@ Customer-facing answer:
 Follow-up buttons: Contact details · Find a branch · Talk to a person
 
 
-## System messages (60 texts)
+## System messages (62 texts)
 
 Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts, retries, confirmations. Source: `knowledge/system_messages.yaml`. `{placeholders}` are filled in by the bot (contact details from `app/config.py`, or the values listed).
 
@@ -830,6 +890,19 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Status: **draft**
 
 > No problem — back to the main menu.
+
+### `cancel_confirm`
+
+- Status: **draft**
+- Filled in by the bot: `{flow}`
+
+> Your {flow} isn't sent yet. Stop anyway?
+
+### `carry_on`
+
+- Status: **draft**
+
+> Okay, let's carry on.
 
 ### `stale_button`
 

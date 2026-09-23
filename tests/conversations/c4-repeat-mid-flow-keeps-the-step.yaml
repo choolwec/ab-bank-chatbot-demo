@@ -1,0 +1,10 @@
+id: c4-repeat-mid-flow-keeps-the-step
+turns:
+  - say: i think i was scammed
+  - say: they called me pretending to be the bank
+  - say: say that again
+    expect: {action: repeat, active_flow: fraud, flow_step: when, text_contains: [when did this happen]}
+  - say: what do you mean?
+    expect: {action: clarify, active_flow: fraud, flow_step: when, last_buttons_include: [human_handoff]}
+  - say: yesterday
+    expect: {flow_step: channel, flow_data_has: {when: yesterday}}

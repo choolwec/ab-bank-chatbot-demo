@@ -1,0 +1,7 @@
+id: c4-clarify-without-answer-simple
+# No plainer version written: repeat it, with a way to a person.
+turns:
+  - say: what is your swift code
+    expect: {intent: sort_swift_code}
+  - say: i don't understand
+    expect: {action: clarify, strikes: 0, text_contains: [swift], last_buttons_include: [human_handoff]}

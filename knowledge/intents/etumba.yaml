@@ -22,6 +22,8 @@ intents:
       smartphone or internet needed, just dial {ussd_code}.
       Cash in/out at any AB Bank branch, or at Kazang, 543 Konse Konse and
       Zoona agents countrywide.
+    answer_simple: >-
+      eTumba is a wallet on your phone. You can send money, buy airtime and pay bills with it. You don't need a smartphone or the internet — just dial {ussd_code}.
     buttons:
       - {label: "Register for eTumba", payload: "etumba_register"}
       - {label: "eTumba fees", payload: "etumba_fees"}
@@ -49,6 +51,8 @@ intents:
       Registering doesn't automatically link eTumba to your AB Bank
       account — for that, visit any branch with your original ID
       (NRC/Passport/Driving Licence) to link the two.
+    answer_simple: >-
+      You can join eTumba in two ways: get the eTumba app, or dial {ussd_code}. To connect it to your AB Bank account, take your ID to any branch.
     buttons:
       - {label: "What is eTumba?", payload: "etumba_what_is"}
       - {label: "eTumba fees", payload: "etumba_fees"}
@@ -75,6 +79,8 @@ intents:
       you can register, check your balance, send money, buy airtime, pay
       ZESCO/water, and save via Yaka — it all happens securely on your
       phone, so I never see your balance or PIN.
+    answer_simple: >-
+      Dial {ussd_code} on your phone. A menu opens. Choose what you want to do, like checking your balance or sending money.
     buttons:
       - {label: "Register for eTumba", payload: "etumba_register"}
       - {label: "Transfers to mobile money", payload: "etumba_transfer_mobile_money"}
@@ -102,6 +108,8 @@ intents:
       statutory Mobile Money Transaction Levy (a government charge, not an
       AB Bank fee). All other eTumba charges are listed in the tariff
       guide: {tariff_url}
+    answer_simple: >-
+      When you send money from eTumba, the government charges a small levy. It is not an AB Bank fee. Our other charges are in the tariff guide: {tariff_url}
     buttons:
       - {label: "What is eTumba?", payload: "etumba_what_is"}
       - {label: "Register for eTumba", payload: "etumba_register"}
@@ -289,6 +297,8 @@ intents:
       Check your own balance directly on your phone — dial {ussd_code} and
       follow the balance-enquiry option, or open the eTumba app. For your
       security I can't look up or display your balance here.
+    answer_simple: >-
+      Dial {ussd_code} and choose the balance option, or open the eTumba app. I can't see your balance here — that keeps your money safe.
     buttons:
       - {label: "Using *888#", payload: "etumba_ussd"}
       - {label: "Talk to a person", payload: "human_handoff"}

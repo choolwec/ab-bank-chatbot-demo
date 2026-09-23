@@ -28,6 +28,10 @@ class Session:
     # C3: what the last bot reply asked for -- {"options": [(label, payload)],
     # "yes": payload, "no": payload}. Rebuilt after every reply.
     expecting: dict = field(default_factory=dict)
+    # C4: the last bot replies (masked, rendered) for "repeat", and the
+    # intent they answered, for "what do you mean?".
+    last_replies: list = field(default_factory=list)
+    last_answer_intent: str | None = None
 
     def add(self, role: str, text: str) -> None:
         self.transcript.append({"role": role, "text": text, "ts": time.time()})

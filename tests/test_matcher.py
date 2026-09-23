@@ -96,3 +96,14 @@ def test_misspellings_and_zambian_english(query, expected):
 def test_gibberish_scores_low():
     ranked = matcher.match("flurb zzqx vortblatt")
     assert not ranked or ranked[0][1] < config.MEDIUM_CONFIDENCE
+
+
+def test_answer_simple_is_plainer_and_present_for_top_intents():
+    """C4/K1: 'what do you mean?' has a legally reviewable plainer version
+    for at least the 15 most-used intents, and it really is shorter."""
+    simple = {n: i for n, i in matcher.intents.items() if i.get("answer_simple")}
+    assert len(simple) >= 15, sorted(simple)
+    for name, intent in simple.items():
+        assert intent.get("answer"), name
+        assert len(intent["answer_simple"]) < len(intent["answer"]), name
+        assert "[CONFIRM" not in intent["answer_simple"], name

@@ -1,6 +1,5 @@
 id: probe-09-repair-the-bots-turn
 fixes: C4
-xfail: true
 turns:
   - say: what is etumba
     expect: {intent: etumba_what_is}

@@ -26,6 +26,8 @@ intents:
       - Term Deposit Account — fix funds 30-365 days, 9.3%-16% interest
       - Joint account (AND or OR)
       Which one would you like to know more about?
+    answer_simple: >-
+      We have everyday accounts (Tamanga and Tamanga Plus), a business account (Mukula Plus), and savings accounts for adults and for children. Tell me which one you'd like to know about.
     buttons:
       - {label: "Savings account", payload: "savings_account"}
       - {label: "Current account (Tamanga)", payload: "current_account"}
@@ -54,6 +56,8 @@ intents:
       - No opening fees, no monthly/maintenance fees
       To open one, visit any branch with your NRC/passport, proof of
       residence, and TPIN certificate — I can show you the full list.
+    answer_simple: >-
+      A Savings account keeps your money safe and pays you 5% interest a year. You need at least ZMW 100 in it. There is no monthly fee.
     buttons:
       - {label: "What you need to open", payload: "account_opening_requirements"}
       - {label: "Savings Plan account", payload: "savings_plan_account"}
@@ -86,6 +90,8 @@ intents:
       - Monthly maintenance fee: ZMW 36
       Would you like to know what you need to open one, or hear about
       Tamanga Plus (our premium tier with Online Banking)?
+    answer_simple: >-
+      Tamanga is an everyday account for your money. It costs ZMW 36 a month. Opening it is free, and taking out cash is free.
     buttons:
       - {label: "Tamanga Plus (premium)", payload: "tamanga_plus_account"}
       - {label: "What you need to open", payload: "account_opening_requirements"}
@@ -352,6 +358,8 @@ intents:
         market association chairperson)
       Business accounts need additional entity-specific documents.
       Account opening can't be completed without full documentation.
+    answer_simple: >-
+      To open an account, bring: your ID (NRC, passport or driving licence), a utility bill that shows where you live, your TPIN certificate, and a reference form signed by someone who knows you.
     buttons:
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Types of accounts", payload: "account_types_overview"}
@@ -378,6 +386,8 @@ intents:
       account opening. Bring the right documents and it's usually done
       the same day.
       Would you like the list of documents, or the nearest branch?
+    answer_simple: >-
+      You open an account at a branch. Bring your documents with you. It is usually done on the same day.
     buttons:
       - {label: "What to bring", payload: "account_opening_requirements"}
       - {label: "Find a branch", payload: "branch_locator"}

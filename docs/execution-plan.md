@@ -1392,7 +1392,7 @@ that finishes the ticket.
 | C1 | System messages in YAML | 1 | W02 | 2 | — | Dev | ☑ |
 | C2 | Typed commands anywhere | 1 | W03 | 1.5 | E2, C1 | Dev | ☑ |
 | C3 | Answers to the bot's questions (yes/no, numbers, labels) | 1 | W03 | 2 | E2 | Dev | ☑ |
-| C4 | Repair: repeat / what do you mean | 1 | W03 | 1.5 | C1, C2 | Dev | ☐ |
+| C4 | Repair: repeat / what do you mean | 1 | W03 | 1.5 | C1, C2 | Dev | ☑ |
 | C5 | Frustration detection | 1 | W04 | 1 | C1 | Dev | ☐ |
 | C6 | In-flow digressions and corrections | 1 | W04–05 | 4 | C1, C3 | Dev | ☐ |
 | C7 | Confirm before sending, and read-back | 1 | W05 | 2.5 | C1 | Dev | ☐ |

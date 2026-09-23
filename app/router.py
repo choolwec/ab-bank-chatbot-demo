@@ -5,6 +5,7 @@ least one button), two-strike fallback, urgent topics bypass everything,
 PII masked before anything else sees the text.
 """
 
+import copy
 import re
 
 from rapidfuzz import fuzz
@@ -60,6 +61,21 @@ COMMANDS = {
         "human_handoff",
     ),
     "help": "help",
+    # C4: repairing the bot's own turn. Never a strike.
+    **dict.fromkeys(
+        ["repeat", "repeat that", "say again", "say that again", "come again",
+         "pardon", "sorry what", "what did you say"],
+        "repeat",
+    ),
+    **dict.fromkeys(
+        ["what do you mean", "what does that mean", "i don't understand",
+         "i dont understand", "i do not understand", "explain", "explain that",
+         "please explain", "explain please", "can you explain", "huh", "eh",
+         "example", "for example", "an example", "meaning", "not clear",
+         "i'm confused", "im confused", "confused", "simpler please",
+         "in simple words", "say it simply"],
+        "clarify",
+    ),
 }
 # Words that are commands elsewhere but a legitimate answer inside a flow:
 # the locator asks "a branch, or an eTumba agent?".
@@ -101,7 +117,7 @@ def welcome(session):
     replies = [{"text": text, "buttons": list(MENU_BUTTONS)}]
     session.add("bot", text)
     audit.log_event(session.id, "bot", text, action="welcome")
-    _remember_expecting(session, replies)
+    _remember_expecting(session, replies, {"action": "welcome"})
     return replies
 
 
@@ -124,7 +140,7 @@ def resume(session):
         reply["text"] = _render(reply["text"])
         session.add("bot", reply["text"])
         audit.log_event(session.id, "bot", reply["text"], action=meta["action"])
-    _remember_expecting(session, replies)
+    _remember_expecting(session, replies, meta)
     return replies, meta
 
 
@@ -160,7 +176,7 @@ def handle(session, text=None, payload=None):
             confidence=meta.get("confidence"),
             action=meta.get("action"),
         )
-    _remember_expecting(session, replies)
+    _remember_expecting(session, replies, meta)
     return replies, meta
 
 
@@ -177,9 +193,15 @@ _NUMBER_RE = re.compile(r"^(?:(?:option|number|no)\s*)?([1-9])$")
 LABEL_MATCH_MIN = 90
 
 
-def _remember_expecting(session, replies):
-    """Store what the final reply asked for; strip the internal yes/no keys
-    so they never reach the widget."""
+def _remember_expecting(session, replies, meta=None):
+    """Store what the final reply asked for (C3) and the replies themselves
+    for "repeat" (C4); then strip the internal yes/no keys so they never
+    reach the widget."""
+    action = (meta or {}).get("action")
+    if action != "repeat":
+        session.last_replies = copy.deepcopy(replies)  # keeps yes/no for a repeat
+    if action not in ("repeat", "clarify"):
+        session.last_answer_intent = (meta or {}).get("intent") if action == "answer" else None
     last = replies[-1] if replies else {}
     session.expecting = {
         "options": [(b["label"], b["payload"]) for b in last.get("buttons", [])],
@@ -288,6 +310,10 @@ def _route(session, text, payload):
         command = _typed_command(session, text)
         if command == "help":
             return _help(session)
+        if command == "repeat":
+            return _repeat(session)
+        if command == "clarify":
+            return _clarify(session)
         if command:
             if command == "menu" and session.active_flow in ("fraud", "complaint"):
                 command = "cancel_flow"  # never drop a report without asking
@@ -483,6 +509,32 @@ def _typed_command(session, text):
     if command and guards.normalise(text) in COMMAND_ANSWERS.get(session.active_flow, ()):
         return None  # a legitimate answer to the current question
     return command
+
+
+def _repeat(session):
+    """Resend the last replies exactly; flow state is untouched."""
+    if not session.last_replies:
+        return [{"text": msg("menu"), "buttons": list(MENU_BUTTONS)}], {"action": "repeat"}
+    return copy.deepcopy(session.last_replies), {"action": "repeat"}
+
+
+def _clarify(session):
+    """ "What do you mean?": the plainer answer_simple of the last answer,
+    or the last message again with a way to a person."""
+    intent = matcher.get(session.last_answer_intent) if session.last_answer_intent else None
+    if intent and intent.get("answer_simple"):
+        buttons = [dict(b) for b in intent.get("buttons", [])]
+        return (
+            [{"text": intent["answer_simple"].strip(), "buttons": buttons}],
+            {"action": "clarify", "intent": intent["intent"]},
+        )
+    replies, _ = _repeat(session)
+    last = replies[-1]
+    if not any(b["payload"] == "human_handoff" for b in last.get("buttons", [])):
+        last["buttons"] = list(last.get("buttons", [])) + [
+            {"label": "Talk to a person", "payload": "human_handoff"}
+        ]
+    return replies, {"action": "clarify"}
 
 
 def _help(session):

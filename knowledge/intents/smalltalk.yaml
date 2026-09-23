@@ -10,6 +10,8 @@
 #              English; the regression suite asserts every phrase matches
 #   answer:    approved text; {placeholders} filled from app/config.py CONTACTS
 #   buttons:   every answer must offer at least one next step (no dead ends)
+#   answer_simple: (optional) a plainer, shorter version of the answer, sent
+#              when the customer asks "what do you mean?" -- same facts only
 #   on_yes / on_no: (optional) the payload a typed "yes" / "no" means, when
 #              the answer ends in a yes/no question ("anything else?")
 #

@@ -1,0 +1,8 @@
+id: c4-repair-is-never-a-strike
+turns:
+  - say: flurb zzqx vortblatt
+    expect: {action: fallback, strikes: 1}
+  - say: huh?
+    expect: {action: clarify, strikes: 1}
+  - say: repeat
+    expect: {action: repeat, strikes: 1, text_contains: [didn't quite catch]}

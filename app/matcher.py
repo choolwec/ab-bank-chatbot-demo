@@ -5,12 +5,23 @@ TF-IDF over character n-grams (robust to misspellings) with fuzzy string
 ratios, then takes the best phrase score per intent.
 """
 
+import re
+
 import yaml
 from rapidfuzz import fuzz
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from . import config
+
+
+# Punctuation carries no meaning for matching but costs score: "what are your
+# opening hours?" scored 0.686 against the exact phrase without the "?".
+_PUNCT_RE = re.compile(r"[^\w\s']+")
+
+
+def normalise(text: str) -> str:
+    return " ".join(_PUNCT_RE.sub(" ", (text or "").lower()).split())
 
 
 class Matcher:
@@ -31,7 +42,7 @@ class Matcher:
                 item["_source"] = path.name
                 self.intents[name] = item
                 for p in item.get("phrases", []):
-                    phrases.append(str(p).lower().strip())
+                    phrases.append(normalise(str(p)))
                     owners.append(name)
         if not phrases:
             raise RuntimeError(f"no intent phrases found under {config.INTENTS_DIR}")
@@ -44,7 +55,7 @@ class Matcher:
         return self.intents.get(name)
 
     def match(self, text: str, top_n: int = 5) -> list[tuple[str, float]]:
-        q = " ".join((text or "").lower().split())
+        q = normalise(text)
         if not q:
             return []
         sims = cosine_similarity(self._vec.transform([q]), self._matrix)[0]

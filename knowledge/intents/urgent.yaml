@@ -62,6 +62,33 @@ intents:
       - "dispute a charge"
       - "raise a dispute"
 
+  - intent: emergency_line
+    label: "Emergency number"
+    category: urgent
+    status: draft
+    phrases:
+      - "what is the emergency number"
+      - "emergency number"
+      - "emergency line"
+      - "emergency contact"
+      - "fraud hotline"
+      - "fraud line number"
+      - "24 hour number"
+      - "who do i call in an emergency"
+      - "urgent number to call"
+      - "number to report fraud"
+    answer: |
+      For anything urgent — a lost or stolen card, or money taken without
+      your permission — call {emergency_phone} straight away.
+      You can also report it to me now and I'll raise an urgent case for
+      our team.
+    answer_simple: >-
+      If your card is lost or someone took your money, call {emergency_phone} now.
+    buttons:
+      - {label: "Report fraud", payload: "fraud_scam"}
+      - {label: "Lost or stolen card", payload: "lost_stolen_card"}
+      - {label: "Contact details", payload: "contact_details"}
+
   - intent: credential_trouble
     label: "Forgot PIN or password"
     category: urgent

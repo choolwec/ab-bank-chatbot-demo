@@ -210,14 +210,9 @@ def test_confirm_step_shows_summary_and_allows_edit(client):
 
 
 def test_faq_question_mid_flow_is_answered_and_flow_resumes(client):
-    """§ pattern borrowed from RasaHQ/financial-demo: a high-confidence,
-    unrelated FAQ question asked mid-flow gets answered without losing the
-    customer's progress, instead of the flow trying to treat it as an
-    answer to the current field. Only fraud's "what_happened" and
-    complaint's "details" opt into this (see interruptible_fields) — a
-    fraud/complaint narrative is unlikely to itself resemble an FAQ
-    question, unlike e.g. fraud's "channel" field, whose legitimate answers
-    (card, eTumba, branch) collide with real FAQ topics."""
+    """A question asked mid-flow is answered and the flow resumes at the
+    same step (C6 digressions; pattern from RasaHQ/financial-demo). It must
+    be question-shaped, so a narrative answer is never mistaken for one."""
     sid = new_session(client)
     chat(client, sid, message="i think i was scammed")  # fraud flow, step: what_happened
     data = chat(client, sid, message="what is etumba")

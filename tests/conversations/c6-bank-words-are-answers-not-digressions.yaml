@@ -1,0 +1,15 @@
+id: c6-bank-words-are-answers-not-digressions
+# The two regressions that motivated the old opt-in interrupt list.
+turns:
+  - say: i think i was scammed
+  - say: they called me pretending to be the bank
+  - say: yesterday
+  - say: eTumba
+    expect: {flow_step: contact, flow_data_has: {channel: eTumba}}
+  - payload: cancel_flow
+  - payload: cancel_yes
+  - payload: human_handoff
+  - say: Mary
+  - say: "0977123456"
+  - say: Opening a business account
+    expect: {flow_step: time, flow_data_has: {topic: business account}}

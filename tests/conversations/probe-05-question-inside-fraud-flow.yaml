@@ -1,6 +1,5 @@
 id: probe-05-question-inside-fraud-flow
 fixes: C6
-xfail: true
 turns:
   - say: i think i was scammed
   - say: what is the emergency number?

@@ -136,17 +136,29 @@ chance to fix it. The fraud flow also now has a mandatory `contact` step
 contact you" while collecting no way to actually reach the customer, a real
 bug found in the same review.
 
-A flow can opt individual fields into `interruptible_fields` so a
-high-confidence, unrelated FAQ question asked mid-field gets answered and
-the flow resumes at the same step (`router._maybe_answer_faq_interrupt`,
-pattern borrowed from RasaHQ/financial-demo's "switch skills mid-transaction
-and return"). This is opt-in, not opt-out, and deliberately narrow: only
-fraud's `what_happened` and complaint's `details` qualify. Fields whose
-*legitimate* answers are themselves bank-topic words — fraud's `channel`
-(card/eTumba/branch), lead's `topic` — must stay excluded, confirmed the
-hard way when "eTumba" (a real channel answer) and "Opening a business
-account" (a real callback topic) were both misread as FAQ interruptions
-during testing and desynced the flow's step counter.
+**Digressions and corrections (C6).** Every in-flow message is classified
+before it is stored. A **digression** (`router._digression`) is an
+unrelated question asked mid-flow. It is answered, and the current step is
+re-asked on the same reply, with `flow_state` untouched and no strike. All
+three conditions must hold:
+1. the message is question-shaped (ends in "?" or starts with a question
+   word);
+2. the matcher's top intent is a plain answer at `HIGH_CONFIDENCE`
+   (+0.05 inside fraud/complaint);
+3. at a validated step, the message also fails the validator.
+
+The question-shape test replaced the older opt-in `interruptible_fields`
+list, and still keeps the two regressions that list existed for ("eTumba"
+as a fraud channel, "Opening a business account" as a callback topic)
+stored as answers: `tests/conversations/c6-*.yaml` pins both.
+
+A **correction** (`FormFlow._correction`) needs a marker ("sorry",
+"actually", "my number is"…) *and* a value that passes an **earlier**
+validated step's validator. That field is updated and read back ("Thanks,
+I've updated your phone to 0966 123 456"), then the current step (or the
+summary) is re-asked. Only validated fields (`correctable`) can be
+corrected this way. Phone numbers are stored in one canonical form
+("0977123456") in every flow.
 
 ### Session store (`app/session.py`)
 In-memory, single-process by design (`SessionStore` behind a lock, 30-minute

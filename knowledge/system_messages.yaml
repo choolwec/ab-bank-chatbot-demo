@@ -104,6 +104,11 @@ messages:
     fills: [value]
     text: "Got it: {value}."
 
+  corrected:
+    status: draft
+    fills: [field, value]
+    text: "Thanks, I've updated your {field} to {value}."
+
   # Field names shown in the confirmation summary.
   field.what_happened: {status: draft, text: What happened}
   field.when: {status: draft, text: When}

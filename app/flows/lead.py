@@ -6,7 +6,14 @@ day. The transcript rides along so the customer never repeats themselves.
 
 from .. import audit
 from ..messages import msg
-from .base import CANCEL_BUTTON, DONE_BUTTON, MENU_BUTTON, FormFlow, is_valid_zambian_phone
+from .base import (
+    CANCEL_BUTTON,
+    DONE_BUTTON,
+    MENU_BUTTON,
+    FormFlow,
+    clean_phone,
+    is_valid_zambian_phone,
+)
 
 
 class LeadFlow(FormFlow):
@@ -17,6 +24,10 @@ class LeadFlow(FormFlow):
 
     def message_keys(self):
         return super().message_keys() + ["lead.finish"]
+
+    def store_value(self, field, value):
+        # One canonical form for the contact centre: "0977123456".
+        return clean_phone(value) if field == "phone" else value
 
     def _prompt(self, i):
         prompt = super()._prompt(i)

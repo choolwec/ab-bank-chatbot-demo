@@ -1,0 +1,6 @@
+id: c6-narrative-with-when-is-the-answer
+# Not question-shaped: stored as the answer, never treated as a digression.
+turns:
+  - say: i think i was scammed
+  - say: they took money when I was at the ATM
+    expect: {flow_step: when, flow_data_has: {what_happened: when i was at the atm}}

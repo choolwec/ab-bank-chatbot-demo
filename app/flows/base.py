@@ -61,6 +61,27 @@ def is_skip(text: str) -> bool:
     return " ".join((text or "").lower().strip(" .!").split()) in SKIP_WORDS
 
 
+# C6: a correction needs a marker AND a value that passes an earlier step's
+# validator -- "sorry my number is actually 0966123456".
+CORRECTION_RE = re.compile(
+    r"(?i)\b(?:sorry|actually|i\s+meant|i\s+mean|wrong|correction|mistake|"
+    r"typo|should\s+be|instead|not\s+\S+\s+but|"
+    r"my\s+(?:number|phone|cell|mobile|email)\s+is|"
+    r"change\s+(?:my|the)\s+(?:number|phone|email))\b"
+)
+PHONE_CANDIDATE_RE = re.compile(r"\+?\d[\d \-]{7,15}\d")
+EMAIL_CANDIDATE_RE = re.compile(r"[^@\s]+@[^@\s]+\.[a-z]{2,}", re.IGNORECASE)
+
+
+def value_candidates(text: str) -> list[str]:
+    """Phone numbers and email addresses embedded in a longer message."""
+    return PHONE_CANDIDATE_RE.findall(text or "") + EMAIL_CANDIDATE_RE.findall(text or "")
+
+
+def read_back(value: str) -> str:
+    return format_phone(value) if is_valid_zambian_phone(value) else value
+
+
 CONFIRM_BUTTON = {"label": "Yes, submit", "payload": "confirm_yes"}
 EDIT_BUTTON = {"label": "No, let me fix that", "payload": "confirm_edit"}
 
@@ -73,15 +94,14 @@ class FormFlow:
     # stored; on failure the same step re-prompts with msg("<name>.retry.<field>")
     # instead of advancing.
     validators: dict = {}
-    # Fields where a mid-flow FAQ question is safe to detect (router.py's
-    # _maybe_answer_faq_interrupt) — opt-in, not opt-out. Only genuinely
-    # free-narrative fields belong here: fields whose *legitimate* answers
-    # are themselves bank-topic words (e.g. fraud's "channel": card/eTumba/
-    # branch, or lead's "topic") collide with the exact FAQ vocabulary this
-    # check looks for, so those must stay excluded — confirmed the hard way
-    # when "eTumba" as a channel answer and "Opening a business account" as
-    # a callback topic were both misread as FAQ interruptions in testing.
-    interruptible_fields: frozenset[str] = frozenset()
+    # Fields a customer can correct later in the flow ("sorry, my number is
+    # actually ...", C6). A correction is only recognised when the message
+    # carries a value that passes the field's validator, so this defaults to
+    # the validated fields; free-text fields can't be corrected this way.
+    @property
+    def correctable(self) -> frozenset[str]:
+        return frozenset(self.validators)
+
     # Flows that create a ticket/callback should confirm the collected data
     # before submitting it — a typo'd date or garbled detail otherwise goes
     # straight to a human with no chance to fix it. Read-only lookups (e.g.
@@ -148,8 +168,36 @@ class FormFlow:
         """Hook: optional read-back text sent before the next prompt."""
         return None
 
+    def _correction(self, state, text):
+        """(field, value) if `text` corrects an EARLIER answer, else None."""
+        if not text or not CORRECTION_RE.search(text):
+            return None
+        current = len(self.steps) if state.get("confirming") else state.get("step", 0)
+        data = state.get("data", {})
+        for field in reversed(self.steps[:current]):
+            is_valid = self.validators.get(field)
+            if field not in self.correctable or not is_valid:
+                continue
+            for candidate in value_candidates(text):
+                if is_valid(candidate):
+                    value = self.store_value(field, candidate)
+                    if data.get(field) != value:
+                        return field, value
+        return None
+
+    def _apply_correction(self, session, field, value):
+        state = session.flow_state
+        state.setdefault("data", {})[field] = value
+        label = msg(f"field.{field}").lower()
+        note = {"text": msg("corrected", field=label, value=read_back(value)), "buttons": []}
+        return [note] + self.resume(session), False
+
     def handle(self, session, text, payload=None):
         state = session.flow_state
+
+        correction = self._correction(state, text) if not payload else None
+        if correction:
+            return self._apply_correction(session, *correction)
 
         if state.get("confirming"):
             if payload == "confirm_yes":
@@ -169,7 +217,11 @@ class FormFlow:
 
         is_valid = self.validators.get(field)
         if is_valid and not is_valid(value):
-            return [{"text": msg(f"{self.name}.retry.{field}"), "buttons": [CANCEL_BUTTON]}], False
+            # "my number is 0977 123 456": use the one valid value inside.
+            found = [c for c in value_candidates(value) if is_valid(c)]
+            if len(found) != 1:
+                return [{"text": msg(f"{self.name}.retry.{field}"), "buttons": [CANCEL_BUTTON]}], False
+            value = found[0]
 
         value = self.store_value(field, value)
         state.setdefault("data", {})[field] = value

@@ -1,0 +1,10 @@
+id: c6-digression-in-the-locator
+turns:
+  - payload: branch_locator
+  - say: what are your opening hours?
+    expect:
+      action: "digression:locator"
+      active_flow: locator
+      text_contains: ["08:00", back to your branch search, which town or city]
+  - say: Kitwe
+    expect: {text_contains: [chisokone]}

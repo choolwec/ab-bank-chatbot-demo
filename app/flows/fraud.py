@@ -28,7 +28,6 @@ def _valid_contact(text):
 class FraudFlow(FormFlow):
     name = "fraud"
     require_confirmation = True
-    interruptible_fields = frozenset({"what_happened"})
     steps = ["what_happened", "when", "channel", "contact"]
     validators = {"contact": _valid_contact}
 

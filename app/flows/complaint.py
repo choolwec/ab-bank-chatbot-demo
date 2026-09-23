@@ -9,7 +9,6 @@ from .base import HUMAN_BUTTON, MENU_BUTTON, FormFlow
 class ComplaintFlow(FormFlow):
     name = "complaint"
     require_confirmation = True
-    interruptible_fields = frozenset({"details"})
     steps = ["topic", "details", "contact"]
 
     def message_keys(self):

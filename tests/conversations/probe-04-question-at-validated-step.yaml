@@ -2,7 +2,6 @@ id: probe-04-question-at-validated-step
 # At the phone step, a question must be answered, not rejected as a bad
 # number twice.
 fixes: C6
-xfail: true
 turns:
   - payload: human_handoff
   - say: Mary Banda

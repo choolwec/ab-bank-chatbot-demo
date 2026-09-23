@@ -335,12 +335,10 @@ def _route(session, text, payload):
             return _continue_flow(session)
         # Anything else: they carried on with the report -- treat it as input.
 
-    # 2. An active flow consumes the message — unless it's a high-confidence
-    # unrelated FAQ question, in which case answer it and resume the flow at
-    # the same step rather than trying to shoehorn it into the current field
-    # (§ pattern from RasaHQ/financial-demo's "switch skills mid-transaction
-    # and return"). Only applies to free-text, unvalidated steps, so fields
-    # with their own retry logic (e.g. phone numbers) are untouched.
+    # 2. An active flow consumes the message -- unless it's an unrelated
+    # question (a digression, C6): answer it and re-ask the same step, the
+    # "switch skills mid-transaction and return" pattern. Corrections to an
+    # earlier answer are handled inside FormFlow.handle().
     if session.active_flow:
         flow = FLOWS[session.active_flow]
         if text and not payload:
@@ -352,9 +350,9 @@ def _route(session, text, payload):
                 and guards.frustration_kind(text) == "phrase"
             ):
                 return _frustrated(session, "phrase", flow=flow)
-            interrupt = _maybe_answer_faq_interrupt(flow, session, text)
-            if interrupt is not None:
-                return interrupt, {"action": f"flow_interrupt:{flow.name}"}
+            digression = _digression(flow, session, text)
+            if digression is not None:
+                return digression
         replies, done = flow.handle(session, text or "", payload)
         if done:
             session.active_flow = None
@@ -479,44 +477,52 @@ def _free_text(session, text, urgent_flows=True):
     )
 
 
-def _maybe_answer_faq_interrupt(flow, session, text):
-    """Return replies if `text` is a high-confidence, unrelated FAQ question
-    asked mid-flow, else None (let the flow handle it as normal).
+QUESTION_WORDS = frozenset({
+    "what", "whats", "what's", "when", "where", "how", "why", "can", "could",
+    "do", "does", "is", "are", "which", "who", "will", "should",
+})
 
-    Trade-off, stated plainly: this is a heuristic, not true intent
-    disambiguation. A HIGH_CONFIDENCE bar (the same one used for "answer
-    directly" elsewhere) keeps false positives rare, and it only applies to
-    fields a flow has explicitly opted into `interruptible_fields` — see
-    that attribute's comment in flows/base.py for why most fields must NOT
-    opt in.
+
+def _question_shaped(text):
+    words = guards.normalise(text).split()
+    return text.rstrip().endswith("?") or bool(words and words[0] in QUESTION_WORDS)
+
+
+def _digression(flow, session, text):
+    """C6: answer an unrelated question asked mid-flow, then re-ask the
+    current step on the same reply. flow_state is untouched, it is never a
+    strike, and it can never end a report. All three must hold:
+
+    1. the message is question-shaped (ends in "?" or starts with a question
+       word), so a narrative like "they took money when I was at the ATM"
+       is stored as the answer;
+    2. the matcher's top intent is a plain answer (not a flow) at
+       HIGH_CONFIDENCE, or HIGH + 0.05 inside a fraud report or complaint;
+    3. at a validated step (a phone number), the message also fails the
+       validator.
     """
-    state = session.flow_state
-    steps = getattr(flow, "steps", None)
-    if not steps or state.get("confirming"):
+    if not _question_shaped(text):
         return None
-    i = state.get("step", 0)
-    if i >= len(steps):
-        return None
-    field = steps[i]
-    if field not in getattr(flow, "interruptible_fields", ()):
-        return None
-
     ranked = matcher.match(text)
     top_name, top_score = ranked[0] if ranked else (None, 0.0)
-    if not top_name or top_score < config.HIGH_CONFIDENCE:
+    bar = config.HIGH_CONFIDENCE + (0.05 if flow.name in ("fraud", "complaint") else 0.0)
+    if not top_name or top_score < bar:
         return None
     intent = matcher.get(top_name)
     if intent.get("flow") or not intent.get("answer"):
         return None
-
-    prompt = flow._prompt(i)
+    state = session.flow_state
+    steps = getattr(flow, "steps", None)
+    if steps and not state.get("confirming"):
+        field = steps[min(state.get("step", 0), len(steps) - 1)]
+        is_valid = getattr(flow, "validators", {}).get(field)
+        if is_valid and is_valid(text):
+            return None
+    prompt = flow.resume(session)[-1]
     back = msg("back_to_flow", flow=flow.topic_label, prompt=prompt["text"])
-    return [
-        {
-            "text": intent["answer"].strip() + "\n\n" + back,
-            "buttons": prompt["buttons"],
-        }
-    ]
+    reply = dict(prompt, text=intent["answer"].strip() + "\n\n" + back)
+    return [reply], {"action": f"digression:{flow.name}", "intent": intent["intent"],
+                     "confidence": round(top_score, 3)}
 
 
 def _typed_command(session, text):

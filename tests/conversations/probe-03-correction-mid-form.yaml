@@ -1,6 +1,5 @@
 id: probe-03-correction-mid-form
 fixes: C6
-xfail: true
 turns:
   - payload: human_handoff
   - say: Mary Banda

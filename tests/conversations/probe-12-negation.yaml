@@ -1,0 +1,4 @@
+id: probe-12-negation
+turns:
+  - say: I don't want a loan, I want to open an account
+    expect: {action: answer, intent: account_opening_how}

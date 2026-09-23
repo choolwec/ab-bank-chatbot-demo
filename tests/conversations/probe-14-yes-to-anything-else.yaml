@@ -1,0 +1,14 @@
+id: probe-14-yes-to-anything-else
+# "Is there anything else I can help with?" -> "yes" must not be a strike.
+fixes: C3
+xfail: true
+turns:
+  - payload: human_handoff
+  - say: Mary Banda
+  - say: "0977123456"
+  - say: Opening a business account
+  - payload: Morning
+  - payload: confirm_yes
+    expect: {ticket_created: callback}
+  - say: "yes"
+    expect: {action: menu, strikes: 0, text_lacks: [didn't quite catch]}

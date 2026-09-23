@@ -1,0 +1,11 @@
+id: probe-05-question-inside-fraud-flow
+fixes: C6
+xfail: true
+turns:
+  - say: i think i was scammed
+  - say: what is the emergency number?
+    expect:
+      active_flow: fraud
+      flow_step: what_happened
+      flow_data_lacks: {what_happened: emergency}
+      text_contains: [back to your fraud report]

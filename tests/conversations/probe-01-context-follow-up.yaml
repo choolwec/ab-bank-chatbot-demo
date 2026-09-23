@@ -1,0 +1,12 @@
+id: probe-01-context-follow-up
+# "how much does it cost" right after Tamanga should mean Tamanga's fee,
+# not the generic fee list.
+fixes: C9
+xfail: true
+turns:
+  - say: what is tamanga
+    expect: {intent: current_account}
+  - say: how much does it cost
+    expect: {intent: fees_tamanga, text_contains: ["36"]}
+  - say: what do i need to open it
+    expect: {intent: account_opening_requirements}

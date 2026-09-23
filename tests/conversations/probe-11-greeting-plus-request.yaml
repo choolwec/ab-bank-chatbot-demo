@@ -1,0 +1,4 @@
+id: probe-11-greeting-plus-request
+turns:
+  - say: hi, I want to open an account
+    expect: {action: answer, intent: account_opening_how}

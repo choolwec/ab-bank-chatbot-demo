@@ -1,0 +1,14 @@
+id: probe-03-correction-mid-form
+fixes: C6
+xfail: true
+turns:
+  - payload: human_handoff
+  - say: Mary Banda
+  - say: "0977123456"
+  - say: sorry my number is actually 0966123456
+    expect:
+      active_flow: lead
+      flow_step: topic
+      flow_data_has: {phone: "0966123456"}
+      flow_data_lacks: {topic: sorry}
+      text_contains: ["0966 123 456"]

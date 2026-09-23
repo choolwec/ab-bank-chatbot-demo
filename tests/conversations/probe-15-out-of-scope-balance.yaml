@@ -1,0 +1,4 @@
+id: probe-15-out-of-scope-balance
+turns:
+  - say: can i check my balance
+    expect: {action: answer, intent: etumba_balance_check}

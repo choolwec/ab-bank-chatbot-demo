@@ -1,0 +1,10 @@
+id: probe-09-repair-the-bots-turn
+fixes: C4
+xfail: true
+turns:
+  - say: what is etumba
+    expect: {intent: etumba_what_is}
+  - say: what do you mean?
+    expect: {action_in: [clarify, repeat], strikes: 0, text_contains: [etumba]}
+  - say: say that again
+    expect: {action: repeat, strikes: 0, text_contains: [etumba]}

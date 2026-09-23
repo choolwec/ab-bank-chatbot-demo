@@ -1,0 +1,17 @@
+id: probe-04-question-at-validated-step
+# At the phone step, a question must be answered, not rejected as a bad
+# number twice.
+fixes: C6
+xfail: true
+turns:
+  - payload: human_handoff
+  - say: Mary Banda
+  - say: what are your opening hours?
+    expect:
+      active_flow: lead
+      flow_step: phone
+      text_contains: ["08:00", back to your callback request]
+      text_lacks: [doesn't look like a valid number]
+      strikes: 0
+  - say: "0977123456"
+    expect: {flow_step: topic}

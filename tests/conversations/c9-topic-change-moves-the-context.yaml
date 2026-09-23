@@ -1,0 +1,8 @@
+id: c9-topic-change-moves-the-context
+turns:
+  - say: what is tamanga
+  - say: what is etumba
+  - say: how much does it cost
+    expect: {intent: etumba_fees}
+  - say: what do i need to open it
+    expect: {intent: etumba_register}

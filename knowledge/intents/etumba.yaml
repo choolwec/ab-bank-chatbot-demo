@@ -24,6 +24,12 @@ intents:
       Zoona agents countrywide.
     answer_simple: >-
       eTumba is a wallet on your phone. You can send money, buy airtime and pay bills with it. You don't need a smartphone or the internet — just dial {ussd_code}.
+    follow_ups:
+      fees_charges: etumba_fees
+      account_opening_requirements: etumba_register
+      loan_requirements: etumba_register
+      business_account_requirements: etumba_register
+      account_opening_how: etumba_register
     buttons:
       - {label: "Register for eTumba", payload: "etumba_register"}
       - {label: "eTumba fees", payload: "etumba_fees"}
@@ -81,6 +87,12 @@ intents:
       phone, so I never see your balance or PIN.
     answer_simple: >-
       Dial {ussd_code} on your phone. A menu opens. Choose what you want to do, like checking your balance or sending money.
+    follow_ups:
+      fees_charges: etumba_fees
+      account_opening_requirements: etumba_register
+      loan_requirements: etumba_register
+      business_account_requirements: etumba_register
+      account_opening_how: etumba_register
     buttons:
       - {label: "Register for eTumba", payload: "etumba_register"}
       - {label: "Transfers to mobile money", payload: "etumba_transfer_mobile_money"}
@@ -166,6 +178,8 @@ intents:
       enter account number → amount → PIN.
       You'll need to link eTumba to your AB Bank account at a branch first
       if you haven't already.
+    follow_ups:
+      fees_charges: etumba_fees
     buttons:
       - {label: "Register for eTumba", payload: "etumba_register"}
       - {label: "Find a branch", payload: "branch_locator"}
@@ -195,6 +209,8 @@ intents:
       Airtel/MTN/Zamtel → eTumba: use each operator's own USSD (e.g. Airtel
       *115#, select Send Money → Banks → AB Bank) and enter your eTumba
       number.
+    follow_ups:
+      fees_charges: etumba_fees
     buttons:
       - {label: "Pull / push funds (bank account)", payload: "etumba_pull_push_funds"}
       - {label: "eTumba fees", payload: "etumba_fees"}

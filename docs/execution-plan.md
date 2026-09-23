@@ -1397,7 +1397,7 @@ that finishes the ticket.
 | C6 | In-flow digressions and corrections | 1 | W04–05 | 4 | C1, C3 | Dev | ☑ |
 | C7 | Confirm before sending, and read-back | 1 | W05 | 2.5 | C1 | Dev | ☑ |
 | C8 | Pre-fill the fraud flow | 1 | W06 | 3 | S2, C6 | Dev | ☑ |
-| C9 | Context carry-over | 1 | W06 | 2 | — | Dev 2 | ☐ |
+| C9 | Context carry-over | 1 | W06 | 2 | — | Dev 2 | ☑ |
 | C10 | Two questions in one message | 1 | W06 | 1.5 | C1 | Dev 2 | ☐ |
 | C11 | Warmth: acknowledgements, name, category fallback | 1 | W06 | 2 | C1, K1 | Dev | ☐ |
 | K1 | Short labels, simple answers, tone guide | 1 | W02–06 | — | — | CO | ☐ |

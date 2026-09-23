@@ -107,3 +107,11 @@ def test_answer_simple_is_plainer_and_present_for_top_intents():
         assert intent.get("answer"), name
         assert len(intent["answer_simple"]) < len(intent["answer"]), name
         assert "[CONFIRM" not in intent["answer_simple"], name
+
+
+def test_follow_ups_point_at_real_intents():
+    """C9: follow_ups maps {generic intent: specific intent}, both real."""
+    for name, intent in matcher.intents.items():
+        for generic, specific in (intent.get("follow_ups") or {}).items():
+            assert generic in matcher.intents, (name, generic)
+            assert specific in matcher.intents, (name, specific)

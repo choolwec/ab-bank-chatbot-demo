@@ -58,6 +58,10 @@ intents:
       residence, and TPIN certificate — I can show you the full list.
     answer_simple: >-
       A Savings account keeps your money safe and pays you 5% interest a year. You need at least ZMW 100 in it. There is no monthly fee.
+    follow_ups:
+      account_opening_requirements: account_opening_requirements
+      loan_requirements: account_opening_requirements
+      business_account_requirements: account_opening_requirements
     buttons:
       - {label: "What you need to open", payload: "account_opening_requirements"}
       - {label: "Savings Plan account", payload: "savings_plan_account"}
@@ -92,6 +96,12 @@ intents:
       Tamanga Plus (our premium tier with Online Banking)?
     answer_simple: >-
       Tamanga is an everyday account for your money. It costs ZMW 36 a month. Opening it is free, and taking out cash is free.
+    follow_ups:
+      fees_charges: fees_tamanga
+      etumba_fees: fees_tamanga
+      account_opening_requirements: account_opening_requirements
+      loan_requirements: account_opening_requirements
+      business_account_requirements: account_opening_requirements
     buttons:
       - {label: "Tamanga Plus (premium)", payload: "tamanga_plus_account"}
       - {label: "What you need to open", payload: "account_opening_requirements"}
@@ -119,6 +129,10 @@ intents:
       If you already have a Tamanga account, a branch can upgrade you to
       Tamanga Plus so you can register for Online Banking and get
       statements without visiting a branch each time.
+    follow_ups:
+      account_opening_requirements: account_opening_requirements
+      loan_requirements: account_opening_requirements
+      business_account_requirements: account_opening_requirements
     buttons:
       - {label: "Tamanga (standard)", payload: "current_account"}
       - {label: "Bank statements", payload: "bank_statement_request"}
@@ -152,6 +166,10 @@ intents:
       - Monthly maintenance fee: ZMW 200
       Requirements differ by entity type (limited company vs. sole trader
       vs. club/NGO) — I can show you the exact document list.
+    follow_ups:
+      account_opening_requirements: business_account_requirements
+      loan_requirements: business_account_requirements
+      business_account_requirements: business_account_requirements
     buttons:
       - {label: "Documents needed by entity type", payload: "business_account_requirements"}
       - {label: "Business loans", payload: "msme_loan"}
@@ -215,6 +233,10 @@ intents:
       - No maintenance fees
       Same opening requirements as any personal account (NRC/passport,
       proof of residence, TPIN certificate).
+    follow_ups:
+      account_opening_requirements: account_opening_requirements
+      loan_requirements: account_opening_requirements
+      business_account_requirements: account_opening_requirements
     buttons:
       - {label: "Savings account (flexible)", payload: "savings_account"}
       - {label: "Kids Savings account", payload: "kids_savings_account"}
@@ -274,6 +296,10 @@ intents:
         and term
       You need an active Savings or Current account first — funds move
       from that account into the TDA. Would you like to open one?
+    follow_ups:
+      account_opening_requirements: account_opening_requirements
+      loan_requirements: account_opening_requirements
+      business_account_requirements: account_opening_requirements
     buttons:
       - {label: "What you need to open", payload: "account_opening_requirements"}
       - {label: "Types of accounts", payload: "account_types_overview"}
@@ -301,6 +327,10 @@ intents:
       - Joint OR — any signatory can transact alone
       All joint account holders must be physically present at account
       opening, each with full ID/proof of residence/TPIN documentation.
+    follow_ups:
+      account_opening_requirements: account_opening_requirements
+      loan_requirements: account_opening_requirements
+      business_account_requirements: account_opening_requirements
     buttons:
       - {label: "What you need to open", payload: "account_opening_requirements"}
       - {label: "Find a branch", payload: "branch_locator"}

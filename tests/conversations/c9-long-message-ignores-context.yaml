@@ -1,0 +1,6 @@
+id: c9-long-message-ignores-context
+# More than 8 words: a new question in its own right, not a follow-up.
+turns:
+  - say: what is tamanga
+  - say: how much does it cost to send money with etumba to airtel
+    expect: {text_lacks: ["tamanga account's monthly maintenance fee"]}

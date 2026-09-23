@@ -2,7 +2,6 @@ id: probe-01-context-follow-up
 # "how much does it cost" right after Tamanga should mean Tamanga's fee,
 # not the generic fee list.
 fixes: C9
-xfail: true
 turns:
   - say: what is tamanga
     expect: {intent: current_account}

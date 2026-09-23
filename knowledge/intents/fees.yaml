@@ -1,4 +1,29 @@
 intents:
+  - intent: fees_tamanga
+    label: "Tamanga fees"
+    category: fees
+    status: draft
+    phrases:
+      - "tamanga fees"
+      - "how much is tamanga"
+      - "tamanga monthly fee"
+      - "cost of a tamanga account"
+      - "tamanga charges"
+      - "how much does tamanga cost"
+      - "tamanga account maintenance fee"
+    answer: |
+      The Tamanga account's monthly maintenance fee is ZMW 36. Opening
+      the account is free, cash and cheque deposits are free, and
+      withdrawals are unlimited and fee-free.
+      For any other charge, the full tariff guide has the current figure:
+      {tariff_url}
+    answer_simple: >-
+      Tamanga costs ZMW 36 a month. Opening it, putting money in and taking money out are free.
+    buttons:
+      - {label: "Open a Tamanga account", payload: "account_opening_requirements"}
+      - {label: "All fees", payload: "fees_charges"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
   - intent: fees_charges
     label: "Fees & charges"
     category: fees

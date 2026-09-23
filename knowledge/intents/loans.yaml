@@ -27,6 +27,10 @@ intents:
       guarantee an amount or timeline before your documents are in.
     answer_simple: >-
       We lend to businesses that are at least 12 months old. You need something valuable as security (collateral), and a person who agrees to repay if you can't (a guarantor).
+    follow_ups:
+      account_opening_requirements: loan_requirements
+      business_account_requirements: loan_requirements
+      account_opening_how: loan_apply_how
     buttons:
       - {label: "Loan requirements", payload: "loan_requirements"}
       - {label: "How to apply", payload: "loan_apply_how"}
@@ -55,6 +59,10 @@ intents:
       loan, on the same terms: 12+ months trading, within our branch
       network, with collateral and a guarantor. A loan officer visits the
       farm to assess the application, same as for any business.
+    follow_ups:
+      account_opening_requirements: loan_requirements
+      business_account_requirements: loan_requirements
+      account_opening_how: loan_apply_how
     buttons:
       - {label: "Business loan details", payload: "msme_loan"}
       - {label: "Loan requirements", payload: "loan_requirements"}
@@ -113,6 +121,10 @@ intents:
         monthly turnover
       - Collateral: term deposit, landed property, or motor vehicle
       - Arrangement fee: 5%
+    follow_ups:
+      account_opening_requirements: loan_requirements
+      business_account_requirements: loan_requirements
+      account_opening_how: loan_apply_how
     buttons:
       - {label: "Business loans", payload: "msme_loan"}
       - {label: "Talk to a person", payload: "human_handoff"}

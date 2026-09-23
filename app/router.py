@@ -150,6 +150,8 @@ def handle(session, text=None, payload=None):
     masked, findings = guards.mask(cleaned)
     inbound = masked if text else f"[button] {payload}"
     session.add("user", inbound)
+    if session.slots.get("context"):
+        session.slots["context"]["age"] += 1  # C9: context fades with each message
     audit.log_event(session.id, "user", inbound)
 
     replies = []
@@ -412,6 +414,44 @@ def _route(session, text, payload):
     return _free_text(session, text, urgent_flows=not guards.urgent_negated(text))
 
 
+# --- C9: carry context between questions ----------------------------------
+# After an answer, its intent's follow_ups ({generic: specific}) apply to the
+# next CONTEXT_TURNS messages, if they are short and refer back ("how much
+# does it cost?" after Tamanga means Tamanga's fee, not the whole fee list).
+CONTEXT_TURNS = 2
+CONTEXT_MAX_WORDS = 8
+_REFERS_BACK_RE = re.compile(
+    r"(?i)\b(?:it|that|this|one|them|those|these|there)\b"
+    r"|\b(?:how\s+much|what\s+do\s+i\s+need|what\s+does\s+it|where|how\s+do\s+i|"
+    r"how\s+long|what\s+are\s+the|cost|costs|fees?|charges?|requirements?|documents?)\b"
+)
+
+
+def _context_follow_up(session, text, ranked):
+    ctx = session.slots.get("context")
+    if not ctx or ctx["age"] > CONTEXT_TURNS:
+        return None
+    if len(text.split()) > CONTEXT_MAX_WORDS or not _REFERS_BACK_RE.search(text):
+        return None
+    follow_ups = (matcher.get(ctx["intent"]) or {}).get("follow_ups") or {}
+    for name, score in ranked[:3]:
+        if score >= config.MEDIUM_CONFIDENCE and name in follow_ups:
+            target = matcher.get(follow_ups[name])
+            if not target:
+                return None
+            # Inspectable: every context-driven decision is in the audit log.
+            audit.log_event(
+                session.id, "system",
+                f"context_boost: {name} -> {target['intent']} (topic {ctx['intent']})",
+                intent=target["intent"], confidence=round(score, 3), action="context_boost",
+            )
+            replies, meta = _answer(session, target, score, text=text, keep_context=True)
+            ctx["age"] = 0  # the conversation is still on this topic
+            meta["context_boost"] = {"from": name, "to": target["intent"], "topic": ctx["intent"]}
+            return replies, meta
+    return None
+
+
 def _free_text(session, text, urgent_flows=True):
     """Matcher + confidence gate. `urgent_flows=False` is used after the
     customer has said "no, it's not fraud": an intent that would start the
@@ -422,6 +462,9 @@ def _free_text(session, text, urgent_flows=True):
             (n, s) for n, s in ranked
             if matcher.get(n).get("flow") not in ("fraud", "complaint")
         ]
+    boosted = _context_follow_up(session, text, ranked)
+    if boosted:
+        return boosted
     top_name, top_score = ranked[0] if ranked else (None, 0.0)
 
     if top_name and top_score >= config.HIGH_CONFIDENCE:
@@ -662,7 +705,7 @@ def _resolve_urgent(session, pending, confirmed):
     return replies, meta
 
 
-def _answer(session, intent, score, text=None):
+def _answer(session, intent, score, text=None, keep_context=False):
     session.strikes = 0
     meta = {"intent": intent["intent"], "confidence": round(float(score), 3)}
 
@@ -681,6 +724,8 @@ def _answer(session, intent, score, text=None):
 
     session.slots["last_intent"] = intent["intent"]
     session.slots["topic"] = intent.get("category")
+    if not keep_context:
+        session.slots["context"] = {"intent": intent["intent"], "age": 0}
     answer = intent.get("answer")
     if not answer:
         return [{"text": msg("fallback"), "buttons": list(MENU_BUTTONS)}], meta

@@ -1,0 +1,5 @@
+id: c9-loans-follow-up
+turns:
+  - payload: msme_loan
+  - say: what do i need to open it
+    expect: {intent: loan_requirements}

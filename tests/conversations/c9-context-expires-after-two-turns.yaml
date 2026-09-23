@@ -1,0 +1,7 @@
+id: c9-context-expires-after-two-turns
+turns:
+  - say: what is tamanga
+  - say: flurb zzqx vortblatt
+  - say: wibble vortz
+  - say: how much does it cost
+    expect: {intent: fees_charges}        # context gone: the general fee list

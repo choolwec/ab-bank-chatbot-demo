@@ -442,3 +442,14 @@ def test_prefilled_ticket_carries_the_hints(bot):
     assert fields["when"] == "yesterday" and fields["channel"] == "eTumba"
     assert fields["amount_hint"] == "K500" and fields["branch_hint"] == "Kitwe Branch"
     assert "when_hint" in fields
+
+
+def test_context_boost_is_in_the_audit_log(bot):
+    """C9: every context-driven answer can be traced."""
+    b = bot()
+    b.say("what is tamanga")
+    b.say("how much does it cost")
+    assert b.last[1]["context_boost"] == {
+        "from": "fees_charges", "to": "fees_tamanga", "topic": "current_account",
+    }
+    assert "context_boost: fees_charges -> fees_tamanga" in audit.JSONL_FILE.read_text(encoding="utf-8")

@@ -110,6 +110,15 @@ against its `phrases:` list from `knowledge/intents/*.yaml`.
 `HIGH_CONFIDENCE`/`MEDIUM_CONFIDENCE` thresholds in `app/config.py` decide
 between a direct answer, a "did you mean…?" suggestion, or a fallback/strike.
 
+**Context carry-over (C9).** An answered intent sets
+`session.slots["context"]` for the next 2 messages. Its optional
+`follow_ups: {generic intent: specific intent}` then applies to a short
+(<= 8 words) message that refers back (a pronoun, "how much", "what do I
+need"…). If one of the matcher's top 3 at `MEDIUM_CONFIDENCE` or above is a
+mapped generic intent, the specific one answers: "how much does it cost?"
+after Tamanga gets `fees_tamanga`. Every switch is logged as an
+`action=context_boost` audit event.
+
 **Evaluation gates (E3).** `tests/test_eval_gates.py` scores the matcher on
 the held-out set `tests/eval/heldout.yaml` at the production thresholds and
 fails the build if any metric crosses `tests/eval/gates.yaml` (right/wrong

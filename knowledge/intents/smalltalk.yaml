@@ -12,6 +12,9 @@
 #   buttons:   every answer must offer at least one next step (no dead ends)
 #   answer_simple: (optional) a plainer, shorter version of the answer, sent
 #              when the customer asks "what do you mean?" -- same facts only
+#   follow_ups: (optional) {generic intent: specific intent} -- after this
+#              answer, a short follow-up ("how much does it cost?") that
+#              matches the generic intent gets the specific one (C9)
 #   on_yes / on_no: (optional) the payload a typed "yes" / "no" means, when
 #              the answer ends in a yes/no question ("anything else?")
 #

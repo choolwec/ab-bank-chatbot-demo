@@ -28,6 +28,11 @@ app or test suite; `python research/matcher-benchmark/bench_matcher.py`).
 Work one ticket per branch (`feat/<ID>-<slug>`) and update its Status in
 that plan's Appendix A in the same PR.
 
+**Progress (2026-09-23):** Phase 0 (M0) and Phase 1 (M1) engineering are
+done. `docs/metrics-baseline.md` is the before picture and `docs/metrics-m1.md`
+the after (`python -m admin.baseline_report`). The owner has asked for work
+to land directly on `master`, not on per-ticket branches.
+
 ## Commands
 
 Setup (Windows):

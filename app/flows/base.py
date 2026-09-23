@@ -26,6 +26,34 @@ def is_valid_zambian_phone(text: str) -> bool:
     return bool(PHONE_RE.fullmatch(cleaned))
 
 
+def clean_phone(text: str) -> str:
+    return re.sub(r"[ \-]", "", text or "")
+
+
+def format_phone(text: str) -> str:
+    """Read-back form of a valid Zambian number: '0977 123 456'."""
+    digits = re.sub(r"\D", "", text or "")
+    if digits.startswith("260") and len(digits) == 12:
+        digits = "0" + digits[3:]
+    if len(digits) == 10:
+        return f"{digits[:4]} {digits[4:7]} {digits[7:]}"
+    return text
+
+
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[a-z]{2,}$", re.IGNORECASE)
+
+
+def is_valid_email(text: str) -> bool:
+    return bool(EMAIL_RE.fullmatch((text or "").strip()))
+
+
+SKIP_WORDS = frozenset({"skip", "no", "none", "no thanks", "rather not", "i'd rather not"})
+
+
+def is_skip(text: str) -> bool:
+    return " ".join((text or "").lower().strip(" .!").split()) in SKIP_WORDS
+
+
 CONFIRM_BUTTON = {"label": "Yes, submit", "payload": "confirm_yes"}
 EDIT_BUTTON = {"label": "No, let me fix that", "payload": "confirm_edit"}
 
@@ -92,6 +120,14 @@ class FormFlow:
         i = min(session.flow_state.get("step", 0), len(self.steps) - 1)
         return [self._prompt(i)]
 
+    def store_value(self, field, value):
+        """Hook: the value stored for `field` (e.g. a canonical "skipped")."""
+        return value
+
+    def acknowledge(self, field, value):
+        """Hook: optional read-back text sent before the next prompt."""
+        return None
+
     def handle(self, session, text, payload=None):
         state = session.flow_state
 
@@ -117,15 +153,18 @@ class FormFlow:
             if not is_valid(value):
                 return [{"text": retry_text, "buttons": [CANCEL_BUTTON]}], False
 
+        value = self.store_value(field, value)
         state.setdefault("data", {})[field] = value
+        ack = self.acknowledge(field, value)
+        before = [{"text": ack, "buttons": []}] if ack else []
         i += 1
         state["step"] = i
         if i < len(self.steps):
-            return [self._prompt(i)], False
+            return before + [self._prompt(i)], False
         if self.require_confirmation:
             state["confirming"] = True
-            return [self._confirmation_prompt(session)], False
-        return self.finish(session), True
+            return before + [self._confirmation_prompt(session)], False
+        return before + self.finish(session), True
 
     def finish(self, session):
         raise NotImplementedError

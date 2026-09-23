@@ -6,13 +6,32 @@ these resolved — a person closes the case.
 """
 
 from .. import audit, config
-from .base import HUMAN_BUTTON, MENU_BUTTON, FormFlow, is_valid_zambian_phone
+from .base import (
+    HUMAN_BUTTON,
+    MENU_BUTTON,
+    FormFlow,
+    clean_phone,
+    format_phone,
+    is_skip,
+    is_valid_email,
+    is_valid_zambian_phone,
+)
 
 CONTACT_RETRY_TEXT = (
     "That doesn't look like a valid number — please send it as 09XXXXXXX "
-    "(10 digits), 260XXXXXXXXX (12 digits), or +260XXXXXXXXX, so our fraud "
-    "team can actually reach you."
+    "(10 digits), 260XXXXXXXXX (12 digits), or +260XXXXXXXXX, or an email "
+    "address, so our fraud team can actually reach you. You can also type "
+    "'skip'."
 )
+CONTACT_SKIPPED_TEXT = (
+    "Without a number we can't call you back. Please call {contact_phone} so "
+    "our team can help you."
+)
+SKIPPED = "skipped"
+
+
+def _valid_contact(text):
+    return is_valid_zambian_phone(text) or is_valid_email(text) or is_skip(text)
 
 
 class FraudFlow(FormFlow):
@@ -31,10 +50,27 @@ class FraudFlow(FormFlow):
         (
             "contact",
             "What's the best phone number to reach you on right now, so our "
-            "fraud team can follow up immediately?",
+            "fraud team can follow up immediately? (An email address works "
+            "too.)",
         ),
     ]
-    validators = {"contact": (is_valid_zambian_phone, CONTACT_RETRY_TEXT)}
+    validators = {"contact": (_valid_contact, CONTACT_RETRY_TEXT)}
+
+    def store_value(self, field, value):
+        if field != "contact":
+            return value
+        if is_skip(value):
+            return SKIPPED
+        return clean_phone(value) if is_valid_zambian_phone(value) else value.strip()
+
+    def acknowledge(self, field, value):
+        if field != "contact":
+            return None
+        if value == SKIPPED:
+            return CONTACT_SKIPPED_TEXT
+        if is_valid_zambian_phone(value):
+            return f"Got it: {format_phone(value)}."
+        return f"Got it: {value}."
 
     def intro(self, session, kind):
         emergency = config.CONTACTS["emergency_phone"]

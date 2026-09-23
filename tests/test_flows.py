@@ -317,3 +317,57 @@ def test_resume_replays_masked_history_without_button_payloads(client):
     assert any(t["role"] == "user" and "etumba" in t["text"].lower() for t in history)
     # internal '[button] <payload>' turns are never shown to the customer
     assert not any(t["text"].startswith("[button]") for t in history)
+
+
+# --- S2: every fraud ticket carries a contact, or an explicit "skipped" ---
+
+
+def _fraud_to_contact_step(b):
+    b.say("i think i was scammed")
+    b.say("Someone called pretending to be the bank")
+    b.say("today")
+    b.say("eTumba")
+
+
+def _ticket_fields(ref):
+    import json
+
+    con = sqlite3.connect(audit.DB_FILE)
+    fields = con.execute("SELECT fields FROM tickets WHERE ref = ?", (ref,)).fetchone()[0]
+    con.close()
+    return json.loads(fields)
+
+
+def _ref(text):
+    match = re.search(r"FRD-\d{8}-[A-Z0-9]{4}", text)
+    assert match, text
+    return match.group(0)
+
+
+def test_fraud_contact_is_read_back_formatted(bot):
+    b = bot()
+    _fraud_to_contact_step(b)
+    b.say("12345")  # rejected first
+    b.say("260 977 123 456")
+    assert "Got it: 0977 123 456." in b.text
+    b.tap("confirm_yes")
+    assert _ticket_fields(_ref(b.text))["contact"] == "260977123456"
+
+
+def test_fraud_contact_accepts_email(bot):
+    b = bot()
+    _fraud_to_contact_step(b)
+    b.say("mary.banda@example.com")
+    assert "Got it: mary.banda@example.com." in b.text
+    b.tap("confirm_yes")
+    assert _ticket_fields(_ref(b.text))["contact"] == "mary.banda@example.com"
+
+
+def test_fraud_contact_skip_states_the_consequence(bot):
+    b = bot()
+    _fraud_to_contact_step(b)
+    b.say("skip")
+    assert "can't call you back" in b.text
+    assert "888" in b.text  # {contact_phone} rendered
+    b.tap("confirm_yes")
+    assert _ticket_fields(_ref(b.text))["contact"] == "skipped"

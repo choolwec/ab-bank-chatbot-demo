@@ -11,6 +11,12 @@ for `[CONFIRM` to find every unverified fact — contacts, hours, branch data).
 Built to the spec in `../technical-build-plan.md` (§3) in the parent project
 folder; every design rule referenced there (§1, §3.1-§3.4) maps to code here.
 
+**Rescope in progress (2026-09-23):** the bot is being extended from
+website-only to website + WhatsApp + Facebook Messenger. Research, the target
+architecture (channel adapters around the unchanged router), Zambian
+legal constraints, and the phased plan are in `docs/multi-platform-research.md`.
+Until that work lands, everything below describes the website-only V1.
+
 ## Commands
 
 Setup (Windows):

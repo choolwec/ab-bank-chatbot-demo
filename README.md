@@ -8,6 +8,11 @@ Deliberately *not* transactional, no account access, no LLM in V1. Built to the 
 > pending legal sign-off (§3.5). Search the repo for `[CONFIRM` to see every value
 > that must be verified before launch.
 
+> **Rescope (2026-09-23): website + WhatsApp + Facebook Messenger.** See
+> `docs/multi-platform-research.md` for the research, architecture, legal
+> constraints, cost model and phased plan. This README still describes the
+> website-only V1.
+
 ## Quickstart (Windows)
 
 ```powershell

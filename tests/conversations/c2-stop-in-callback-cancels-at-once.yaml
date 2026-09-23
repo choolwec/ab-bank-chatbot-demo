@@ -1,0 +1,6 @@
+id: c2-stop-in-callback-cancels-at-once
+# Only fraud/complaint reports ask before stopping.
+turns:
+  - payload: human_handoff
+  - say: never mind
+    expect: {action: cancel, active_flow: null, strikes: 0}

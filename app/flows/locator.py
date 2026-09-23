@@ -11,6 +11,11 @@ from ..messages import msg
 from .base import CANCEL_BUTTON, HUMAN_BUTTON, MENU_BUTTON
 
 
+AGENT_WORDS = frozenset({
+    "agent", "agents", "an agent", "etumba agent", "etumba agents", "an etumba agent",
+})
+
+
 def _load() -> dict:
     return json.loads(config.BRANCHES_FILE.read_text(encoding="utf-8"))
 
@@ -85,6 +90,10 @@ class LocatorFlow:
         city = (payload or text or "").strip()
         if not city:
             return [self._city_prompt("")], False
+        if " ".join(city.lower().split()) in AGENT_WORDS:
+            # "agent" typed at the town question means an eTumba agent.
+            session.flow_state = {}
+            return self._agents(), True
         return self._branch_lookup(session, city)
 
     def _city_prompt(self, prefix):

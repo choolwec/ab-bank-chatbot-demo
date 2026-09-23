@@ -1,0 +1,7 @@
+id: c2-other-text-after-cancel-question-continues
+# Ignoring the "stop anyway?" question and answering the report continues it.
+turns:
+  - say: i think i was scammed
+  - say: stop
+  - say: Someone called pretending to be the bank
+    expect: {active_flow: fraud, flow_step: when}

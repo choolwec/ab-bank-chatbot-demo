@@ -1,0 +1,10 @@
+id: c2-agent-inside-locator-is-an-answer
+# "agent" means an eTumba agent when the locator just asked "branch or agent?"
+turns:
+  - payload: branch_locator
+  - say: agent
+    expect: {active_flow: null, text_contains: [agent networks]}
+  - payload: agent_locator
+  - payload: branch_locator
+  - say: Kitwe
+    expect: {text_contains: [chisokone]}

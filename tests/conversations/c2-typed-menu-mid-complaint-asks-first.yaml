@@ -1,0 +1,7 @@
+id: c2-typed-menu-mid-complaint-asks-first
+turns:
+  - say: I want to complain
+  - say: "0"
+    expect: {action: cancel_confirm, active_flow: complaint, text_contains: [complaint isn't sent yet]}
+  - say: "no"
+    expect: {action: cancel_declined, active_flow: complaint, flow_step: topic}

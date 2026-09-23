@@ -35,6 +35,35 @@ _URGENT_BUTTONS = {
 }
 
 
+# C2: typed commands, matched against the WHOLE normalised message only.
+COMMANDS = {
+    **dict.fromkeys(
+        ["cancel", "stop", "never mind", "nevermind", "quit", "exit", "cancel that"],
+        "cancel_flow",
+    ),
+    **dict.fromkeys(
+        ["menu", "main menu", "start again", "start over", "restart", "0", "home"],
+        "menu",
+    ),
+    **dict.fromkeys(
+        [
+            "agent", "human", "person", "a person", "talk to a person",
+            "speak to a person", "speak to someone", "talk to someone",
+            "talk to a human", "speak to a human", "customer care",
+            "customer service", "real person", "talk to an agent",
+            "speak to an agent",
+        ],
+        "human_handoff",
+    ),
+    "help": "help",
+}
+# Words that are commands elsewhere but a legitimate answer inside a flow:
+# the locator asks "a branch, or an eTumba agent?".
+COMMAND_ANSWERS = {"locator": {"agent", "an agent"}}
+CANCEL_YES = "cancel_yes"
+CANCEL_NO = "cancel_no"
+
+
 def _urgent_confirm(kind, sub):
     key = sub if sub in _URGENT_BUTTONS else kind
     return {
@@ -139,13 +168,22 @@ def _route(session, text, payload):
             [{"text": msg("menu"), "buttons": list(MENU_BUTTONS)}],
             {"action": "menu"},
         )
-    if payload == "cancel_flow":
+    if payload == "cancel_flow" or payload == CANCEL_YES:
+        # Abandoning a fraud report or complaint is costly: confirm first (C2).
+        if (
+            payload == "cancel_flow"
+            and session.active_flow in ("fraud", "complaint")
+            and not session.flow_state.get("confirm_cancel")
+        ):
+            return _confirm_cancel(session)
         session.active_flow = None
         session.flow_state = {}
         return (
             [{"text": msg("cancelled"), "buttons": list(MENU_BUTTONS)}],
             {"action": "cancel"},
         )
+    if payload == CANCEL_NO:
+        return _continue_flow(session)
     # "Talk to a person" always works, even mid-flow (§1 rule 1)
     if payload == "human_handoff":
         session.strikes = 0
@@ -179,6 +217,26 @@ def _route(session, text, payload):
             # Soft: ask first. The flow state is left untouched, so "no"
             # resumes whatever the customer was doing.
             return _ask_urgent(session, urgent.kind, urgent.sub, text, source="scan")
+
+    # 1c. Typed commands work anywhere, exactly like their buttons (C2). Whole
+    # message only: "cancel my card" is a lost-card report, caught above.
+    if text and not payload:
+        command = _typed_command(session, text)
+        if command == "help":
+            return _help(session)
+        if command:
+            if command == "menu" and session.active_flow in ("fraud", "complaint"):
+                command = "cancel_flow"  # never drop a report without asking
+            return _route(session, None, command)
+
+    # 1d. Answer to "Your report isn't sent yet. Stop anyway?"
+    if session.active_flow and session.flow_state.pop("confirm_cancel", False) and text:
+        answer = guards.yes_no(text)
+        if answer is True:
+            return _route(session, None, CANCEL_YES)
+        if answer is False:
+            return _continue_flow(session)
+        # Anything else: they carried on with the report -- treat it as input.
 
     # 2. An active flow consumes the message — unless it's a high-confidence
     # unrelated FAQ question, in which case answer it and resume the flow at
@@ -347,6 +405,54 @@ def _maybe_answer_faq_interrupt(flow, session, text):
             "buttons": prompt["buttons"],
         }
     ]
+
+
+def _typed_command(session, text):
+    command = COMMANDS.get(guards.normalise(text))
+    if command and guards.normalise(text) in COMMAND_ANSWERS.get(session.active_flow, ()):
+        return None  # a legitimate answer to the current question
+    return command
+
+
+def _help(session):
+    capabilities = matcher.get("bot_capabilities")["answer"].strip()
+    if session.active_flow:
+        flow = FLOWS[session.active_flow]
+        prompt = flow.resume(session)[-1]
+        back = msg("back_to_flow", flow=flow.topic_label, prompt=prompt["text"])
+        return (
+            [{"text": capabilities + "\n\n" + back, "buttons": prompt["buttons"]}],
+            {"action": "help"},
+        )
+    return [{"text": capabilities, "buttons": list(MENU_BUTTONS)}], {"action": "help"}
+
+
+def _confirm_cancel(session):
+    session.flow_state["confirm_cancel"] = True
+    flow = FLOWS[session.active_flow]
+    return (
+        [
+            {
+                "text": msg("cancel_confirm", flow=flow.topic_label),
+                "buttons": [
+                    {"label": "Yes, stop", "payload": CANCEL_YES},
+                    {"label": "No, continue", "payload": CANCEL_NO},
+                ],
+            }
+        ],
+        {"action": "cancel_confirm"},
+    )
+
+
+def _continue_flow(session):
+    session.flow_state.pop("confirm_cancel", None)
+    if not session.active_flow:
+        return _route(session, None, "menu")
+    flow = FLOWS[session.active_flow]
+    return (
+        [{"text": msg("carry_on"), "buttons": []}] + flow.resume(session),
+        {"action": "cancel_declined"},
+    )
 
 
 def _start_urgent(session, kind, sub):

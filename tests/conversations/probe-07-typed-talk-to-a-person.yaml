@@ -1,6 +1,5 @@
 id: probe-07-typed-talk-to-a-person
 fixes: C2
-xfail: true
 turns:
   - say: I want to complain
     expect: {active_flow: complaint}

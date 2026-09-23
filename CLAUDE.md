@@ -83,6 +83,13 @@ not incidental:
   suppresses soft signals only, never hard ones. A fraud/complaint intent
   reached only through the fuzzy matcher also asks first. Corpora live in
   `tests/data/urgent_*.txt`; extend them rather than the regexes alone.
+- Typed commands (`router.COMMANDS`, ticket C2: cancel/stop, menu/0,
+  agent/talk to a person, help) run right after the urgent scan and work in
+  any state, exactly like their buttons, but only as the **whole** message
+  ("cancel my card" stays a lost-card report). Leaving a fraud or complaint
+  report, by button or typed, asks "Stop anyway?" first
+  (`flow_state["confirm_cancel"]`). `COMMAND_ANSWERS` lists words that are a
+  legitimate answer inside a flow ("agent" in the locator).
 - Every reply is guaranteed at least one button before `handle()` returns —
   a hard "no dead ends" invariant enforced in code, not a per-answer
   convention to remember.

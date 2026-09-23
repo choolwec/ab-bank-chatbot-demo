@@ -33,6 +33,13 @@ messages:
   cancelled:
     status: draft
     text: No problem — back to the main menu.
+  cancel_confirm:
+    status: draft
+    fills: [flow]
+    text: Your {flow} isn't sent yet. Stop anyway?
+  carry_on:
+    status: draft
+    text: Okay, let's carry on.
   stale_button:
     status: draft
     text: What can I help with?

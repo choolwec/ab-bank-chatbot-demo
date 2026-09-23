@@ -1,6 +1,5 @@
 id: probe-06-typed-cancel
 fixes: C2
-xfail: true
 turns:
   - payload: human_handoff
   - say: cancel

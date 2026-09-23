@@ -1,0 +1,17 @@
+id: c2-stop-mid-fraud-asks-first
+turns:
+  - say: i think i was scammed
+  - say: stop
+    expect:
+      action: cancel_confirm
+      active_flow: fraud
+      text_contains: [fraud report isn't sent yet]
+      last_buttons_include: [cancel_yes, cancel_no]
+  - payload: cancel_no
+    expect: {action: cancel_declined, active_flow: fraud, flow_step: what_happened}
+  - say: Someone called pretending to be the bank
+    expect: {flow_step: when, flow_data_has: {what_happened: pretending}}
+  - say: cancel
+    expect: {action: cancel_confirm, active_flow: fraud}
+  - say: "yes"
+    expect: {action: cancel, active_flow: null}

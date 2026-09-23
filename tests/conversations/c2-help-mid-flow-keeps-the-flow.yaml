@@ -1,0 +1,11 @@
+id: c2-help-mid-flow-keeps-the-flow
+turns:
+  - payload: human_handoff
+  - say: Help!
+    expect:
+      action: help
+      active_flow: lead
+      flow_step: name
+      text_contains: [automated assistant, back to your callback request]
+  - say: Mary
+    expect: {flow_step: phone, flow_data_has: {name: Mary}}

@@ -1,0 +1,5 @@
+id: c2-cancel-my-card-is-still-fraud
+# Commands are whole-message only: "cancel my card" is a lost-card report.
+turns:
+  - say: cancel my card
+    expect: {action: "urgent:fraud", active_flow: fraud}

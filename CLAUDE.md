@@ -16,6 +16,9 @@ website-only to website + WhatsApp + Facebook Messenger. Research, the target
 architecture (channel adapters around the unchanged router), Zambian
 legal constraints, and the phased plan are in `docs/multi-platform-research.md`.
 Until that work lands, everything below describes the website-only V1.
+Conversational-quality research (repair patterns from Rasa/Parlant/etc., a
+15-case probe of where the current router breaks, and a tiered plan) is in
+`docs/conversational-research.md`.
 
 ## Commands
 

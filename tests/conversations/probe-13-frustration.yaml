@@ -1,6 +1,5 @@
 id: probe-13-frustration
 fixes: C5
-xfail: true
 turns:
   - say: this is not helping
     expect: {action: frustration, strikes: 0, last_buttons_include: [human_handoff]}

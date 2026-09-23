@@ -60,6 +60,9 @@ messages:
   abuse:
     status: draft
     text: I can hear this is frustrating — I'm sorry. Let me connect you with a person who can sort it out properly.
+  frustration:
+    status: draft
+    text: I'm sorry — I can see this isn't working for you, and that's frustrating. A person from our team can help you directly, or you can try asking in a different way.
   back_to_flow:
     status: draft
     fills: [flow, prompt]

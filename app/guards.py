@@ -305,5 +305,46 @@ def yes_no(text: str) -> bool | None:
     return None
 
 
+# --- Frustration without swearing (C5) ------------------------------------
+# Grow this from real transcripts each week, the same loop as ABUSE_RE.
+FRUSTRATION_RE = re.compile(
+    r"(?i)\b(?:"
+    r"(?:this|that|you)\s+(?:is|are|r)?\s*not\s+help(?:ing|ful)|"
+    r"not\s+helping|no\s+help\s+at\s+all|"
+    r"you\s+(?:do\s*n'?t|dont|do\s+not|are\s+not|aren'?t|r\s+not)\s+(?:understand|understanding|listening|getting\s+it)|"
+    r"you\s+(?:never|can'?t|cannot)\s+understand|"
+    r"i\s+(?:already|just)\s+(?:told|said|explained)|i\s+have\s+already\s+(?:told|said)|"
+    r"waste\s+of\s+(?:my\s+)?time|wasting\s+my\s+time|"
+    r"useless\s+bot|stupid\s+bot|"
+    r"going\s+(?:round\s+)?in\s+circles|same\s+thing\s+again|"
+    r"so\s+frustrat\w*|i'?m\s+frustrated|i\s+am\s+frustrated|fed\s+up"
+    r")"
+)
+_LETTERS_RE = re.compile(r"[A-Za-z]")
+
+
+def frustration_kind(text: str) -> str | None:
+    """"phrase", "exclaim" (!!!) or "caps" (3+ words, all capitals), else None.
+    Caps alone is weak evidence -- many customers type in capitals from habit
+    -- so the router only treats it as frustration if it can't answer it."""
+    t = text or ""
+    if FRUSTRATION_RE.search(t):
+        return "phrase"
+    if "!!!" in t:
+        return "exclaim"
+    words = [w for w in t.split() if _LETTERS_RE.search(w)]
+    if len(words) >= 3 and t.upper() == t and t.lower() != t:
+        return "caps"
+    return None
+
+
+PROFANITY_RE = re.compile(r"(?i)\b(?:fuck\w*|shit\w*|bullshit|idiot\w*)\b")
+
+
+def is_profane(text: str) -> bool:
+    """Swearing proper -- the subset of ABUSE_RE that isn't mere frustration."""
+    return bool(PROFANITY_RE.search(text or ""))
+
+
 def is_abusive(text: str) -> bool:
     return bool(ABUSE_RE.search(text or ""))

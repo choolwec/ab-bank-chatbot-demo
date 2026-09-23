@@ -344,6 +344,14 @@ def _route(session, text, payload):
     if session.active_flow:
         flow = FLOWS[session.active_flow]
         if text and not payload:
+            # Frustration mid-callback or mid-lookup: apologise, re-ask the
+            # step (C5). Never inside a fraud report or complaint -- there,
+            # "you people are not helping" IS the customer's account.
+            if (
+                flow.name not in ("fraud", "complaint")
+                and guards.frustration_kind(text) == "phrase"
+            ):
+                return _frustrated(session, "phrase", flow=flow)
             interrupt = _maybe_answer_faq_interrupt(flow, session, text)
             if interrupt is not None:
                 return interrupt, {"action": f"flow_interrupt:{flow.name}"}
@@ -369,7 +377,12 @@ def _route(session, text, payload):
             {"action": "menu"},
         )
 
-    # 4. Abuse/frustration → calm + human, no lecture
+    # 4. Abuse/frustration → calm + human, no lecture. A frustration phrase
+    # ("useless bot") gets the gentler reply even if a word is also on the
+    # abuse list; swearing gets the abuse reply.
+    frustration = guards.frustration_kind(text)
+    if frustration == "phrase" and not guards.is_profane(text):
+        return _frustrated(session, frustration)
     if guards.is_abusive(text):
         return (
             [
@@ -383,6 +396,8 @@ def _route(session, text, payload):
             ],
             {"action": "abuse"},
         )
+    if frustration and (frustration != "caps" or not _confident(text)):
+        return _frustrated(session, frustration)
 
     # 5. Free text → matcher (kill switch: menu-only mode, §3.3)
     if not config.free_text_enabled():
@@ -535,6 +550,29 @@ def _clarify(session):
             {"label": "Talk to a person", "payload": "human_handoff"}
         ]
     return replies, {"action": "clarify"}
+
+
+def _confident(text):
+    ranked = matcher.match(text)
+    return bool(ranked) and ranked[0][1] >= config.HIGH_CONFIDENCE
+
+
+def _frustrated(session, kind, flow=None):
+    """Calm, an apology and a person (C5). Never a strike; logged as
+    action=frustration so the weekly report can grow the phrase list."""
+    human = {"label": "Talk to a person", "payload": "human_handoff"}
+    if flow is not None:
+        prompt = flow.resume(session)[-1]
+        back = msg("back_to_flow", flow=flow.topic_label, prompt=prompt["text"])
+        buttons = [human] + [b for b in prompt["buttons"] if b["payload"] != "human_handoff"]
+        return (
+            [{"text": msg("frustration") + "\n\n" + back, "buttons": buttons}],
+            {"action": "frustration", "frustration": kind},
+        )
+    return (
+        [{"text": msg("frustration"), "buttons": [human, {"label": "Main menu", "payload": "menu"}]}],
+        {"action": "frustration", "frustration": kind},
+    )
 
 
 def _help(session):

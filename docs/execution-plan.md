@@ -1387,7 +1387,7 @@ that finishes the ticket.
 | E1 | CI on GitHub Actions | 0 | W01 | 0.5 | — | Dev | ☑ |
 | E2 | Conversation test framework + 15 probe cases | 0 | W02 | 2 | — | Dev | ☑ |
 | E3 | Evaluation gates (held-out + out-of-scope) | 0 | W02 | 1 | — | Dev | ☑ |
-| E4 | Baseline metrics | 0 | W02 | 0.5 | E2, E3 | Dev | ☐ |
+| E4 | Baseline metrics | 0 | W02 | 0.5 | E2, E3 | Dev | ☑ |
 | P8 | Admin route auth | 0 | W02 | 0.5 | — | Dev | ☑ |
 | C1 | System messages in YAML | 1 | W02 | 2 | — | Dev | ☐ |
 | C2 | Typed commands anywhere | 1 | W03 | 1.5 | E2, C1 | Dev | ☐ |

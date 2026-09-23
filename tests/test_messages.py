@@ -47,20 +47,21 @@ def test_legal_export_contains_every_system_message():
 
 
 def _literal_text_values(tree):
-    """String constants used as the value of a "text" key in a dict literal."""
+    """String constants used as the value of a "text" or "label" key in a
+    dict literal (C1 for texts, C11 for button labels)."""
     for node in ast.walk(tree):
         if isinstance(node, ast.Dict):
             for key, value in zip(node.keys, node.values):
                 if (
-                    isinstance(key, ast.Constant) and key.value == "text"
+                    isinstance(key, ast.Constant) and key.value in ("text", "label")
                     and isinstance(value, (ast.Constant, ast.JoinedStr))
                 ):
                     yield node.lineno
 
 
 def test_no_customer_facing_english_left_in_app():
-    """Acceptance: replies are built from msg(), never a Python literal.
-    (Button labels are exempt until C11/P3.)"""
+    """Acceptance (C1, C11): reply texts and button labels are built from
+    msg()/button(), never a Python literal."""
     offenders = []
     for path in APP_DIR.rglob("*.py"):
         tree = ast.parse(path.read_text(encoding="utf-8"))

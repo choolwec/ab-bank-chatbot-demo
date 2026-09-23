@@ -5,7 +5,7 @@ day. The transcript rides along so the customer never repeats themselves.
 """
 
 from .. import audit
-from ..messages import msg
+from ..messages import button, msg
 from .base import (
     CANCEL_BUTTON,
     DONE_BUTTON,
@@ -30,15 +30,23 @@ class LeadFlow(FormFlow):
         # One canonical form for the contact centre: "0977123456".
         return clean_phone(value) if field == "phone" else value
 
-    def acknowledge(self, field, value):
-        return msg("read_back", value=read_back(value)) if field == "phone" else None
+    def acknowledge(self, field, value, session=None):
+        if field == "phone":
+            return msg("read_back", value=read_back(value))
+        if field == "name" and session is not None and not session.slots.get("name_used"):
+            first = value.split()[0] if value.split() else ""
+            # Only something that looks like a name: "Thanks, Mary." (C11)
+            if first.isalpha() and 1 < len(first) <= 20:
+                session.slots["name_used"] = True
+                return msg("thanks_name", name=first.capitalize())
+        return None
 
     def _prompt(self, i):
         prompt = super()._prompt(i)
         if self.steps[i] == "time":
             prompt["buttons"] = [
-                {"label": "Morning", "payload": "Morning"},
-                {"label": "Afternoon", "payload": "Afternoon"},
+                button("morning", "Morning"),
+                button("afternoon", "Afternoon"),
                 CANCEL_BUTTON,
             ]
         return prompt

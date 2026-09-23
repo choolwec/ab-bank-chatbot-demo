@@ -16,7 +16,7 @@ normal questions.
 
 from .. import audit
 from ..extract import CHANNEL_PHRASE, extract
-from ..messages import msg
+from ..messages import button, msg
 from .base import (
     CANCEL_BUTTON,
     HUMAN_BUTTON,
@@ -92,8 +92,8 @@ class FraudFlow(FormFlow):
         return {
             "text": text,
             "buttons": [
-                {"label": "Yes, that's right", "payload": PREFILL_YES},
-                {"label": "No, let me explain", "payload": PREFILL_NO},
+                button("yes_that_s_right", PREFILL_YES),
+                button("no_let_me_explain", PREFILL_NO),
                 CANCEL_BUTTON,
             ],
             "yes": PREFILL_YES,
@@ -133,7 +133,7 @@ class FraudFlow(FormFlow):
     def store_value(self, field, value):
         return store_contact(value) if field == "contact" else value
 
-    def acknowledge(self, field, value):
+    def acknowledge(self, field, value, session=None):
         if field != "contact":
             return None
         if value == SKIPPED:

@@ -12,15 +12,15 @@ confirmation summary. flows/__init__.py checks every one exists at import.
 
 import re
 
-from ..messages import msg
+from ..messages import button, msg, variant
 
-CANCEL_BUTTON = {"label": "Back to menu", "payload": "cancel_flow"}
-MENU_BUTTON = {"label": "Main menu", "payload": "menu"}
-HUMAN_BUTTON = {"label": "Talk to a person", "payload": "human_handoff"}
+CANCEL_BUTTON = button("back_to_menu", "cancel_flow")
+MENU_BUTTON = button("main_menu", "menu")
+HUMAN_BUTTON = button("talk_to_a_person", "human_handoff")
 # Reuses the thanks_goodbye intent as a button target (same pattern as
 # HUMAN_BUTTON reusing human_handoff) so "is there anything else?" has an
 # unambiguous answer instead of relying on free-text "no" detection alone.
-DONE_BUTTON = {"label": "No, that's all", "payload": "thanks_goodbye"}
+DONE_BUTTON = button("no_that_s_all", "thanks_goodbye")
 
 # Zambian mobile numbers: 0XXXXXXXXX (10 digits), 260XXXXXXXXX (12 digits,
 # country code no plus), or +260XXXXXXXXX. Spaces/dashes are stripped first
@@ -96,8 +96,8 @@ def store_contact(value: str) -> str:
     return clean_phone(value) if is_valid_zambian_phone(value) else value.strip()
 
 
-SEND_BUTTON = {"label": "Send it", "payload": "confirm_yes"}
-CHANGE_BUTTON = {"label": "Change something", "payload": "confirm_change"}
+SEND_BUTTON = button("send_it", "confirm_yes")
+CHANGE_BUTTON = button("change_something", "confirm_change")
 CHANGE_PREFIX = "change:"
 
 
@@ -204,8 +204,10 @@ class FormFlow:
         """Hook: the value stored for `field` (e.g. a canonical "skipped")."""
         return value
 
-    def acknowledge(self, field, value):
-        """Hook: optional read-back put in front of the next prompt."""
+    def acknowledge(self, field, value, session=None):
+        """Hook: optional read-back put in front of the next prompt. When a
+        flow has nothing specific to say, a rotating "Got it." / "Thanks." /
+        "Okay." is used instead (C11) -- wrappers vary, facts never do."""
         return None
 
     def _correction(self, state, text):
@@ -276,7 +278,7 @@ class FormFlow:
             value = self.store_value(editing, value)
             state["data"][editing] = value
             state.pop("editing")
-            ack = self.acknowledge(editing, value)
+            ack = self.acknowledge(editing, value, session)
             return [_with_ack(ack, self._confirmation_prompt(session))], False
 
         if state.get("confirming"):
@@ -290,12 +292,14 @@ class FormFlow:
 
         value = self.store_value(field, value)
         state.setdefault("data", {})[field] = value
-        ack = self.acknowledge(field, value)
+        ack = self.acknowledge(field, value, session)
         i += 1
         while i < len(self.steps) and self.steps[i] in state["data"]:
             i += 1  # already answered (e.g. pre-filled from the first message, C8)
         state["step"] = i
         if i < len(self.steps):
+            # Deterministic rotation by turn number, so tests stay stable.
+            ack = ack or variant("ack", len(session.transcript))
             return [_with_ack(ack, self._prompt(i))], False
         if self.require_confirmation:
             state["confirming"] = True

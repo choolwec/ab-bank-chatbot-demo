@@ -1399,7 +1399,7 @@ that finishes the ticket.
 | C8 | Pre-fill the fraud flow | 1 | W06 | 3 | S2, C6 | Dev | ☑ |
 | C9 | Context carry-over | 1 | W06 | 2 | — | Dev 2 | ☑ |
 | C10 | Two questions in one message | 1 | W06 | 1.5 | C1 | Dev 2 | ☑ |
-| C11 | Warmth: acknowledgements, name, category fallback | 1 | W06 | 2 | C1, K1 | Dev | ☐ |
+| C11 | Warmth: acknowledgements, name, category fallback | 1 | W06 | 2 | C1, K1 | Dev | ☑ |
 | K1 | Short labels, simple answers, tone guide | 1 | W02–06 | — | — | CO | ☑ |
 | K2 | Resolve the 17 `[CONFIRM` placeholders | 1–2 | W01–10 | — | — | Business | ☐ |
 | N1 | Golden evaluation set pipeline and workshop | 2 | W04–07 | 1.5 | E3 | Dev + CO | ☐ |

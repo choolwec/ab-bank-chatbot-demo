@@ -11,7 +11,7 @@ import re
 from rapidfuzz import fuzz
 
 from . import audit, config, guards
-from .messages import msg
+from .messages import button, has, msg
 from .flows import FLOWS
 from .flows.locator import branches_mentioned
 from .matcher import Matcher
@@ -19,15 +19,15 @@ from .matcher import Matcher
 matcher = Matcher()
 
 MENU_BUTTONS = [
-    {"label": "Branches & agents", "payload": "branch_locator"},
-    {"label": "Open an account", "payload": "account_types_overview"},
-    {"label": "eTumba", "payload": "etumba_what_is"},
-    {"label": "Loans", "payload": "msme_loan"},
-    {"label": "Talk to a person", "payload": "human_handoff"},
+    button("branches_agents", "branch_locator"),
+    button("open_an_account", "account_types_overview"),
+    button("etumba", "etumba_what_is"),
+    button("loans", "msme_loan"),
+    button("talk_to_a_person", "human_handoff"),
 ]
 DEFAULT_BUTTONS = [
-    {"label": "Main menu", "payload": "menu"},
-    {"label": "Talk to a person", "payload": "human_handoff"},
+    button("main_menu", "menu"),
+    button("talk_to_a_person", "human_handoff"),
 ]
 
 # S1 soft-urgent confirmation payloads. Wording: urgent_confirm.* in
@@ -35,9 +35,9 @@ DEFAULT_BUTTONS = [
 URGENT_YES = "urgent_yes"
 URGENT_NO = "urgent_no"
 _URGENT_BUTTONS = {
-    "fraud": "Yes, report it",
-    "lost_card": "Yes, report it",
-    "complaint": "Yes, complain",
+    "fraud": "yes_report_it",
+    "lost_card": "yes_report_it",
+    "complaint": "yes_complain",
 }
 
 
@@ -90,8 +90,8 @@ def _urgent_confirm(kind, sub):
     return {
         "text": msg(f"urgent_confirm.{key}"),
         "buttons": [
-            {"label": _URGENT_BUTTONS[key], "payload": URGENT_YES},
-            {"label": "No, I have a question", "payload": URGENT_NO},
+            button(_URGENT_BUTTONS[key], URGENT_YES),
+            button("no_i_have_a_question", URGENT_NO),
         ],
         "yes": URGENT_YES,
         "no": URGENT_NO,
@@ -390,8 +390,8 @@ def _route(session, text, payload):
                 {
                     "text": msg("abuse"),
                     "buttons": [
-                        {"label": "Request a callback", "payload": "human_handoff"},
-                        {"label": "Main menu", "payload": "menu"},
+                        button("request_a_callback", "human_handoff"),
+                        button("main_menu", "menu"),
                     ],
                 }
             ],
@@ -503,6 +503,17 @@ def _two_questions(session, text):
     )
 
 
+def _did_you_mean_text(suggested):
+    """Say what WAS understood (C11): "I can see this is about loans. Which
+    of these is closest?" -- only when every suggestion shares the topic."""
+    categories = {matcher.get(n).get("category") for n in suggested}
+    if len(categories) == 1:
+        category = categories.pop()
+        if category and has(f"category.{category}"):
+            return msg("did_you_mean_category", category=msg(f"category.{category}"))
+    return msg("did_you_mean")
+
+
 def _free_text(session, text, urgent_flows=True):
     """Matcher + confidence gate. `urgent_flows=False` is used after the
     customer has said "no, it's not fraud": an intent that would start the
@@ -535,16 +546,20 @@ def _free_text(session, text, urgent_flows=True):
         return _answer(session, intent, top_score, text=text)
 
     if top_name and top_score >= config.MEDIUM_CONFIDENCE:
+        suggested = [
+            name for name, score in ranked[: config.SUGGESTION_COUNT]
+            if score >= config.MEDIUM_CONFIDENCE
+        ]
         buttons = [
             {"label": matcher.get(name).get("label", name), "payload": name}
             for name, score in ranked[: config.SUGGESTION_COUNT]
             if score >= config.MEDIUM_CONFIDENCE
         ]
-        buttons.append({"label": "Talk to a person", "payload": "human_handoff"})
+        buttons.append(button("talk_to_a_person", "human_handoff"))
         return (
             [
                 {
-                    "text": msg("did_you_mean"),
+                    "text": _did_you_mean_text(suggested),
                     "buttons": buttons,
                 }
             ],
@@ -561,8 +576,8 @@ def _free_text(session, text, urgent_flows=True):
                 {
                     "text": msg("two_strike"),
                     "buttons": [
-                        {"label": "Request a callback", "payload": "human_handoff"},
-                        {"label": "Main menu", "payload": "menu"},
+                        button("request_a_callback", "human_handoff"),
+                        button("main_menu", "menu"),
                     ],
                 }
             ],
@@ -650,7 +665,7 @@ def _clarify(session):
     last = replies[-1]
     if not any(b["payload"] == "human_handoff" for b in last.get("buttons", [])):
         last["buttons"] = list(last.get("buttons", [])) + [
-            {"label": "Talk to a person", "payload": "human_handoff"}
+            button("talk_to_a_person", "human_handoff")
         ]
     return replies, {"action": "clarify"}
 
@@ -663,7 +678,7 @@ def _confident(text):
 def _frustrated(session, kind, flow=None):
     """Calm, an apology and a person (C5). Never a strike; logged as
     action=frustration so the weekly report can grow the phrase list."""
-    human = {"label": "Talk to a person", "payload": "human_handoff"}
+    human = button("talk_to_a_person", "human_handoff")
     if flow is not None:
         prompt = flow.resume(session)[-1]
         back = msg("back_to_flow", flow=flow.topic_label, prompt=prompt["text"])
@@ -673,7 +688,7 @@ def _frustrated(session, kind, flow=None):
             {"action": "frustration", "frustration": kind},
         )
     return (
-        [{"text": msg("frustration"), "buttons": [human, {"label": "Main menu", "payload": "menu"}]}],
+        [{"text": msg("frustration"), "buttons": [human, button("main_menu", "menu")]}],
         {"action": "frustration", "frustration": kind},
     )
 
@@ -699,8 +714,8 @@ def _confirm_cancel(session):
             {
                 "text": msg("cancel_confirm", flow=flow.topic_label),
                 "buttons": [
-                    {"label": "Yes, stop", "payload": CANCEL_YES},
-                    {"label": "No, continue", "payload": CANCEL_NO},
+                    button("yes_stop", CANCEL_YES),
+                    button("no_continue", CANCEL_NO),
                 ],
                 "yes": CANCEL_YES,
                 "no": CANCEL_NO,

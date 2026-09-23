@@ -295,7 +295,8 @@ YES_WORDS = frozenset({
 NO_WORDS = frozenset({
     "no", "n", "nope", "nah", "no thanks", "no thank you", "not really",
     "thats all", "that's all", "no its not", "no it's not", "it isnt",
-    "it isn't", "no i have a question", "i have a question", "ayi", "iyo",
+    "it isn't", "no i have a question", "i have a question", "no just a question",
+    "just a question", "ayi", "iyo",
 })
 _PUNCT_RE = re.compile(r"[^\w\s']+")
 

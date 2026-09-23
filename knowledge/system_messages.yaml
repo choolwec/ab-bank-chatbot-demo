@@ -12,7 +12,7 @@
 #              {placeholders} are filled by the code that sends the message
 #              (listed in `fills:` so reviewers know what appears there).
 #
-# Button labels are not here yet (they move with tickets C11/P3).
+# Button labels are the button.* entries at the end (C11).
 # ============================================================================
 
 messages:
@@ -54,6 +54,17 @@ messages:
   did_you_mean:
     status: draft
     text: I want to make sure I get this right — did you mean one of these?
+  did_you_mean_category:
+    status: draft
+    fills: [category]
+    text: I can see this is about {category}. Which of these is closest?
+  # Topic names for did_you_mean_category (one per intent category).
+  category.accounts: {status: draft, text: accounts}
+  category.etumba: {status: draft, text: eTumba}
+  category.fees: {status: draft, text: fees and charges}
+  category.loans: {status: draft, text: loans}
+  category.locations: {status: draft, text: branches and contact details}
+  category.technical: {status: draft, text: app and service problems}
   freetext_off:
     status: draft
     text: Free-typing is temporarily unavailable — please choose an option below.
@@ -105,6 +116,15 @@ messages:
   confirm.change:
     status: draft
     text: Which part would you like to change?
+  ack:
+    status: draft
+    # Rotated in front of the next question, by turn number (C11).
+    text: Got it.
+    variants: ["Got it.", "Thanks.", "Okay."]
+  thanks_name:
+    status: draft
+    fills: [name]
+    text: Thanks, {name}.
   read_back:
     status: draft
     fills: [value]
@@ -188,7 +208,7 @@ messages:
       First: what is your complaint about? (For example: an account, eTumba, a loan, service at a branch.)
   complaint.step.details:
     status: draft
-    text: Thank you. Please describe what happened.
+    text: Please describe what happened.
   complaint.step.contact:
     status: draft
     text: What's the best phone number or email for updates on this complaint? (Type 'skip' if you'd rather not — it is logged either way.)
@@ -211,10 +231,10 @@ messages:
       What's your name?
   lead.step.phone:
     status: draft
-    text: Thanks. What phone number should we call?
+    text: What phone number should we call?
   lead.step.topic:
     status: draft
-    text: And what would you like to discuss?
+    text: What would you like to discuss?
   lead.step.time:
     status: draft
     text: When is best to call — morning or afternoon?
@@ -261,3 +281,31 @@ messages:
     status: draft
     fills: [cities]
     text: "I couldn't find a listed branch there. We currently list branches in: {cities}. Our team can help you find the nearest service point."
+
+  # --- Button labels (C11). 20 characters or fewer: WhatsApp's limit. --------
+  button.a_branch: {status: draft, text: "A branch"}
+  button.about_etumba: {status: draft, text: "About eTumba"}
+  button.afternoon: {status: draft, text: "Afternoon"}
+  button.an_etumba_agent: {status: draft, text: "An eTumba agent"}
+  button.back_to_menu: {status: draft, text: "Back to menu"}
+  button.branches_agents: {status: draft, text: "Branches & agents"}
+  button.change_something: {status: draft, text: "Change something"}
+  button.etumba: {status: draft, text: "eTumba"}
+  button.etumba_agents: {status: draft, text: "eTumba agents"}
+  button.find_a_branch: {status: draft, text: "Find a branch"}
+  button.loans: {status: draft, text: "Loans"}
+  button.main_menu: {status: draft, text: "Main menu"}
+  button.morning: {status: draft, text: "Morning"}
+  button.no_continue: {status: draft, text: "No, continue"}
+  button.no_i_have_a_question: {status: draft, text: "No, just a question"}
+  button.no_let_me_explain: {status: draft, text: "No, let me explain"}
+  button.no_that_s_all: {status: draft, text: "No, that's all"}
+  button.open_an_account: {status: draft, text: "Open an account"}
+  button.opening_hours: {status: draft, text: "Opening hours"}
+  button.request_a_callback: {status: draft, text: "Request a callback"}
+  button.send_it: {status: draft, text: "Send it"}
+  button.talk_to_a_person: {status: draft, text: "Talk to a person"}
+  button.yes_complain: {status: draft, text: "Yes, complain"}
+  button.yes_report_it: {status: draft, text: "Yes, report it"}
+  button.yes_stop: {status: draft, text: "Yes, stop"}
+  button.yes_that_s_right: {status: draft, text: "Yes, that's right"}

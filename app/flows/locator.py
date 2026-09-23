@@ -8,7 +8,7 @@ import json
 import re
 
 from .. import config
-from ..messages import msg
+from ..messages import button, msg
 from .base import CANCEL_BUTTON, HUMAN_BUTTON, MENU_BUTTON
 
 
@@ -90,8 +90,8 @@ class LocatorFlow:
         return {
             "text": msg("locator.mode"),
             "buttons": [
-                {"label": "A branch", "payload": "loc_branch"},
-                {"label": "An eTumba agent", "payload": "loc_agent"},
+                button("a_branch", "loc_branch"),
+                button("an_etumba_agent", "loc_agent"),
                 CANCEL_BUTTON,
             ],
         }
@@ -131,8 +131,8 @@ class LocatorFlow:
             {
                 "text": msg("locator.agents", networks=networks),
                 "buttons": [
-                    {"label": "Find a branch", "payload": "branch_locator"},
-                    {"label": "About eTumba", "payload": "etumba_what_is"},
+                    button("find_a_branch", "branch_locator"),
+                    button("about_etumba", "etumba_what_is"),
                     MENU_BUTTON,
                 ],
             }
@@ -143,8 +143,8 @@ class LocatorFlow:
         return {
             "text": msg("locator.found", lines=branch_lines(matches)),
             "buttons": [
-                {"label": "eTumba agents", "payload": "agent_locator"},
-                {"label": "Opening hours", "payload": "opening_hours"},
+                button("etumba_agents", "agent_locator"),
+                button("opening_hours", "opening_hours"),
                 MENU_BUTTON,
             ],
         }

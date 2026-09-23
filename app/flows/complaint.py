@@ -28,7 +28,7 @@ class ComplaintFlow(FormFlow):
     def store_value(self, field, value):
         return store_contact(value) if field == "contact" else value
 
-    def acknowledge(self, field, value):
+    def acknowledge(self, field, value, session=None):
         if field == "contact" and value != SKIPPED:
             return msg("read_back", value=read_back(value))
         return None

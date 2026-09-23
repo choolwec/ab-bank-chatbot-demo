@@ -894,7 +894,7 @@ Customer-facing answer:
 Follow-up buttons: Contact details · Find a branch · Talk to a person
 
 
-## System messages (70 texts)
+## System messages (105 texts)
 
 Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts, retries, confirmations. Source: `knowledge/system_messages.yaml`. `{placeholders}` are filled in by the bot (contact details from `app/config.py`, or the values listed).
 
@@ -964,6 +964,49 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Status: **draft**
 
 > I want to make sure I get this right — did you mean one of these?
+
+### `did_you_mean_category`
+
+- Status: **draft**
+- Filled in by the bot: `{category}`
+
+> I can see this is about {category}. Which of these is closest?
+
+### `category.accounts`
+
+- Status: **draft**
+
+> accounts
+
+### `category.etumba`
+
+- Status: **draft**
+
+> eTumba
+
+### `category.fees`
+
+- Status: **draft**
+
+> fees and charges
+
+### `category.loans`
+
+- Status: **draft**
+
+> loans
+
+### `category.locations`
+
+- Status: **draft**
+
+> branches and contact details
+
+### `category.technical`
+
+- Status: **draft**
+
+> app and service problems
 
 ### `freetext_off`
 
@@ -1047,6 +1090,20 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Status: **draft**
 
 > Which part would you like to change?
+
+### `ack`
+
+- Status: **draft**
+- Rotates between: "Got it." / "Thanks." / "Okay."
+
+> Got it.
+
+### `thanks_name`
+
+- Status: **draft**
+- Filled in by the bot: `{name}`
+
+> Thanks, {name}.
 
 ### `read_back`
 
@@ -1222,7 +1279,7 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 
 - Status: **draft**
 
-> Thank you. Please describe what happened.
+> Please describe what happened.
 
 ### `complaint.step.contact`
 
@@ -1261,13 +1318,13 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 
 - Status: **draft**
 
-> Thanks. What phone number should we call?
+> What phone number should we call?
 
 ### `lead.step.topic`
 
 - Status: **draft**
 
-> And what would you like to discuss?
+> What would you like to discuss?
 
 ### `lead.step.time`
 
@@ -1348,4 +1405,160 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Filled in by the bot: `{cities}`
 
 > I couldn't find a listed branch there. We currently list branches in: {cities}. Our team can help you find the nearest service point.
+
+### `button.a_branch`
+
+- Status: **draft**
+
+> A branch
+
+### `button.about_etumba`
+
+- Status: **draft**
+
+> About eTumba
+
+### `button.afternoon`
+
+- Status: **draft**
+
+> Afternoon
+
+### `button.an_etumba_agent`
+
+- Status: **draft**
+
+> An eTumba agent
+
+### `button.back_to_menu`
+
+- Status: **draft**
+
+> Back to menu
+
+### `button.branches_agents`
+
+- Status: **draft**
+
+> Branches & agents
+
+### `button.change_something`
+
+- Status: **draft**
+
+> Change something
+
+### `button.etumba`
+
+- Status: **draft**
+
+> eTumba
+
+### `button.etumba_agents`
+
+- Status: **draft**
+
+> eTumba agents
+
+### `button.find_a_branch`
+
+- Status: **draft**
+
+> Find a branch
+
+### `button.loans`
+
+- Status: **draft**
+
+> Loans
+
+### `button.main_menu`
+
+- Status: **draft**
+
+> Main menu
+
+### `button.morning`
+
+- Status: **draft**
+
+> Morning
+
+### `button.no_continue`
+
+- Status: **draft**
+
+> No, continue
+
+### `button.no_i_have_a_question`
+
+- Status: **draft**
+
+> No, just a question
+
+### `button.no_let_me_explain`
+
+- Status: **draft**
+
+> No, let me explain
+
+### `button.no_that_s_all`
+
+- Status: **draft**
+
+> No, that's all
+
+### `button.open_an_account`
+
+- Status: **draft**
+
+> Open an account
+
+### `button.opening_hours`
+
+- Status: **draft**
+
+> Opening hours
+
+### `button.request_a_callback`
+
+- Status: **draft**
+
+> Request a callback
+
+### `button.send_it`
+
+- Status: **draft**
+
+> Send it
+
+### `button.talk_to_a_person`
+
+- Status: **draft**
+
+> Talk to a person
+
+### `button.yes_complain`
+
+- Status: **draft**
+
+> Yes, complain
+
+### `button.yes_report_it`
+
+- Status: **draft**
+
+> Yes, report it
+
+### `button.yes_stop`
+
+- Status: **draft**
+
+> Yes, stop
+
+### `button.yes_that_s_right`
+
+- Status: **draft**
+
+> Yes, that's right
 

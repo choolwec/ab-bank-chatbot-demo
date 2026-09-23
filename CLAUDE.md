@@ -240,8 +240,11 @@ code change.
 holds branch/agent locator data; `system_messages.yaml` holds every
 built-in text that isn't an intent answer (welcome, fallbacks, flow prompts,
 retries, finish texts), read through `app/messages.msg(key, **fmt)`. No
-customer-facing reply text may be a Python literal (an AST test enforces
-it; button labels are the one exception until C11). Flows look keys up by
+customer-facing reply text or button label may be a Python literal (an
+AST test enforces it). Buttons are built with `messages.button(key,
+payload)` from `button.*` entries, 20 characters or fewer. Rotating
+wrappers ("Got it." / "Thanks." / "Okay.") use `variant(key, n)`, picked by
+turn number so tests stay deterministic; only wrappers vary, never facts. Flows look keys up by
 convention (`<flow>.step.<field>`, `<flow>.retry.<field>`), and both
 `messages.verify()` and `flows.verify_messages()` fail at import on a
 missing key; `faq/*.md` is source prose intended for a

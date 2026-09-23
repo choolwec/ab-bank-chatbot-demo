@@ -1,0 +1,6 @@
+id: c8-short-trigger-asks-every-step
+turns:
+  - say: scam
+    expect: {active_flow: fraud, flow_step: what_happened, text_contains: [tell me briefly what happened]}
+  - say: i think i was scammed     # five words, but no facts: still asks
+    expect: {flow_step: when}

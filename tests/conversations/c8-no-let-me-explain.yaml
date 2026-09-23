@@ -1,0 +1,8 @@
+id: c8-no-let-me-explain
+turns:
+  - say: I lost my card yesterday at cairo branch
+    expect: {text_contains: [you said this happened yesterday, your card]}
+  - say: "no"
+    expect: {flow_step: what_happened, flow_data_lacks: {when: yesterday}, text_contains: [tell me briefly what happened]}
+  - say: I left it in a taxi on monday
+    expect: {flow_step: when}

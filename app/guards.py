@@ -92,7 +92,7 @@ FRAUD_HARD_RE = re.compile(
 # money from my etumba" -- telling a customer to secure a card they never
 # mentioned.
 FRAUD_HARD_PHRASES = [
-    "someone took", "somebody took", "they took my", "took my money",
+    "someone took", "somebody took", "took my money",
     "took money from my account", "taken from my account", "money was taken",
     "money got taken", "taken without my permission", "without my permission",
     "without my consent", "without my knowledge", "without my authorisation",
@@ -105,6 +105,17 @@ FRAUD_HARD_PHRASES = [
     "transaction i did not make", "transactions i did not make",
     "debited without",
 ]
+
+# "they took K500 from my wallet", "he withdrew K2000 from my account": a
+# person + a taking verb + money context. Found while building C8 -- the
+# phrase list above only knew "they took MY".
+THEFT_RE = re.compile(
+    r"(?i)\b(?:someone|somebody|some\s+one|they|he|she|people|a\s+(?:man|woman|guy|person))\s+"
+    r"(?:took|has\s+taken|have\s+taken|withdrew|has\s+withdrawn|have\s+withdrawn|deducted|drained|emptied)\b"
+    # the money word within five words of the verb: "they took my documents
+    # at the branch, when will my account be ready" is not a theft
+    r"(?:\W+\w+){0,5}?\W+(?:all\s+)?(?:money|k\s?\d[\d,]*|zmw|kwacha|savings|balance|wallet|e-?tumba|funds|cash)\b"
+)
 
 # Consistent with fraud, but with a plausible innocent reading -> confirm.
 SOFT_MONEY_PHRASES = [
@@ -251,7 +262,7 @@ def urgent_scan(text: str) -> UrgentSignal | None:
         if any(p in t for p in LOST_CARD_PHRASES) or LOST_CARD_RE.search(t):
             strength = "soft" if EDUCATION_RE.search(t) else "hard"
             return UrgentSignal("fraud", "lost_card", strength)
-        if FRAUD_HARD_RE.search(t) or any(p in t for p in FRAUD_HARD_PHRASES):
+        if FRAUD_HARD_RE.search(t) or THEFT_RE.search(t) or any(p in t for p in FRAUD_HARD_PHRASES):
             strength = "soft" if EDUCATION_RE.search(t) else "hard"
             return UrgentSignal("fraud", _fraud_sub(t), strength)
 

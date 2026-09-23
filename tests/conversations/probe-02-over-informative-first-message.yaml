@@ -2,7 +2,6 @@ id: probe-02-over-informative-first-message
 # The first message already says what happened, when and where. Don't ask
 # for it again: confirm it instead.
 fixes: C8
-xfail: true
 turns:
   - say: I lost my card yesterday at cairo branch
     expect:

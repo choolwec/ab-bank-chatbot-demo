@@ -27,7 +27,18 @@ ROOT = config.BASE_DIR
 PATHS = {
     "Fraud report (free-text trigger)": [
         ("say", "someone stole money from my etumba"),
-        ("say", "they took K500 after a call pretending to be the bank"),
+        ("say", "yes"),
+        ("say", "yesterday"),
+        ("say", "0977123456"),
+    ],
+    "Fraud report (over-informative first message)": [
+        ("say", "I lost my card yesterday at cairo branch"),
+        ("say", "yes"),
+        ("say", "0977123456"),
+    ],
+    "Fraud report (short trigger)": [
+        ("say", "scam"),
+        ("say", "they called pretending to be the bank and took K500"),
         ("say", "yesterday"),
         ("say", "eTumba"),
         ("say", "0977123456"),
@@ -186,6 +197,8 @@ def main() -> None:
         args.out.write_text(report, encoding="utf-8")
         print(f"written: {args.out}")
     else:
+        if hasattr(sys.stdout, "reconfigure"):  # Windows consoles default to cp1252
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
         print(report)
 
 

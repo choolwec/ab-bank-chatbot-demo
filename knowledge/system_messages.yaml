@@ -137,6 +137,18 @@ messages:
       I'm sorry this has happened. You've done the right thing by reporting it, and I'm treating it as urgent.
       If money is at risk right now, call us immediately on {emergency_phone}.
       I'll take a few details for our fraud team, and a person will follow up with you.
+  fraud.prefill.both:
+    status: draft
+    fills: [when, channel]
+    text: You said this happened {when}, involving {channel}. Is that right?
+  fraud.prefill.when:
+    status: draft
+    fills: [when]
+    text: You said this happened {when}. Is that right?
+  fraud.prefill.channel:
+    status: draft
+    fills: [channel]
+    text: You said this involved {channel}. Is that right?
   fraud.step.what_happened:
     status: draft
     text: Please tell me briefly what happened.

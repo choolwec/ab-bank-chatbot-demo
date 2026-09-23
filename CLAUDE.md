@@ -140,6 +140,17 @@ mandatory `contact` step (phone, email or an explicit "skip" with the
 consequence stated). It used to promise "a member of staff will contact
 you" while collecting no way to reach the customer.
 
+**Pre-fill (C8).** When the message that starts a fraud report is at least
+5 words *and* states a fact, or is 10+ words, it becomes `what_happened`.
+`app/extract.py` pulls when/channel/branch/amount from it, and one yes/no
+question ("You said this happened yesterday, involving your card. Is that
+right?") replaces up to three. "No, let me explain" falls back to the normal
+questions, and steps already filled are skipped. `when` always keeps the
+customer's own words; `when_hint` (an ISO date) is added only when
+unambiguous. dateparser hits need a digit and must not be just a time, so
+"I may have been scammed" and "10am" never become dates. Every date test
+pins "now".
+
 **Digressions and corrections (C6).** Every in-flow message is classified
 before it is stored. A **digression** (`router._digression`) is an
 unrelated question asked mid-flow. It is answered, and the current step is

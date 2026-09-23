@@ -61,6 +61,10 @@ fraud | someone is using my account
 fraud | someone logged into my account from another phone
 fraud | money taken from my account last night
 fraud | somebody took K2000 from my etumba
+fraud | they took K500 from my etumba wallet yesterday at the kitwe branch
+fraud | he withdrew K2000 from my account without telling me
+fraud | a man deducted money from my wallet at the agent
+fraud | someone has withdrawn all my savings
 
 # --- lost / stolen card (card wording) ---
 fraud | i lost my card

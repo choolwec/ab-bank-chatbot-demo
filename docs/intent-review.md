@@ -875,7 +875,7 @@ Customer-facing answer:
 Follow-up buttons: Contact details · Find a branch · Talk to a person
 
 
-## System messages (66 texts)
+## System messages (69 texts)
 
 Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts, retries, confirmations. Source: `knowledge/system_messages.yaml`. `{placeholders}` are filled in by the bot (contact details from `app/config.py`, or the values listed).
 
@@ -1112,6 +1112,27 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 > I'm sorry this has happened. You've done the right thing by reporting it, and I'm treating it as urgent.
 > If money is at risk right now, call us immediately on {emergency_phone}.
 > I'll take a few details for our fraud team, and a person will follow up with you.
+
+### `fraud.prefill.both`
+
+- Status: **draft**
+- Filled in by the bot: `{when}`, `{channel}`
+
+> You said this happened {when}, involving {channel}. Is that right?
+
+### `fraud.prefill.when`
+
+- Status: **draft**
+- Filled in by the bot: `{when}`
+
+> You said this happened {when}. Is that right?
+
+### `fraud.prefill.channel`
+
+- Status: **draft**
+- Filled in by the bot: `{channel}`
+
+> You said this involved {channel}. Is that right?
 
 ### `fraud.step.what_happened`
 

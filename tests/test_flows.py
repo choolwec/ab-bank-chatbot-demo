@@ -398,7 +398,7 @@ def test_read_back_formats_phone_numbers(raw, shown):
 
 def test_fraud_has_no_confirm_step_and_finish_shows_the_summary(bot):
     b = bot()
-    b.say("someone stole money from my etumba")
+    b.say("i think i was scammed")
     b.say("they sent K500 from my wallet")
     b.say("yesterday")
     b.say("eTumba")
@@ -430,3 +430,15 @@ def test_pre_c7_edit_button_still_works(bot):
     b.say("skip")
     b.tap("confirm_edit")
     assert "which part" in b.text.lower()
+
+
+def test_prefilled_ticket_carries_the_hints(bot):
+    b = bot()
+    b.say("they took K500 from my etumba wallet yesterday at the kitwe branch")
+    b.tap("prefill_yes")
+    b.say("0977123456")
+    fields = _ticket_fields(_ref(b.text))
+    assert fields["what_happened"].startswith("they took K500")
+    assert fields["when"] == "yesterday" and fields["channel"] == "eTumba"
+    assert fields["amount_hint"] == "K500" and fields["branch_hint"] == "Kitwe Branch"
+    assert "when_hint" in fields

@@ -1,0 +1,10 @@
+id: c8-fraud-report-with-one-missing-fact
+turns:
+  - say: someone stole money from my etumba
+    expect: {text_contains: [you said this involved etumba]}
+  - payload: prefill_yes
+    expect: {flow_step: when}
+  - say: yesterday
+    expect: {flow_step: contact}
+  - say: "0977123456"
+    expect: {ticket_created: fraud, bot_messages_max: 4}

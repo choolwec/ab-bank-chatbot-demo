@@ -1,0 +1,9 @@
+id: c8-fraud-report-in-four-messages
+# M1: <= 4 bot messages per scripted fraud report.
+turns:
+  - say: I lost my card yesterday at cairo branch
+    expect: {replies_max: 1}
+  - say: "yes"
+    expect: {flow_step: contact, flow_data_has: {when: yesterday, channel: card}}
+  - say: "0977123456"
+    expect: {ticket_created: fraud, active_flow: null, bot_messages_max: 3}

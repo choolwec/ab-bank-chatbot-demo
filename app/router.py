@@ -299,7 +299,7 @@ def _route(session, text, payload):
         urgent = guards.urgent_scan(text)
         if urgent and session.active_flow not in ("fraud", "complaint"):
             if urgent.is_hard:
-                return _start_urgent(session, urgent.kind, urgent.sub)
+                return _start_urgent(session, urgent.kind, urgent.sub, trigger=text)
             # Soft: ask first. The flow state is left untouched, so "no"
             # resumes whatever the customer was doing.
             return _ask_urgent(session, urgent.kind, urgent.sub, text, source="scan")
@@ -624,10 +624,10 @@ def _continue_flow(session):
     )
 
 
-def _start_urgent(session, kind, sub):
+def _start_urgent(session, kind, sub, trigger=None):
     session.strikes = 0
     flow = FLOWS["fraud" if kind == "fraud" else "complaint"]
-    replies, done = flow.start(session, kind=sub)
+    replies, done = flow.start(session, kind=sub, trigger=trigger)
     if done:
         session.active_flow = None
     return replies, {"action": f"urgent:{kind}"}
@@ -643,7 +643,7 @@ def _ask_urgent(session, kind, sub, text, source):
 
 def _resolve_urgent(session, pending, confirmed):
     if confirmed:
-        return _start_urgent(session, pending["kind"], pending["sub"])
+        return _start_urgent(session, pending["kind"], pending["sub"], trigger=pending["text"])
     # "No, I have a question": pick up an interrupted flow where it was, or
     # answer the original message -- minus the urgent reading they declined.
     if session.active_flow:
@@ -672,7 +672,7 @@ def _answer(session, intent, score, text=None):
         # Card-block wording only when a card was actually mentioned (S1).
         if kind == "lost_card" and text and not guards.CARD_MENTION_RE.search(text):
             kind = "fraud"
-        replies, done = FLOWS[flow_name].start(session, kind=kind)
+        replies, done = FLOWS[flow_name].start(session, kind=kind, trigger=text)
         if done:
             session.active_flow = None
             session.flow_state = {}

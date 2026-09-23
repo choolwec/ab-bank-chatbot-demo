@@ -52,7 +52,7 @@ class LocatorFlow:
     def message_keys(self):
         return ["locator.topic_label"]
 
-    def start(self, session, kind=None):
+    def start(self, session, kind=None, trigger=None):
         session.active_flow = self.name
         session.flow_state = {"mode": kind, "misses": 0}
         if kind == "agent":

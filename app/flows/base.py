@@ -148,12 +148,17 @@ class FormFlow:
     def intro(self, session, kind):
         return []
 
-    def start(self, session, kind=None):
+    def start(self, session, kind=None, trigger=None):
+        """`trigger` is the customer message that started the flow, if any
+        (a flow may pre-fill from it -- see FraudFlow)."""
         session.active_flow = self.name
         session.flow_state = {"step": 0, "data": {}, "kind": kind}
-        replies = self.intro(session, kind)
-        replies.append(self._prompt(0))
-        return replies, False
+        return self.opening(session, self.intro(session, kind), self._prompt(0)), False
+
+    def opening(self, session, intro, question):
+        """The intro and the first question share ONE bubble (M1 budget)."""
+        text = "\n\n".join([r["text"] for r in intro] + [question["text"]])
+        return [dict(question, text=text)]
 
     def _prompt(self, i):
         return {"text": msg(f"{self.name}.step.{self.steps[i]}"), "buttons": [CANCEL_BUTTON]}
@@ -287,6 +292,8 @@ class FormFlow:
         state.setdefault("data", {})[field] = value
         ack = self.acknowledge(field, value)
         i += 1
+        while i < len(self.steps) and self.steps[i] in state["data"]:
+            i += 1  # already answered (e.g. pre-filled from the first message, C8)
         state["step"] = i
         if i < len(self.steps):
             return [_with_ack(ack, self._prompt(i))], False

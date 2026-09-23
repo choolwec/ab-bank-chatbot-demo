@@ -5,5 +5,5 @@ turns:
     expect: {active_flow: fraud, flow_step: what_happened, strikes: 0}
   - say: how do i check my etumba balance?
     expect: {active_flow: fraud, flow_step: what_happened, text_contains: [back to your fraud report]}
-  - say: they sent K500 from my wallet
-    expect: {flow_step: when}
+  - payload: prefill_yes          # "You said this involved eTumba" (C8)
+    expect: {flow_step: when, flow_data_has: {channel: eTumba}}

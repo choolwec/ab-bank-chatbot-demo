@@ -5,6 +5,7 @@ offer instead of trapping the user (mirrors the two-strike rule).
 """
 
 import json
+import re
 
 from .. import config
 from ..messages import msg
@@ -31,6 +32,20 @@ def find_branches(needle: str) -> list[dict]:
     ]
 
 
+def branches_mentioned(text: str) -> list[dict]:
+    """Branches whose town or own name appears in `text` as whole words:
+    "where is the kitwe branch", "is there a branch in chilenje"."""
+    lowered = (text or "").lower()
+    found = []
+    for b in _load()["branches"]:
+        short = re.sub(r"(?i)\s+(?:premium\s+)?(?:satellite\s+|promotional\s+)?(?:branch|office).*$", "", b["name"]).strip().lower()
+        for needle in {b["city"].lower(), short}:
+            if needle and re.search(rf"\b{re.escape(needle)}\b", lowered):
+                found.append(b)
+                break
+    return found
+
+
 def branch_lines(branches: list[dict]) -> str:
     return "\n".join(
         msg(
@@ -53,6 +68,14 @@ class LocatorFlow:
         return ["locator.topic_label"]
 
     def start(self, session, kind=None, trigger=None):
+        # "where is the kitwe branch" already names the town: answer it
+        # rather than asking "which town or city are you in?".
+        if kind in (None, "branch") and trigger:
+            matches = branches_mentioned(trigger)
+            if matches:
+                session.active_flow = None
+                session.flow_state = {}
+                return [self.found_reply(session, matches)], True
         session.active_flow = self.name
         session.flow_state = {"mode": kind, "misses": 0}
         if kind == "agent":

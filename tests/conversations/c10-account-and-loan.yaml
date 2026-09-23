@@ -1,0 +1,7 @@
+id: c10-account-and-loan
+turns:
+  - say: I want to open an account and get a loan
+    expect:
+      action: answer
+      replies_max: 1
+      text_contains: [opened at any branch, and on your other question, loan officer]

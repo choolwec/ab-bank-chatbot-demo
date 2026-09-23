@@ -1,0 +1,4 @@
+id: c10-urgent-is-never-split
+turns:
+  - say: my card is stolen and blocked
+    expect: {action: "urgent:fraud", active_flow: fraud}

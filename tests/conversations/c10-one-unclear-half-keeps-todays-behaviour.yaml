@@ -1,0 +1,4 @@
+id: c10-one-unclear-half-keeps-todays-behaviour
+turns:
+  - say: what is etumba and flurb zzqx vortblatt
+    expect: {text_lacks: [and on your other question]}

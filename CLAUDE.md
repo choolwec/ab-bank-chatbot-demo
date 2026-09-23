@@ -119,6 +119,14 @@ mapped generic intent, the specific one answers: "how much does it cost?"
 after Tamanga gets `fees_tamanga`. Every switch is logged as an
 `action=context_boost` audit event.
 
+**Two questions in one message (C10).** `router._two_questions` splits on
+" and " / " also " / "?" into exactly two clauses of 3+ words. If *both* get
+a confident, different direct answer, both go in one reply, with up to 5
+buttons merged. Otherwise nothing changes. Urgent messages never reach it.
+A branch lookup counts as a direct answer when the clause names a branch or
+town; the locator itself also answers straight away when its trigger does
+("where is the kitwe branch").
+
 **Evaluation gates (E3).** `tests/test_eval_gates.py` scores the matcher on
 the held-out set `tests/eval/heldout.yaml` at the production thresholds and
 fails the build if any metric crosses `tests/eval/gates.yaml` (right/wrong

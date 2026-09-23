@@ -13,6 +13,7 @@ from rapidfuzz import fuzz
 from . import audit, config, guards
 from .messages import msg
 from .flows import FLOWS
+from .flows.locator import branches_mentioned
 from .matcher import Matcher
 
 matcher = Matcher()
@@ -452,6 +453,56 @@ def _context_follow_up(session, text, ranked):
     return None
 
 
+# --- C10: two questions in one message --------------------------------------
+_CLAUSE_SPLIT_RE = re.compile(r"\?|\band\b|\balso\b", re.IGNORECASE)
+CLAUSE_MIN_WORDS = 3
+MAX_BUTTONS = 5
+
+
+def _clause_answer(session, clause):
+    """(intent name, text, buttons) if `clause` alone gets a direct answer."""
+    ranked = matcher.match(clause)
+    if not ranked or ranked[0][1] < config.HIGH_CONFIDENCE:
+        return None
+    intent = matcher.get(ranked[0][0])
+    if intent.get("flow") == "locator" and (intent.get("flow_args") or {}).get("kind") == "branch":
+        # "where is the kitwe branch" names the branch: answer it inline.
+        matches = branches_mentioned(clause)
+        if not matches:
+            return None
+        found = FLOWS["locator"].found_reply(session, matches)
+        return intent["intent"], found["text"], found["buttons"]
+    if intent.get("flow") or not intent.get("answer"):
+        return None
+    return intent["intent"], intent["answer"].strip(), intent.get("buttons", [])
+
+
+def _two_questions(session, text):
+    """ "what are your opening hours and where is the kitwe branch": when
+    BOTH halves get a confident, different answer, send both in ONE reply
+    (one billable WhatsApp message, not two). Anything less: None, and the
+    normal single-answer path runs."""
+    clauses = [c.strip(" ,.;") for c in _CLAUSE_SPLIT_RE.split(text)]
+    clauses = [c for c in clauses if c]
+    if len(clauses) != 2 or any(len(c.split()) < CLAUSE_MIN_WORDS for c in clauses):
+        return None
+    answers = [_clause_answer(session, c) for c in clauses]
+    if not all(answers) or answers[0][0] == answers[1][0]:
+        return None
+    (first, text1, buttons1), (second, text2, buttons2) = answers
+    buttons, seen = [], set()
+    for b in list(buttons1) + list(buttons2):
+        if b["payload"] not in seen and len(buttons) < MAX_BUTTONS:
+            seen.add(b["payload"])
+            buttons.append(dict(b))
+    session.strikes = 0
+    session.slots["context"] = {"intent": second, "age": 0}
+    return (
+        [{"text": text1 + "\n\n" + msg("and_also") + "\n" + text2, "buttons": buttons}],
+        {"action": "answer", "intent": first, "intents": [first, second]},
+    )
+
+
 def _free_text(session, text, urgent_flows=True):
     """Matcher + confidence gate. `urgent_flows=False` is used after the
     customer has said "no, it's not fraud": an intent that would start the
@@ -465,6 +516,9 @@ def _free_text(session, text, urgent_flows=True):
     boosted = _context_follow_up(session, text, ranked)
     if boosted:
         return boosted
+    both = _two_questions(session, text)
+    if both:
+        return both
     top_name, top_score = ranked[0] if ranked else (None, 0.0)
 
     if top_name and top_score >= config.HIGH_CONFIDENCE:

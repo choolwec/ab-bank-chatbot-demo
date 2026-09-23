@@ -1,0 +1,5 @@
+id: c10-named-branch-answers-directly
+# The locator no longer asks "which town?" when the message says.
+turns:
+  - say: where is the kitwe branch
+    expect: {active_flow: null, text_contains: [chisokone], replies_max: 1}

@@ -894,7 +894,7 @@ Customer-facing answer:
 Follow-up buttons: Contact details · Find a branch · Talk to a person
 
 
-## System messages (69 texts)
+## System messages (70 texts)
 
 Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts, retries, confirmations. Source: `knowledge/system_messages.yaml`. `{placeholders}` are filled in by the bot (contact details from `app/config.py`, or the values listed).
 
@@ -982,6 +982,12 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Status: **draft**
 
 > I'm sorry — I can see this isn't working for you, and that's frustrating. A person from our team can help you directly, or you can try asking in a different way.
+
+### `and_also`
+
+- Status: **draft**
+
+> And on your other question:
 
 ### `back_to_flow`
 

@@ -453,3 +453,12 @@ def test_context_boost_is_in_the_audit_log(bot):
         "from": "fees_charges", "to": "fees_tamanga", "topic": "current_account",
     }
     assert "context_boost: fees_charges -> fees_tamanga" in audit.JSONL_FILE.read_text(encoding="utf-8")
+
+
+def test_two_answers_share_at_most_five_buttons(bot):
+    b = bot()
+    b.say("what are your opening hours and where is the kitwe branch")
+    assert len(b.last[0]) == 1
+    payloads = b.buttons
+    assert len(payloads) <= 5 and len(set(payloads)) == len(payloads)
+    assert b.last[1]["intents"] == ["opening_hours", "branch_locator"]

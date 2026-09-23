@@ -1,6 +1,5 @@
 id: probe-08-two-questions
 fixes: C10
-xfail: true
 turns:
   - say: what are your opening hours and where is the kitwe branch
     expect:

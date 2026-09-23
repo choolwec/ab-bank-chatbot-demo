@@ -1400,7 +1400,7 @@ that finishes the ticket.
 | C9 | Context carry-over | 1 | W06 | 2 | — | Dev 2 | ☑ |
 | C10 | Two questions in one message | 1 | W06 | 1.5 | C1 | Dev 2 | ☑ |
 | C11 | Warmth: acknowledgements, name, category fallback | 1 | W06 | 2 | C1, K1 | Dev | ☐ |
-| K1 | Short labels, simple answers, tone guide | 1 | W02–06 | — | — | CO | ☐ |
+| K1 | Short labels, simple answers, tone guide | 1 | W02–06 | — | — | CO | ☑ |
 | K2 | Resolve the 17 `[CONFIRM` placeholders | 1–2 | W01–10 | — | — | Business | ☐ |
 | N1 | Golden evaluation set pipeline and workshop | 2 | W04–07 | 1.5 | E3 | Dev + CO | ☐ |
 | N2 | Out-of-scope set (≥ 300) | 2 | W07 | 1 | — | Dev + CO | ☐ |

@@ -115,3 +115,17 @@ def test_follow_ups_point_at_real_intents():
         for generic, specific in (intent.get("follow_ups") or {}).items():
             assert generic in matcher.intents, (name, generic)
             assert specific in matcher.intents, (name, specific)
+
+
+def test_every_long_label_has_a_short_label():
+    """K1: WhatsApp buttons allow 20 characters. Every intent label and YAML
+    button label longer than that carries a short_label that fits."""
+    missing = []
+    for name, intent in matcher.intents.items():
+        items = [intent] + list(intent.get("buttons", []))
+        for item in items:
+            if len(item["label"]) > 20:
+                short = item.get("short_label", "")
+                if not short or len(short) > 20:
+                    missing.append((name, item["label"], short))
+    assert not missing, missing

@@ -30,9 +30,9 @@ intents:
       We have everyday accounts (Tamanga and Tamanga Plus), a business account (Mukula Plus), and savings accounts for adults and for children. Tell me which one you'd like to know about.
     buttons:
       - {label: "Savings account", payload: "savings_account"}
-      - {label: "Current account (Tamanga)", payload: "current_account"}
+      - {label: "Current account (Tamanga)", short_label: "Tamanga account", payload: "current_account"}
       - {label: "Business account", payload: "business_account"}
-      - {label: "How to open an account", payload: "account_opening_how"}
+      - {label: "How to open an account", short_label: "Opening an account", payload: "account_opening_how"}
 
   - intent: savings_account
     label: "Savings account"
@@ -63,13 +63,14 @@ intents:
       loan_requirements: account_opening_requirements
       business_account_requirements: account_opening_requirements
     buttons:
-      - {label: "What you need to open", payload: "account_opening_requirements"}
+      - {label: "What you need to open", short_label: "What you need", payload: "account_opening_requirements"}
       - {label: "Savings Plan account", payload: "savings_plan_account"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Fees & charges", payload: "fees_charges"}
 
   - intent: current_account
     label: "Current account (Tamanga)"
+    short_label: "Tamanga account"
     category: accounts
     status: draft
     phrases:
@@ -103,13 +104,14 @@ intents:
       loan_requirements: account_opening_requirements
       business_account_requirements: account_opening_requirements
     buttons:
-      - {label: "Tamanga Plus (premium)", payload: "tamanga_plus_account"}
-      - {label: "What you need to open", payload: "account_opening_requirements"}
+      - {label: "Tamanga Plus (premium)", short_label: "Tamanga Plus", payload: "tamanga_plus_account"}
+      - {label: "What you need to open", short_label: "What you need", payload: "account_opening_requirements"}
       - {label: "Fees & charges", payload: "fees_charges"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
   - intent: tamanga_plus_account
     label: "Tamanga Plus (premium current account)"
+    short_label: "Tamanga Plus"
     category: accounts
     status: draft
     phrases:
@@ -141,6 +143,7 @@ intents:
 
   - intent: business_account
     label: "Business account (Mukula Plus)"
+    short_label: "Mukula Plus account"
     category: accounts
     status: draft
     phrases:
@@ -171,13 +174,14 @@ intents:
       loan_requirements: business_account_requirements
       business_account_requirements: business_account_requirements
     buttons:
-      - {label: "Documents needed by entity type", payload: "business_account_requirements"}
+      - {label: "Documents needed by entity type", short_label: "Documents needed", payload: "business_account_requirements"}
       - {label: "Business loans", payload: "msme_loan"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
   - intent: business_account_requirements
     label: "Business account documents by entity type"
+    short_label: "Business documents"
     category: accounts
     status: draft
     phrases:
@@ -206,7 +210,7 @@ intents:
       All documents must be original. A branch can confirm the exact list
       for your specific case.
     buttons:
-      - {label: "Business account overview", payload: "business_account"}
+      - {label: "Business account overview", short_label: "Business account", payload: "business_account"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
@@ -238,7 +242,7 @@ intents:
       loan_requirements: account_opening_requirements
       business_account_requirements: account_opening_requirements
     buttons:
-      - {label: "Savings account (flexible)", payload: "savings_account"}
+      - {label: "Savings account (flexible)", short_label: "Savings account", payload: "savings_account"}
       - {label: "Kids Savings account", payload: "kids_savings_account"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Talk to a person", payload: "human_handoff"}
@@ -268,12 +272,13 @@ intents:
       the child's document (under-5 card, birth certificate, or birth
       record) to any branch.
     buttons:
-      - {label: "Savings account (adult)", payload: "savings_account"}
+      - {label: "Savings account (adult)", short_label: "Savings account", payload: "savings_account"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
   - intent: term_deposit_account
     label: "Term Deposit Account (TDA)"
+    short_label: "Term deposit"
     category: accounts
     status: draft
     phrases:
@@ -301,7 +306,7 @@ intents:
       loan_requirements: account_opening_requirements
       business_account_requirements: account_opening_requirements
     buttons:
-      - {label: "What you need to open", payload: "account_opening_requirements"}
+      - {label: "What you need to open", short_label: "What you need", payload: "account_opening_requirements"}
       - {label: "Types of accounts", payload: "account_types_overview"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
@@ -332,12 +337,13 @@ intents:
       loan_requirements: account_opening_requirements
       business_account_requirements: account_opening_requirements
     buttons:
-      - {label: "What you need to open", payload: "account_opening_requirements"}
+      - {label: "What you need to open", short_label: "What you need", payload: "account_opening_requirements"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
   - intent: foreign_national_account
     label: "Account opening for foreign nationals"
+    short_label: "Foreign nationals"
     category: accounts
     status: draft
     phrases:
@@ -364,6 +370,7 @@ intents:
 
   - intent: account_opening_requirements
     label: "What you need to open an account"
+    short_label: "What you need"
     category: accounts
     status: draft
     phrases:
@@ -393,11 +400,12 @@ intents:
     buttons:
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Types of accounts", payload: "account_types_overview"}
-      - {label: "Business account documents", payload: "business_account_requirements"}
+      - {label: "Business account documents", short_label: "Business documents", payload: "business_account_requirements"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
   - intent: account_opening_how
     label: "How to open an account"
+    short_label: "Opening an account"
     category: accounts
     status: draft
     phrases:
@@ -425,6 +433,7 @@ intents:
 
   - intent: bank_statement_request
     label: "Getting a bank statement"
+    short_label: "Bank statement"
     category: accounts
     status: draft
     phrases:
@@ -446,12 +455,13 @@ intents:
       You can also call the Contact Centre on 888 (not toll-free) or visit
       a branch either way.
     buttons:
-      - {label: "Upgrade to Tamanga Plus", payload: "tamanga_plus_account"}
+      - {label: "Upgrade to Tamanga Plus", short_label: "Get Tamanga Plus", payload: "tamanga_plus_account"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
   - intent: account_reactivation
     label: "Reactivating a dormant account"
+    short_label: "Dormant account"
     category: accounts
     status: draft
     phrases:
@@ -474,6 +484,7 @@ intents:
 
   - intent: sort_swift_code
     label: "Sort code / SWIFT code"
+    short_label: "Sort & SWIFT codes"
     category: accounts
     status: draft
     phrases:

@@ -1,6 +1,7 @@
 intents:
   - intent: msme_loan
     label: "Business (MSME) loans"
+    short_label: "Business loans"
     category: loans
     status: draft
     phrases:
@@ -39,6 +40,7 @@ intents:
 
   - intent: agri_loan
     label: "Loans for farming businesses"
+    short_label: "Farming loans"
     category: loans
     status: draft
     phrases:
@@ -64,12 +66,13 @@ intents:
       business_account_requirements: loan_requirements
       account_opening_how: loan_apply_how
     buttons:
-      - {label: "Business loan details", payload: "msme_loan"}
+      - {label: "Business loan details", short_label: "Business loans", payload: "msme_loan"}
       - {label: "Loan requirements", payload: "loan_requirements"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
   - intent: personal_loan
     label: "Personal loans (government employees)"
+    short_label: "Personal loans"
     category: loans
     status: draft
     phrases:
@@ -157,7 +160,7 @@ intents:
       For a business loan, bring your ID and proof of where you live. Your business must be at least 12 months old. You also need a guarantor and collateral.
     buttons:
       - {label: "How to apply", payload: "loan_apply_how"}
-      - {label: "Personal loan details", payload: "personal_loan"}
+      - {label: "Personal loan details", short_label: "Personal loans", payload: "personal_loan"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
@@ -186,6 +189,7 @@ intents:
 
   - intent: collateral_definition
     label: "What counts as collateral?"
+    short_label: "About collateral"
     category: loans
     status: draft
     phrases:
@@ -211,6 +215,7 @@ intents:
 
   - intent: loan_apply_how
     label: "How to apply for a loan"
+    short_label: "Apply for a loan"
     category: loans
     status: draft
     phrases:

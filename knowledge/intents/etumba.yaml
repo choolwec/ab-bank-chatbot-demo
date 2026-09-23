@@ -95,7 +95,7 @@ intents:
       account_opening_how: etumba_register
     buttons:
       - {label: "Register for eTumba", payload: "etumba_register"}
-      - {label: "Transfers to mobile money", payload: "etumba_transfer_mobile_money"}
+      - {label: "Transfers to mobile money", short_label: "Send to mobile money", payload: "etumba_transfer_mobile_money"}
       - {label: "Cash in / cash out", payload: "etumba_cash_in_out"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
@@ -129,6 +129,7 @@ intents:
 
   - intent: etumba_cash_in_out
     label: "eTumba cash in / cash out"
+    short_label: "eTumba cash in/out"
     category: etumba
     status: draft
     phrases:
@@ -157,6 +158,7 @@ intents:
 
   - intent: etumba_pull_push_funds
     label: "Move money between eTumba and my bank account"
+    short_label: "eTumba to bank"
     category: etumba
     status: draft
     phrases:
@@ -187,6 +189,7 @@ intents:
 
   - intent: etumba_transfer_mobile_money
     label: "Transfer between eTumba and Airtel/MTN/Zamtel"
+    short_label: "Send to mobile money"
     category: etumba
     status: draft
     phrases:
@@ -212,7 +215,7 @@ intents:
     follow_ups:
       fees_charges: etumba_fees
     buttons:
-      - {label: "Pull / push funds (bank account)", payload: "etumba_pull_push_funds"}
+      - {label: "Pull / push funds (bank account)", short_label: "eTumba to bank", payload: "etumba_pull_push_funds"}
       - {label: "eTumba fees", payload: "etumba_fees"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
@@ -239,11 +242,12 @@ intents:
       select Yaka Savings.
     buttons:
       - {label: "What is eTumba?", payload: "etumba_what_is"}
-      - {label: "Savings account (bank)", payload: "savings_account"}
+      - {label: "Savings account (bank)", short_label: "Savings account", payload: "savings_account"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
   - intent: zesco_token
     label: "Retrieving a ZESCO token"
+    short_label: "ZESCO token"
     category: etumba
     status: draft
     phrases:
@@ -269,6 +273,7 @@ intents:
 
   - intent: etumba_reversal
     label: "Reverse a wrongly sent eTumba transfer"
+    short_label: "Reverse a transfer"
     category: etumba
     status: draft
     phrases:

@@ -6,6 +6,7 @@
 intents:
   - intent: fraud_scam
     label: "Report fraud or a scam"
+    short_label: "Report fraud"
     category: urgent
     status: draft
     flow: fraud
@@ -91,6 +92,7 @@ intents:
 
   - intent: credential_trouble
     label: "Forgot PIN or password"
+    short_label: "Forgot PIN/password"
     category: urgent
     status: draft
     phrases:

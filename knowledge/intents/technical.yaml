@@ -1,6 +1,7 @@
 intents:
   - intent: technical_issue
     label: "App or online banking not working"
+    short_label: "App not working"
     category: technical
     status: draft
     phrases:

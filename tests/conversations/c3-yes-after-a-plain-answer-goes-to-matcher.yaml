@@ -1,0 +1,6 @@
+id: c3-yes-after-a-plain-answer-goes-to-matcher
+# An answer that asked no yes/no question: "yes" is not a pick.
+turns:
+  - say: what is etumba
+  - say: "yes"
+    expect: {text_lacks: [what can i help with]}

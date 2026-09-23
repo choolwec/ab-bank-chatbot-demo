@@ -1,0 +1,10 @@
+id: c3-typed-labels-and-numbers-in-a-flow
+turns:
+  - payload: human_handoff
+  - say: Mary Banda
+  - say: "0977123456"
+  - say: a loan
+  - say: "2"                    # Morning / Afternoon / Back to menu
+    expect: {flow_data_has: {time: Afternoon}, text_contains: [shall i submit this]}
+  - say: yes please
+    expect: {ticket_created: callback, active_flow: null}

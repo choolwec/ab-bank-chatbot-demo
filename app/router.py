@@ -5,6 +5,10 @@ least one button), two-strike fallback, urgent topics bypass everything,
 PII masked before anything else sees the text.
 """
 
+import re
+
+from rapidfuzz import fuzz
+
 from . import audit, config, guards
 from .messages import msg
 from .flows import FLOWS
@@ -72,6 +76,8 @@ def _urgent_confirm(kind, sub):
             {"label": _URGENT_BUTTONS[key], "payload": URGENT_YES},
             {"label": "No, I have a question", "payload": URGENT_NO},
         ],
+        "yes": URGENT_YES,
+        "no": URGENT_NO,
     }
 
 
@@ -95,6 +101,7 @@ def welcome(session):
     replies = [{"text": text, "buttons": list(MENU_BUTTONS)}]
     session.add("bot", text)
     audit.log_event(session.id, "bot", text, action="welcome")
+    _remember_expecting(session, replies)
     return replies
 
 
@@ -117,6 +124,7 @@ def resume(session):
         reply["text"] = _render(reply["text"])
         session.add("bot", reply["text"])
         audit.log_event(session.id, "bot", reply["text"], action=meta["action"])
+    _remember_expecting(session, replies)
     return replies, meta
 
 
@@ -152,13 +160,69 @@ def handle(session, text=None, payload=None):
             confidence=meta.get("confidence"),
             action=meta.get("action"),
         )
+    _remember_expecting(session, replies)
     return replies, meta
+
+
+# --- C3: answers to the bot's own questions -----------------------------------
+# Buttons that are ways out rather than answers; they don't make a reply
+# "a question with options" on their own.
+_CONTROL_PAYLOADS = {"cancel_flow"}
+_NUMBER_WORDS = {
+    "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+    "six": 6, "seven": 7, "eight": 8, "nine": 9,
+    "first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5,
+}
+_NUMBER_RE = re.compile(r"^(?:(?:option|number|no)\s*)?([1-9])$")
+LABEL_MATCH_MIN = 90
+
+
+def _remember_expecting(session, replies):
+    """Store what the final reply asked for; strip the internal yes/no keys
+    so they never reach the widget."""
+    last = replies[-1] if replies else {}
+    session.expecting = {
+        "options": [(b["label"], b["payload"]) for b in last.get("buttons", [])],
+        "yes": last.get("yes"),
+        "no": last.get("no"),
+    }
+    for reply in replies:
+        reply.pop("yes", None)
+        reply.pop("no", None)
+
+
+def _expected_payload(expecting, text):
+    """The payload `text` picks from the last reply, or None."""
+    if not expecting:
+        return None
+    answer = guards.yes_no(text)
+    if answer is True and expecting.get("yes"):
+        return expecting["yes"]
+    if answer is False and expecting.get("no"):
+        return expecting["no"]
+    options = expecting.get("options") or []
+    if sum(p not in _CONTROL_PAYLOADS for _, p in options) < 2:
+        return None  # a free-text step: "2" is an answer, not a pick
+    t = guards.normalise(text)
+    m = _NUMBER_RE.match(t)
+    n = int(m.group(1)) if m else _NUMBER_WORDS.get(t)
+    if n:
+        return options[n - 1][1] if n <= len(options) else None
+    best, best_score = None, 0
+    for label, payload in options:
+        score = fuzz.ratio(t, guards.normalise(label))
+        if score > best_score:
+            best, best_score = payload, score
+    return best if best_score >= LABEL_MATCH_MIN else None
 
 
 def _route(session, text, payload):
     # A soft-urgent confirmation question (S1) can only be answered by the
     # very next message -- anything else, including a button, drops it.
     pending = session.slots.pop("pending_urgent", None)
+    # Same for what the last reply was expecting (C3).
+    expecting = session.expecting
+    session.expecting = {}
 
     # 0. Session controls come before everything
     if payload in ("menu", "start"):
@@ -228,6 +292,13 @@ def _route(session, text, payload):
             if command == "menu" and session.active_flow in ("fraud", "complaint"):
                 command = "cancel_flow"  # never drop a report without asking
             return _route(session, None, command)
+
+    # 1c'. "yes", "2", or a typed button label answering the last reply (C3).
+    if text and not payload:
+        picked = _expected_payload(expecting, text)
+        if picked:
+            replies, meta = _route(session, None, picked)
+            return replies, dict(meta, expected_pick=picked)
 
     # 1d. Answer to "Your report isn't sent yet. Stop anyway?"
     if session.active_flow and session.flow_state.pop("confirm_cancel", False) and text:
@@ -438,6 +509,8 @@ def _confirm_cancel(session):
                     {"label": "Yes, stop", "payload": CANCEL_YES},
                     {"label": "No, continue", "payload": CANCEL_NO},
                 ],
+                "yes": CANCEL_YES,
+                "no": CANCEL_NO,
             }
         ],
         {"action": "cancel_confirm"},
@@ -517,4 +590,10 @@ def _answer(session, intent, score, text=None):
         return [{"text": msg("fallback"), "buttons": list(MENU_BUTTONS)}], meta
     buttons = [dict(b) for b in intent.get("buttons", [])]
     meta["action"] = "answer"
-    return [{"text": answer.strip(), "buttons": buttons}], meta
+    reply = {"text": answer.strip(), "buttons": buttons}
+    # An answer that ends in a yes/no question declares what each means (C3).
+    if intent.get("on_yes"):
+        reply["yes"] = intent["on_yes"]
+    if intent.get("on_no"):
+        reply["no"] = intent["on_no"]
+    return [reply], meta

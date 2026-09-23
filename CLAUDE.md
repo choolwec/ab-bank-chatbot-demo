@@ -90,6 +90,13 @@ not incidental:
   report, by button or typed, asks "Stop anyway?" first
   (`flow_state["confirm_cancel"]`). `COMMAND_ANSWERS` lists words that are a
   legitimate answer inside a flow ("agent" in the locator).
+- After every reply the router records `session.expecting` (C3): the last
+  reply's options plus the payloads a typed yes/no means, declared with
+  internal `yes`/`no` keys on the reply dict (flows) or `on_yes`/`on_no` in
+  an intent's YAML. Those keys are stripped before replies leave `handle()`.
+  The next message can then be "yes", "2", or a typed button label. Numbered
+  picks need at least 2 real options, so "2" at a free-text step stays an
+  answer. Any other message clears the expectation.
 - Every reply is guaranteed at least one button before `handle()` returns —
   a hard "no dead ends" invariant enforced in code, not a per-answer
   convention to remember.

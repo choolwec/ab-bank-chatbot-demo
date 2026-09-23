@@ -25,6 +25,9 @@ class Session:
     slots: dict = field(default_factory=dict)       # topic, city, last_intent…
     transcript: list = field(default_factory=list)  # masked turns only
     greeted: bool = False
+    # C3: what the last bot reply asked for -- {"options": [(label, payload)],
+    # "yes": payload, "no": payload}. Rebuilt after every reply.
+    expecting: dict = field(default_factory=dict)
 
     def add(self, role: str, text: str) -> None:
         self.transcript.append({"role": role, "text": text, "ts": time.time()})

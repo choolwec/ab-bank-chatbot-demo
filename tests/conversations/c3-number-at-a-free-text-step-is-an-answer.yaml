@@ -1,0 +1,7 @@
+id: c3-number-at-a-free-text-step-is-an-answer
+# "2" at "When did this happen?" (only a Back-to-menu button) is the answer.
+turns:
+  - say: i think i was scammed
+  - say: they called me pretending to be the bank
+  - say: "2"
+    expect: {active_flow: fraud, flow_step: channel, flow_data_has: {when: "2"}}

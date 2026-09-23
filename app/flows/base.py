@@ -125,6 +125,8 @@ class FormFlow:
         return {
             "text": msg("confirm.summary", lines=lines),
             "buttons": [CONFIRM_BUTTON, EDIT_BUTTON, CANCEL_BUTTON],
+            "yes": CONFIRM_BUTTON["payload"],
+            "no": EDIT_BUTTON["payload"],
         }
 
     def resume(self, session):

@@ -1,0 +1,5 @@
+id: c3-typed-suggestion-label
+# A typed menu label picks it, like the button.
+turns:
+  - say: Branches & agents
+    expect: {active_flow: locator}

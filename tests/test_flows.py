@@ -371,3 +371,11 @@ def test_fraud_contact_skip_states_the_consequence(bot):
     assert "888" in b.text  # {contact_phone} rendered
     b.tap("confirm_yes")
     assert _ticket_fields(_ref(b.text))["contact"] == "skipped"
+
+
+def test_internal_yes_no_keys_never_reach_the_widget(client):
+    sid = new_session(client)
+    chat(client, sid, message="my money is gone")  # declares yes/no internally
+    data = chat(client, sid, message="what is etumba")
+    for reply in data["replies"]:
+        assert set(reply) == {"text", "buttons"}, reply

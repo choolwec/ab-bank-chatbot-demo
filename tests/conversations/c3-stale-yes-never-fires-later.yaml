@@ -1,0 +1,13 @@
+id: c3-stale-yes-never-fires-later
+turns:
+  - payload: human_handoff
+  - say: Mary Banda
+  - say: "0977123456"
+  - say: a loan
+  - say: morning
+  - say: "yes"
+    expect: {ticket_created: callback, text_contains: [anything else]}
+  - say: what is etumba          # moves on; the "anything else?" is gone
+    expect: {intent: etumba_what_is}
+  - say: "yes"
+    expect: {action_in: [fallback, did_you_mean, answer, two_strike]}

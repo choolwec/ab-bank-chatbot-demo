@@ -1,0 +1,8 @@
+id: c3-no-at-the-summary-edits
+turns:
+  - say: I want to complain
+  - say: Service at a branch
+  - say: nobody helped me
+  - say: skip
+  - say: "no"
+    expect: {active_flow: complaint, flow_step: contact}

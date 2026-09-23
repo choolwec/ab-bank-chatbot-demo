@@ -10,6 +10,8 @@
 #              English; the regression suite asserts every phrase matches
 #   answer:    approved text; {placeholders} filled from app/config.py CONTACTS
 #   buttons:   every answer must offer at least one next step (no dead ends)
+#   on_yes / on_no: (optional) the payload a typed "yes" / "no" means, when
+#              the answer ends in a yes/no question ("anything else?")
 #
 # Content edits are deploys (§6): run pytest before committing. Git history
 # is the content audit trail.
@@ -79,6 +81,7 @@ intents:
     answer: |
       You're welcome. Is there anything else I can help with? If not, thank
       you for chatting with AB Bank — goodbye for now.
+    on_yes: menu
     buttons:
       - {label: "Main menu", payload: "menu"}
       - {label: "Talk to a person", payload: "human_handoff"}

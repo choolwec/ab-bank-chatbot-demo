@@ -1,7 +1,6 @@
 id: probe-14-yes-to-anything-else
 # "Is there anything else I can help with?" -> "yes" must not be a strike.
 fixes: C3
-xfail: true
 turns:
   - payload: human_handoff
   - say: Mary Banda

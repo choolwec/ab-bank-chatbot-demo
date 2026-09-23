@@ -2,7 +2,6 @@ id: probe-10-numbered-reply
 # "2" after the welcome menu picks its second option (and matters on
 # WhatsApp, where buttons scroll away).
 fixes: C3
-xfail: true
 turns:
   - say: "2"
     expect: {intent: account_types_overview, strikes: 0}

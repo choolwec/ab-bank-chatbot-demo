@@ -31,4 +31,12 @@ class LeadFlow(FormFlow):
     def finish(self, session):
         data = dict(session.flow_state.get("data", {}))
         ref = audit.create_ticket("callback", data, session.transcript)
-        return [{"text": msg("lead.finish", ref=ref), "buttons": [DONE_BUTTON, MENU_BUTTON]}]
+        return [
+            {
+                "text": msg("lead.finish", ref=ref),
+                "buttons": [DONE_BUTTON, MENU_BUTTON],
+                # "Is there anything else?" -- typed yes/no answer it (C3).
+                "yes": "menu",
+                "no": "thanks_goodbye",
+            }
+        ]

@@ -65,6 +65,27 @@ def test_all_phrases_reach_their_intent():
         ("nope", "thanks_goodbye"),
         ("nothing else", "thanks_goodbye"),
         ("i'm done", "thanks_goodbye"),
+        # Added 2026-07-25 after reviewing external banking-chatbot repos for
+        # V1 improvement ideas: several (the Dialogflow and Rasa demos) hit
+        # near-miss confusions in exactly this style — a close cousin to the
+        # already-fixed credential_trouble/technical_issue misroute.
+        # Note: "cant log in" phrasing is deliberately credential_trouble
+        # (PIN-reset flow), not technical_issue — see knowledge/intents/
+        # urgent.yaml's "cant log in to myabz" phrase. Login-failure wording
+        # is genuinely ambiguous (forgotten PIN vs. outage); these cases stay
+        # on the outage side by describing a crash/error rather than a login.
+        ("network error on the app", "technical_issue"),
+        ("the etumba app keeps crashing", "technical_issue"),
+        ("how do i open a savings acc", "savings_account"),
+        ("wat do i need to open an account", "account_opening_requirements"),
+        ("do you guys do loans for small business", "msme_loan"),
+        ("were is the nearest branch", "branch_locator"),
+        ("i wana talk to somone", "human_handoff"),
+        ("can i speak to a human", "human_handoff"),
+        ("someone stole money from my account", "fraud_scam"),
+        ("i think someone hacked into my etumba", "fraud_scam"),
+        ("wats ur workin hours", "opening_hours"),
+        ("how much do you charge for a savings account", "fees_charges"),
     ],
 )
 def test_misspellings_and_zambian_english(query, expected):

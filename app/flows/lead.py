@@ -16,6 +16,8 @@ PHONE_RETRY_TEXT = (
 
 class LeadFlow(FormFlow):
     name = "lead"
+    topic_label = "callback request"
+    require_confirmation = True
     steps = [
         (
             "name",

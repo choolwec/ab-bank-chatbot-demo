@@ -65,9 +65,10 @@ wins over the default in `app/config.py`).
 
 ### Request pipeline (`app/router.py`)
 Every inbound message runs through, in order: **guards → session-control
-payloads → "talk to a person" → urgent-topic scan → active flow → quick-reply
-payload → abuse check → free-text matcher → confidence-gated response**. The
-order is load-bearing, not incidental:
+payloads → "talk to a person" → urgent-topic scan → active flow (with a
+mid-flow FAQ interrupt check) → quick-reply payload → abuse check →
+free-text matcher → confidence-gated response**. The order is load-bearing,
+not incidental:
 - `app/guards.py` masks PII (card/NRC/account/PIN numbers) *before* anything
   else — including the audit log — ever sees the raw text.
 - The urgent-topic scan (`guards.urgent_scan`) runs on **every** message
@@ -93,6 +94,27 @@ AI-generated. State lives on the session (`session.flow_state`), not on the
 flow object, so one flow instance is stateless and shared across sessions.
 Fraud/complaint flows always end in a ticket (`audit.create_ticket`) that
 only a human closes — the bot never marks its own case resolved.
+
+Fraud/complaint/lead (`require_confirmation = True`) show a summary of
+collected fields with Confirm/Edit-last/Cancel buttons before `finish()` is
+called — added 2026-07-25 after reviewing external banking-chatbot repos,
+since a typo'd detail previously went straight to a human ticket with no
+chance to fix it. The fraud flow also now has a mandatory `contact` step
+(validated Zambian phone) — it used to promise "a member of staff will
+contact you" while collecting no way to actually reach the customer, a real
+bug found in the same review.
+
+A flow can opt individual fields into `interruptible_fields` so a
+high-confidence, unrelated FAQ question asked mid-field gets answered and
+the flow resumes at the same step (`router._maybe_answer_faq_interrupt`,
+pattern borrowed from RasaHQ/financial-demo's "switch skills mid-transaction
+and return"). This is opt-in, not opt-out, and deliberately narrow: only
+fraud's `what_happened` and complaint's `details` qualify. Fields whose
+*legitimate* answers are themselves bank-topic words — fraud's `channel`
+(card/eTumba/branch), lead's `topic` — must stay excluded, confirmed the
+hard way when "eTumba" (a real channel answer) and "Opening a business
+account" (a real callback topic) were both misread as FAQ interruptions
+during testing and desynced the flow's step counter.
 
 ### Session store (`app/session.py`)
 In-memory, single-process by design (`SessionStore` behind a lock, 30-minute
@@ -124,8 +146,11 @@ mode**: a synthetic issue (fake key like `CC-3`, correct priority/labels/
 summary/full transcript) is appended to `data/jira_mock.jsonl` instead of
 calling the network. `GET /admin/jira-preview` renders those mock issues as
 Jira-style cards — this is what the demo uses to show "what will land in
-the contact center's Jira" without real Jira access. No auth on that route
-yet: fine pre-launch, must be gated before it carries real customer data.
+the contact center's Jira" without real Jira access. Gated by `ADMIN_TOKEN`
+(`config.py`): unset (today's state) leaves it wide open for the pre-launch
+demo; once set, `?token=...` must match (constant-time compare) or the
+route 403s. Set it before this carries real customer data — same
+config-driven pattern as the `JIRA_*` env vars, no code change needed.
 Once those four env vars are set (see `docs/deployment-and-jira-setup.md`
 for where each one comes from — self-service via the contact-center team's
 own Jira login in most cases, not necessarily IT), setting them flips

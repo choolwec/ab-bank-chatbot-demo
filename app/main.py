@@ -5,6 +5,7 @@ CORS locked to the bank's domain via ALLOWED_ORIGINS. HTTPS terminates at
 IT's existing setup. No cookies — the widget holds a session id only.
 """
 
+import hmac
 import time
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager
@@ -135,9 +136,14 @@ def demo_page():
 
 
 @app.get("/admin/jira-preview", response_class=HTMLResponse)
-def jira_preview():
+def jira_preview(token: str = ""):
     """Staff-facing preview of the contact-center handoff — see CLAUDE.md
-    for why this exists and jira_export.py for the mock/real split. No auth
-    yet: fine for a pre-launch demo, must gate before this carries real
+    for why this exists and jira_export.py for the mock/real split. Gated by
+    ADMIN_TOKEN (config.py): unset means wide open (today's pre-launch demo
+    state), set means ?token=... must match before this carries real
     customer data (name/phone/transcript)."""
+    if config.admin_auth_configured() and not hmac.compare_digest(
+        token, config.ADMIN_TOKEN
+    ):
+        raise HTTPException(status_code=403, detail="forbidden")
     return jira_export.render_jira_preview()

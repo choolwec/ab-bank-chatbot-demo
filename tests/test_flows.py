@@ -37,7 +37,9 @@ def test_fraud_urgent_fires_mid_conversation_with_transcript(client):
 
     chat(client, sid, message="Someone called pretending to be the bank")
     chat(client, sid, message="today")
-    data = chat(client, sid, message="eTumba")
+    chat(client, sid, message="eTumba")
+    chat(client, sid, message="0977123456")
+    data = chat(client, sid, payload="confirm_yes")
     match = re.search(r"FRD-\d{8}-[A-Z0-9]{4}", _all_text(data))
     assert match, _all_text(data)
     # never bot-resolved: ticket open, transcript attached (§1 rules 3 & 7)
@@ -64,7 +66,8 @@ def test_complaint_flow_returns_reference(client):
     assert data["meta"]["action"] == "urgent:complaint"
     chat(client, sid, message="Service at a branch")
     chat(client, sid, message="I waited two hours and nobody helped me")
-    data = chat(client, sid, message="skip")
+    chat(client, sid, message="skip")
+    data = chat(client, sid, payload="confirm_yes")
     assert re.search(r"CMP-\d{8}-[A-Z0-9]{4}", _all_text(data))
 
 
@@ -74,7 +77,8 @@ def test_callback_flow_promises_one_working_day(client):
     chat(client, sid, message="Choolwe")
     chat(client, sid, message="0977123456")
     chat(client, sid, message="Opening a business account")
-    data = chat(client, sid, payload="Morning")
+    chat(client, sid, payload="Morning")
+    data = chat(client, sid, payload="confirm_yes")
     text = _all_text(data)
     assert "one working day" in text
     assert re.search(r"CBK-\d{8}-[A-Z0-9]{4}", text)
@@ -112,6 +116,7 @@ def test_saying_no_after_callback_is_recognised_as_goodbye(client):
     chat(client, sid, message="0977123456")
     chat(client, sid, message="Opening a business account")
     chat(client, sid, payload="Morning")
+    chat(client, sid, payload="confirm_yes")
     data = chat(client, sid, message="no")
     assert data["meta"]["action"] == "answer"
     assert data["meta"]["intent"] == "thanks_goodbye"
@@ -158,6 +163,71 @@ def test_pii_never_reaches_logs_or_replies(client):
     ).fetchone()[0]
     con.close()
     assert hits == 0
+
+
+def test_fraud_flow_captures_a_callback_number(client):
+    """Regression test for a real gap found reviewing external banking-bot
+    repos: the fraud flow used to finish() with no contact info at all, so
+    "a member of staff will contact you" had no channel to actually do that."""
+    sid = new_session(client)
+    chat(client, sid, message="i think i was scammed")
+    chat(client, sid, message="Someone called pretending to be the bank")
+    chat(client, sid, message="today")
+    chat(client, sid, message="eTumba")
+    data = chat(client, sid, message="not a phone number")
+    assert "doesn't look like a valid number" in _all_text(data)
+    chat(client, sid, message="0977123456")
+    data = chat(client, sid, payload="confirm_yes")
+    match = re.search(r"FRD-\d{8}-[A-Z0-9]{4}", _all_text(data))
+    assert match, _all_text(data)
+    con = sqlite3.connect(audit.DB_FILE)
+    fields = con.execute(
+        "SELECT fields FROM tickets WHERE ref = ?", (match.group(0),)
+    ).fetchone()[0]
+    con.close()
+    assert "0977123456" in fields
+
+
+def test_confirm_step_shows_summary_and_allows_edit(client):
+    sid = new_session(client)
+    chat(client, sid, message="I want to complain")
+    chat(client, sid, message="Service at a branch")
+    chat(client, sid, message="I waited two hours and nobody helped me")
+    data = chat(client, sid, message="skip")
+    summary_text = _all_text(data)
+    assert "waited two hours" in summary_text
+    assert any(b["payload"] == "confirm_yes" for b in data["replies"][-1]["buttons"])
+    assert any(b["payload"] == "confirm_edit" for b in data["replies"][-1]["buttons"])
+
+    # Editing goes back to the last field instead of submitting.
+    data = chat(client, sid, payload="confirm_edit")
+    assert "best phone number or email" in _all_text(data).lower()
+    data = chat(client, sid, message="skip")
+    assert any(b["payload"] == "confirm_yes" for b in data["replies"][-1]["buttons"])
+
+    data = chat(client, sid, payload="confirm_yes")
+    assert re.search(r"CMP-\d{8}-[A-Z0-9]{4}", _all_text(data))
+
+
+def test_faq_question_mid_flow_is_answered_and_flow_resumes(client):
+    """§ pattern borrowed from RasaHQ/financial-demo: a high-confidence,
+    unrelated FAQ question asked mid-flow gets answered without losing the
+    customer's progress, instead of the flow trying to treat it as an
+    answer to the current field. Only fraud's "what_happened" and
+    complaint's "details" opt into this (see interruptible_fields) — a
+    fraud/complaint narrative is unlikely to itself resemble an FAQ
+    question, unlike e.g. fraud's "channel" field, whose legitimate answers
+    (card, eTumba, branch) collide with real FAQ topics."""
+    sid = new_session(client)
+    chat(client, sid, message="i think i was scammed")  # fraud flow, step: what_happened
+    data = chat(client, sid, message="what is etumba")
+    text = _all_text(data)
+    assert "mobile wallet" in text.lower() or "e-tumba" in text.lower() or "etumba" in text.lower()
+    assert "back to your fraud report" in text.lower()
+    assert "please tell me briefly what happened" in text.lower()
+    # The flow is still active and un-advanced: a real answer now proceeds normally.
+    data = chat(client, sid, message="Someone called pretending to be the bank")
+    assert "when did this happen" in _all_text(data).lower()
 
 
 def test_locator_flow_finds_placeholder_branch(client):
@@ -214,7 +284,9 @@ def test_refresh_mid_fraud_flow_resumes_not_wipes(client):
     assert "pick up where we left off" in _all_text(data).lower()
     # The flow continues from the same step and the pre-refresh answer survives.
     chat(client, sid, message="today")
-    data = chat(client, sid, message="card")
+    chat(client, sid, message="card")
+    chat(client, sid, message="0977123456")
+    data = chat(client, sid, payload="confirm_yes")
     match = re.search(r"FRD-\d{8}-[A-Z0-9]{4}", _all_text(data))
     assert match, _all_text(data)
     con = sqlite3.connect(audit.DB_FILE)

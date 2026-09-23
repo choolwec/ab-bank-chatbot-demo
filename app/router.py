@@ -160,9 +160,18 @@ def _route(session, text, payload):
                 session.active_flow = None
             return replies, {"action": f"urgent:{kind}"}
 
-    # 2. An active flow consumes the message
+    # 2. An active flow consumes the message — unless it's a high-confidence
+    # unrelated FAQ question, in which case answer it and resume the flow at
+    # the same step rather than trying to shoehorn it into the current field
+    # (§ pattern from RasaHQ/financial-demo's "switch skills mid-transaction
+    # and return"). Only applies to free-text, unvalidated steps, so fields
+    # with their own retry logic (e.g. phone numbers) are untouched.
     if session.active_flow:
         flow = FLOWS[session.active_flow]
+        if text and not payload:
+            interrupt = _maybe_answer_faq_interrupt(flow, session, text)
+            if interrupt is not None:
+                return interrupt, {"action": f"flow_interrupt:{flow.name}"}
         replies, done = flow.handle(session, text or "", payload)
         if done:
             session.active_flow = None
@@ -258,6 +267,47 @@ def _route(session, text, payload):
         [{"text": FALLBACK_TEXT, "buttons": list(MENU_BUTTONS)}],
         {"action": "fallback", "confidence": round(top_score, 3)},
     )
+
+
+def _maybe_answer_faq_interrupt(flow, session, text):
+    """Return replies if `text` is a high-confidence, unrelated FAQ question
+    asked mid-flow, else None (let the flow handle it as normal).
+
+    Trade-off, stated plainly: this is a heuristic, not true intent
+    disambiguation. A HIGH_CONFIDENCE bar (the same one used for "answer
+    directly" elsewhere) keeps false positives rare, and it only applies to
+    fields a flow has explicitly opted into `interruptible_fields` — see
+    that attribute's comment in flows/base.py for why most fields must NOT
+    opt in.
+    """
+    state = session.flow_state
+    steps = getattr(flow, "steps", None)
+    if not steps or state.get("confirming"):
+        return None
+    i = state.get("step", 0)
+    if i >= len(steps):
+        return None
+    field = steps[i][0]
+    if field not in getattr(flow, "interruptible_fields", ()):
+        return None
+
+    ranked = matcher.match(text)
+    top_name, top_score = ranked[0] if ranked else (None, 0.0)
+    if not top_name or top_score < config.HIGH_CONFIDENCE:
+        return None
+    intent = matcher.get(top_name)
+    if intent.get("flow") or not intent.get("answer"):
+        return None
+
+    prompt = flow._prompt(i)
+    topic = getattr(flow, "topic_label", "request")
+    return [
+        {
+            "text": intent["answer"].strip() + f"\n\nNow, back to your {topic} — "
+            + prompt["text"],
+            "buttons": prompt["buttons"],
+        }
+    ]
 
 
 def _answer(session, intent, score):

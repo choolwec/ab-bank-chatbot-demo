@@ -26,14 +26,35 @@ def is_valid_zambian_phone(text: str) -> bool:
     return bool(PHONE_RE.fullmatch(cleaned))
 
 
+CONFIRM_BUTTON = {"label": "Yes, submit", "payload": "confirm_yes"}
+EDIT_BUTTON = {"label": "No, let me fix that", "payload": "confirm_edit"}
+
+
 class FormFlow:
     name = "form"
+    # Human-readable noun used in "back to your {topic_label}" resume prompts
+    # (§ mid-flow FAQ interrupt, see router._maybe_answer_faq_interrupt).
+    topic_label = "request"
     # list of (field_key, prompt_text)
     steps: list[tuple[str, str]] = []
     # optional {field_key: (is_valid_fn, retry_message)} — checked before a
     # step's answer is stored; on failure the same step re-prompts with the
     # retry message instead of advancing.
     validators: dict[str, tuple] = {}
+    # Fields where a mid-flow FAQ question is safe to detect (router.py's
+    # _maybe_answer_faq_interrupt) — opt-in, not opt-out. Only genuinely
+    # free-narrative fields belong here: fields whose *legitimate* answers
+    # are themselves bank-topic words (e.g. fraud's "channel": card/eTumba/
+    # branch, or lead's "topic") collide with the exact FAQ vocabulary this
+    # check looks for, so those must stay excluded — confirmed the hard way
+    # when "eTumba" as a channel answer and "Opening a business account" as
+    # a callback topic were both misread as FAQ interruptions in testing.
+    interruptible_fields: frozenset[str] = frozenset()
+    # Flows that create a ticket/callback should confirm the collected data
+    # before submitting it — a typo'd date or garbled detail otherwise goes
+    # straight to a human with no chance to fix it. Read-only lookups (e.g.
+    # the branch locator) leave this False.
+    require_confirmation = False
 
     def intro(self, session, kind):
         return []
@@ -48,17 +69,44 @@ class FormFlow:
     def _prompt(self, i):
         return {"text": self.steps[i][1], "buttons": [CANCEL_BUTTON]}
 
+    def _confirmation_prompt(self, session):
+        data = session.flow_state.get("data", {})
+        lines = [
+            f"- {field.replace('_', ' ').capitalize()}: {data[field]}"
+            for field, _ in self.steps
+            if data.get(field)
+        ]
+        text = (
+            "Here's what I've got:\n" + "\n".join(lines) + "\n\nShall I submit this?"
+        )
+        return {"text": text, "buttons": [CONFIRM_BUTTON, EDIT_BUTTON, CANCEL_BUTTON]}
+
     def resume(self, session):
         """Re-issue the current step's prompt without touching collected data.
 
         Used when a returning page load reopens an in-progress flow — a
         half-finished fraud report must never be silently discarded.
         """
+        if session.flow_state.get("confirming"):
+            return [self._confirmation_prompt(session)]
         i = min(session.flow_state.get("step", 0), len(self.steps) - 1)
         return [self._prompt(i)]
 
     def handle(self, session, text, payload=None):
         state = session.flow_state
+
+        if state.get("confirming"):
+            if payload == "confirm_yes":
+                return self.finish(session), True
+            if payload == "confirm_edit":
+                last_field = self.steps[-1][0]
+                state.get("data", {}).pop(last_field, None)
+                state["step"] = len(self.steps) - 1
+                state["confirming"] = False
+                return [self._prompt(state["step"])], False
+            # Unexpected free text while confirming: re-ask, no dead end.
+            return [self._confirmation_prompt(session)], False
+
         i = state.get("step", 0)
         field = self.steps[i][0]
         value = (text or payload or "").strip()
@@ -74,6 +122,9 @@ class FormFlow:
         state["step"] = i
         if i < len(self.steps):
             return [self._prompt(i)], False
+        if self.require_confirmation:
+            state["confirming"] = True
+            return [self._confirmation_prompt(session)], False
         return self.finish(session), True
 
     def finish(self, session):

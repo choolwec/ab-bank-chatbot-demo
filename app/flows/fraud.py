@@ -6,11 +6,20 @@ these resolved — a person closes the case.
 """
 
 from .. import audit, config
-from .base import HUMAN_BUTTON, MENU_BUTTON, FormFlow
+from .base import HUMAN_BUTTON, MENU_BUTTON, FormFlow, is_valid_zambian_phone
+
+CONTACT_RETRY_TEXT = (
+    "That doesn't look like a valid number — please send it as 09XXXXXXX "
+    "(10 digits), 260XXXXXXXXX (12 digits), or +260XXXXXXXXX, so our fraud "
+    "team can actually reach you."
+)
 
 
 class FraudFlow(FormFlow):
     name = "fraud"
+    topic_label = "fraud report"
+    require_confirmation = True
+    interruptible_fields = frozenset({"what_happened"})
     steps = [
         ("what_happened", "Please tell me briefly what happened."),
         ("when", "When did this happen? (For example: today, yesterday, or a date.)"),
@@ -19,7 +28,13 @@ class FraudFlow(FormFlow):
             "Which service was involved — card or ATM, eTumba, internet banking, "
             "or a branch?",
         ),
+        (
+            "contact",
+            "What's the best phone number to reach you on right now, so our "
+            "fraud team can follow up immediately?",
+        ),
     ]
+    validators = {"contact": (is_valid_zambian_phone, CONTACT_RETRY_TEXT)}
 
     def intro(self, session, kind):
         emergency = config.CONTACTS["emergency_phone"]

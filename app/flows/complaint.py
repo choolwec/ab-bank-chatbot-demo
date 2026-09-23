@@ -7,6 +7,9 @@ from .base import HUMAN_BUTTON, MENU_BUTTON, FormFlow
 
 class ComplaintFlow(FormFlow):
     name = "complaint"
+    topic_label = "complaint"
+    require_confirmation = True
+    interruptible_fields = frozenset({"details"})
     steps = [
         (
             "topic",

@@ -1381,7 +1381,7 @@ that finishes the ticket.
 
 | ID | Title | Phase | Week | Size (days) | Depends on | Owner | Status |
 |---|---|---|---|---|---|---|---|
-| S1 | Urgent detection: recall and precision | 0 | W01 | 2 | — | Dev | ☐ |
+| S1 | Urgent detection: recall and precision | 0 | W01 | 2 | — | Dev | ☑ |
 | S2 | Fraud flow collects contact details | 0 | W01 | 1 | — | Dev | ☐ |
 | S3 | Red-team routing suite | 0 | W01 | 1 | S1 | Dev | ☐ |
 | E1 | CI on GitHub Actions | 0 | W01 | 0.5 | — | Dev | ☐ |

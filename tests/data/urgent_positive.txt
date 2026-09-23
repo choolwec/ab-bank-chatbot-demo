@@ -1,0 +1,94 @@
+# S1 positive set: every line must reach the fraud/complaint flow, either
+# directly (hard signal) or after a "yes" to the confirmation (soft signal).
+# Format: <expected kind> | <message>. # lines are comments.
+
+# --- the four measured misses (execution-plan S1) ---
+fraud | someone stole money from my etumba
+fraud | they stole my money
+fraud | someone took money from my account
+fraud | my money was taken without my permission
+
+# --- theft verbs, tenses ---
+fraud | my money has been stolen
+fraud | somebody is stealing from my account
+fraud | someone steals money from my wallet every week
+fraud | money was stolen from my savings
+fraud | they have stolen all my savings
+fraud | i was robbed, the thief used my phone to send money
+fraud | there has been theft on my account
+fraud | thieves took my phone and my etumba
+
+# --- misspellings seen in real traffic ---
+fraud | sombody stoled my money
+fraud | my money was stollen
+fraud | some one is steeling my money
+fraud | i have been skammed
+fraud | i was scamed by a guy on facebook
+fraud | fraudulant transaction on my account
+fraud | i think i was hackd
+
+# --- scam / fraud vocabulary ---
+fraud | i think i've been scammed
+fraud | this is a scam call pretending to be ab bank
+fraud | i want to report fraud
+fraud | there is fraud on my account
+fraud | i was defrauded by someone claiming to be from the bank
+fraud | someone conned me out of K500
+fraud | i was cheated by an agent
+fraud | i got a phishing sms asking for my pin
+fraud | someone is impersonating the bank on whatsapp
+fraud | my account was hacked
+fraud | someone hacked my myabz
+fraud | my etumba has been hacked
+fraud | someone cloned my card
+fraud | i think my card was skimmed at the atm
+fraud | i was duped into sending money
+
+# --- unauthorised / without permission ---
+fraud | there is an unauthorised transaction on my account
+fraud | unauthorized withdrawal from my account
+fraud | money was withdrawn without my consent
+fraud | someone withdrew without my knowledge
+fraud | i did not authorise this payment
+fraud | i didn't authorize that transfer
+fraud | i never authorised this debit
+fraud | this is not my transaction
+fraud | there is a transaction i did not make
+fraud | i see transactions i did not make on my statement
+fraud | my account was debited without my permission
+fraud | someone accessed my account
+fraud | someone is using my account
+fraud | someone logged into my account from another phone
+fraud | money taken from my account last night
+fraud | somebody took K2000 from my etumba
+
+# --- lost / stolen card (card wording) ---
+fraud | i lost my card
+fraud | my card was stolen at the market
+fraud | stolen card
+fraud | i cant find my card
+fraud | please block my card
+fraud | my card is missing
+fraud | someone has my card
+fraud | cancel my card
+
+# --- soft signals: confirmation, then the fraud flow ---
+fraud | my money is gone
+fraud | money missing from my account
+fraud | my money has disappeared from etumba
+fraud | my balance is wrong
+fraud | there is less money in my account than yesterday
+fraud | i did not make this transaction
+fraud | i didnt make that withdrawal
+fraud | i never made those payments
+
+# --- complaints ---
+complaint | i want to complain
+complaint | i would like to make a complaint about the branch
+complaint | how do i file a complaint
+complaint | poor service at your kitwe branch
+complaint | i am not happy with how i was treated
+complaint | the teller was rude to me
+complaint | this is unacceptable, i have waited two hours
+complaint | i want to dispute a charge
+complaint | complaint

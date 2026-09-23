@@ -74,6 +74,14 @@ not incidental:
 - The urgent-topic scan (`guards.urgent_scan`) runs on **every** message
   regardless of active flow, and fraud/lost-card reports preempt any
   in-progress flow except an already-active fraud/complaint one.
+  It returns an `UrgentSignal` with a strength (ticket S1): **hard** signals
+  (stole/scam/hacked/lost card…) start the flow at once; **soft** ones
+  (money gone, "didn't make this transaction", a bare "complaint", questions
+  *about* scams) ask a yes/no confirmation first, held in
+  `session.slots["pending_urgent"]` for exactly one message. Negation
+  suppresses soft signals only, never hard ones. A fraud/complaint intent
+  reached only through the fuzzy matcher also asks first. Corpora live in
+  `tests/data/urgent_*.txt`; extend them rather than the regexes alone.
 - Every reply is guaranteed at least one button before `handle()` returns —
   a hard "no dead ends" invariant enforced in code, not a per-answer
   convention to remember.

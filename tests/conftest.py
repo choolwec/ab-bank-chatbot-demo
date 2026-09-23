@@ -25,3 +25,54 @@ def chat(client, session_id=None, message=None, payload=None):
     response = client.post("/chat", json=body)
     assert response.status_code == 200, response.text
     return response.json()
+
+
+class Bot:
+    """Drives router.handle() in-process for one conversation (no HTTP)."""
+
+    def __init__(self):
+        from app import router
+        from app.session import SessionStore
+
+        self.router = router
+        self.session, _ = SessionStore().get_or_create()
+        self.router.welcome(self.session)
+        self.last = None
+
+    def say(self, text):
+        self.last = self.router.handle(self.session, text=text)
+        return self.last
+
+    def tap(self, payload):
+        self.last = self.router.handle(self.session, payload=payload)
+        return self.last
+
+    @property
+    def action(self):
+        return self.last[1].get("action")
+
+    @property
+    def text(self):
+        return " ".join(r["text"] for r in self.last[0])
+
+    @property
+    def buttons(self):
+        return [b["payload"] for b in self.last[0][-1]["buttons"]]
+
+
+@pytest.fixture
+def isolated_data(tmp_path, monkeypatch):
+    """Point the audit trail and Jira mock log at a temp dir."""
+    from app import audit, config
+
+    monkeypatch.setattr(config, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(audit, "DB_FILE", tmp_path / "audit.db")
+    monkeypatch.setattr(audit, "JSONL_FILE", tmp_path / "audit.jsonl")
+    monkeypatch.setattr(audit, "_init_done", False)
+    return tmp_path
+
+
+@pytest.fixture
+def bot(isolated_data):
+    """A factory: bot() returns a fresh in-process conversation."""
+    return Bot

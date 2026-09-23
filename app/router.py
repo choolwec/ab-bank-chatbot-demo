@@ -44,6 +44,38 @@ ABUSE_TEXT = (
 RESUME_FLOW_TEXT = "Welcome back — let's pick up where we left off."
 RESUME_TEXT = "Welcome back! What can I help with?"
 
+# S1 soft-urgent confirmation. Ops/Risk reviews this wording.
+URGENT_YES = "urgent_yes"
+URGENT_NO = "urgent_no"
+URGENT_CONFIRM = {
+    "fraud": {
+        "text": "It sounds like something may be wrong with your money. Do you "
+        "want to report it as fraud?",
+        "buttons": [
+            {"label": "Yes, report it", "payload": URGENT_YES},
+            {"label": "No, I have a question", "payload": URGENT_NO},
+        ],
+    },
+    "lost_card": {
+        "text": "Has your card been lost or stolen? If so, I can help you block "
+        "it and report it now.",
+        "buttons": [
+            {"label": "Yes, report it", "payload": URGENT_YES},
+            {"label": "No, I have a question", "payload": URGENT_NO},
+        ],
+    },
+    "complaint": {
+        "text": "It sounds like you may not be happy with something. Would you "
+        "like to make a formal complaint?",
+        "buttons": [
+            {"label": "Yes, complain", "payload": URGENT_YES},
+            {"label": "No, I have a question", "payload": URGENT_NO},
+        ],
+    },
+}
+URGENT_DECLINED_TEXT = "No problem. What would you like to know?"
+URGENT_DECLINED_FLOW_TEXT = "No problem — let's carry on."
+
 
 class _SafeDict(dict):
     def __missing__(self, key):
@@ -125,6 +157,10 @@ def handle(session, text=None, payload=None):
 
 
 def _route(session, text, payload):
+    # A soft-urgent confirmation question (S1) can only be answered by the
+    # very next message -- anything else, including a button, drops it.
+    pending = session.slots.pop("pending_urgent", None)
+
     # 0. Session controls come before everything
     if payload in ("menu", "start"):
         session.active_flow = None
@@ -148,17 +184,31 @@ def _route(session, text, payload):
             session.active_flow = None
         return replies, {"intent": "human_handoff", "action": "flow_start"}
 
-    # 1. Urgent topics bypass everything, from any flow (§1 rule 3)
+    # 1a. Answer to that confirmation question
+    if payload in (URGENT_YES, URGENT_NO):
+        if pending:
+            return _resolve_urgent(session, pending, confirmed=payload == URGENT_YES)
+        # A stale button from an old reply: harmless, and never wipes a flow.
+        if session.active_flow:
+            return FLOWS[session.active_flow].resume(session), {"action": "stale_button"}
+        return (
+            [{"text": "What can I help with?", "buttons": list(MENU_BUTTONS)}],
+            {"action": "stale_button"},
+        )
+    if pending and text:
+        answer = guards.yes_no(text)
+        if answer is not None:
+            return _resolve_urgent(session, pending, confirmed=answer)
+
+    # 1b. Urgent topics bypass everything, from any flow (§1 rule 3)
     if text:
         urgent = guards.urgent_scan(text)
         if urgent and session.active_flow not in ("fraud", "complaint"):
-            kind, sub = urgent
-            session.strikes = 0
-            flow = FLOWS["fraud" if kind == "fraud" else "complaint"]
-            replies, done = flow.start(session, kind=sub)
-            if done:
-                session.active_flow = None
-            return replies, {"action": f"urgent:{kind}"}
+            if urgent.is_hard:
+                return _start_urgent(session, urgent.kind, urgent.sub)
+            # Soft: ask first. The flow state is left untouched, so "no"
+            # resumes whatever the customer was doing.
+            return _ask_urgent(session, urgent.kind, urgent.sub, text, source="scan")
 
     # 2. An active flow consumes the message — unless it's a high-confidence
     # unrelated FAQ question, in which case answer it and resume the flow at
@@ -222,11 +272,33 @@ def _route(session, text, payload):
             {"action": "freetext_off"},
         )
 
+    return _free_text(session, text, urgent_flows=not guards.urgent_negated(text))
+
+
+def _free_text(session, text, urgent_flows=True):
+    """Matcher + confidence gate. `urgent_flows=False` is used after the
+    customer has said "no, it's not fraud": an intent that would start the
+    fraud/complaint flow anyway must not override their answer."""
     ranked = matcher.match(text)
+    if not urgent_flows:
+        ranked = [
+            (n, s) for n, s in ranked
+            if matcher.get(n).get("flow") not in ("fraud", "complaint")
+        ]
     top_name, top_score = ranked[0] if ranked else (None, 0.0)
 
     if top_name and top_score >= config.HIGH_CONFIDENCE:
-        return _answer(session, matcher.get(top_name), top_score)
+        intent = matcher.get(top_name)
+        if intent.get("flow") in ("fraud", "complaint"):
+            # The keyword scan already let this message through, so only the
+            # fuzzy matcher calls it urgent ("i am happy with the service" is
+            # close to "not happy with the service"). Ask, don't hijack.
+            kind = intent["flow"]
+            sub = (intent.get("flow_args") or {}).get("kind")
+            if sub == "lost_card" and not guards.CARD_MENTION_RE.search(text):
+                sub = "fraud"
+            return _ask_urgent(session, kind, sub, text, source="matcher")
+        return _answer(session, intent, top_score, text=text)
 
     if top_name and top_score >= config.MEDIUM_CONFIDENCE:
         buttons = [
@@ -310,13 +382,55 @@ def _maybe_answer_faq_interrupt(flow, session, text):
     ]
 
 
-def _answer(session, intent, score):
+def _start_urgent(session, kind, sub):
+    session.strikes = 0
+    flow = FLOWS["fraud" if kind == "fraud" else "complaint"]
+    replies, done = flow.start(session, kind=sub)
+    if done:
+        session.active_flow = None
+    return replies, {"action": f"urgent:{kind}"}
+
+
+def _ask_urgent(session, kind, sub, text, source):
+    session.slots["pending_urgent"] = {"kind": kind, "sub": sub, "text": text}
+    confirm = URGENT_CONFIRM.get(sub) or URGENT_CONFIRM[kind]
+    return (
+        [{"text": confirm["text"], "buttons": list(confirm["buttons"])}],
+        {"action": f"urgent_confirm:{kind}", "urgent_source": source},
+    )
+
+
+def _resolve_urgent(session, pending, confirmed):
+    if confirmed:
+        return _start_urgent(session, pending["kind"], pending["sub"])
+    # "No, I have a question": pick up an interrupted flow where it was, or
+    # answer the original message -- minus the urgent reading they declined.
+    if session.active_flow:
+        flow = FLOWS[session.active_flow]
+        return (
+            [{"text": URGENT_DECLINED_FLOW_TEXT, "buttons": []}] + flow.resume(session),
+            {"action": "urgent_declined"},
+        )
+    strikes = session.strikes
+    replies, meta = _free_text(session, pending["text"], urgent_flows=False)
+    if meta.get("action") in ("fallback", "two_strike"):
+        # Their message only read as urgent, so a strike would be unfair.
+        session.strikes = strikes
+        replies = [{"text": URGENT_DECLINED_TEXT, "buttons": list(MENU_BUTTONS)}]
+    meta = dict(meta, action="urgent_declined", declined_answer=meta.get("action"))
+    return replies, meta
+
+
+def _answer(session, intent, score, text=None):
     session.strikes = 0
     meta = {"intent": intent["intent"], "confidence": round(float(score), 3)}
 
     flow_name = intent.get("flow")
     if flow_name:
         kind = (intent.get("flow_args") or {}).get("kind")
+        # Card-block wording only when a card was actually mentioned (S1).
+        if kind == "lost_card" and text and not guards.CARD_MENTION_RE.search(text):
+            kind = "fraud"
         replies, done = FLOWS[flow_name].start(session, kind=kind)
         if done:
             session.active_flow = None

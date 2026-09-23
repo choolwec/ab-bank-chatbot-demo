@@ -1,0 +1,50 @@
+# S1 negative set: none of these may open the fraud or complaint flow
+# (urgent_scan must return None). One message per line; # lines are comments.
+
+# --- the measured false alarms (execution-plan S1) ---
+I didn't make it to the branch today, what time do you open tomorrow
+I did not make the deadline for my loan documents
+I don't want to complain, just a question
+is it rude to ask about fees
+
+# --- negated complaint ---
+i do not want to complain
+not a complaint, just asking about loans
+no complaints, the service was great
+i'm not complaining, just want to know the charges
+i don't mean to complain but what are your hours
+no problem, thanks for the help
+no worries, what is etumba
+
+# --- negated fraud ---
+nothing was stolen, i just want to check my balance
+it's not a scam is it? i want to open an account
+my card is not stolen, it just stopped working
+
+# --- "did not make" / "make" without a transaction ---
+i didnt make it in time to the branch
+we did not make enough profit to repay the loan this month
+i never made an account with you before
+how do i make a transfer to another bank
+
+# --- ordinary banking questions with near-miss vocabulary ---
+how do i take money out of my etumba
+where can i withdraw money
+how much money can i withdraw at the atm
+what happens if i take a loan
+can i take a loan for my business
+how can i keep my card safe
+how do i change my password
+i forgot my pin
+what is etumba
+what are your opening hours
+how do i open a savings account
+is it safe to use internet banking
+thank you for your help
+you have been very helpful
+my card was swallowed by the atm, is it possible to get it back today
+where do i collect my new card
+how long does it take to get a card
+i am happy with the service, thank you
+can my husband and i open a joint account
+i sent money to the wrong number by mistake

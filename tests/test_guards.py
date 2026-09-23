@@ -61,17 +61,18 @@ def test_clean_caps_length_and_strips_zero_width():
 
 
 def test_urgent_scan_fraud():
-    assert guards.urgent_scan("i think someone hacked my account") == ("fraud", "fraud")
-    assert guards.urgent_scan("there is money missing from my account") == ("fraud", "fraud")
+    assert guards.urgent_scan("i think someone hacked my account") == ("fraud", "fraud", "hard")
+    # S1: missing money has innocent readings too, so it asks first
+    assert guards.urgent_scan("there is money missing from my account") == ("fraud", "fraud", "soft")
 
 
 def test_urgent_scan_lost_card():
-    assert guards.urgent_scan("I lost my card yesterday") == ("fraud", "lost_card")
+    assert guards.urgent_scan("I lost my card yesterday") == ("fraud", "lost_card", "hard")
 
 
 def test_urgent_scan_complaint():
-    kind, _sub = guards.urgent_scan("I want to complain about poor service")
-    assert kind == "complaint"
+    signal = guards.urgent_scan("I want to complain about poor service")
+    assert signal.kind == "complaint" and signal.is_hard
 
 
 def test_urgent_scan_clean_message():

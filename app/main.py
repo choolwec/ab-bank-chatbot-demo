@@ -10,9 +10,10 @@ import time
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -135,15 +136,35 @@ def demo_page():
     return FileResponse(WIDGET_DIR / "demo.html")
 
 
-@app.get("/admin/jira-preview", response_class=HTMLResponse)
-def jira_preview(token: str = ""):
+_basic = HTTPBasic(auto_error=False)
+
+
+def require_admin(credentials: HTTPBasicCredentials | None = Depends(_basic)) -> None:
+    """Gate for every /admin/* route (P8). Unconfigured -> 404, so the route
+    doesn't exist as far as the internet can tell; wrong or missing
+    credentials -> 401 with a Basic challenge. Constant-time comparison."""
+    expected = config.admin_credentials()
+    if expected is None:
+        raise HTTPException(status_code=404, detail="Not Found")
+    ok = credentials is not None and (
+        hmac.compare_digest(credentials.username.encode(), expected[0].encode())
+        & hmac.compare_digest(credentials.password.encode(), expected[1].encode())
+    )
+    if not ok:
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized",
+            headers={"WWW-Authenticate": 'Basic realm="admin"'},
+        )
+
+
+@app.get(
+    "/admin/jira-preview",
+    response_class=HTMLResponse,
+    dependencies=[Depends(require_admin)],
+)
+def jira_preview():
     """Staff-facing preview of the contact-center handoff — see CLAUDE.md
-    for why this exists and jira_export.py for the mock/real split. Gated by
-    ADMIN_TOKEN (config.py): unset means wide open (today's pre-launch demo
-    state), set means ?token=... must match before this carries real
-    customer data (name/phone/transcript)."""
-    if config.admin_auth_configured() and not hmac.compare_digest(
-        token, config.ADMIN_TOKEN
-    ):
-        raise HTTPException(status_code=403, detail="forbidden")
+    for why this exists and jira_export.py for the mock/real split. It shows
+    names, phone numbers and transcripts, hence require_admin."""
     return jira_export.render_jira_preview()

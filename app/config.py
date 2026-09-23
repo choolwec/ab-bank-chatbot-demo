@@ -77,17 +77,17 @@ def jira_configured() -> bool:
     return bool(JIRA_BASE_URL and JIRA_EMAIL and JIRA_API_TOKEN and JIRA_PROJECT_KEY)
 
 
-# --- Admin routes (e.g. /admin/jira-preview) ---
-# Unset by default so the current pre-launch demo keeps working with no
-# setup. Set ADMIN_TOKEN before this route (or any future /admin/* route)
-# carries real customer data — see CLAUDE.md. A shared query-token is a
-# low-effort speed bump for a small internal tool, not a substitute for
-# real staff SSO if this ever needs to be more than that.
-ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "")
+# --- Admin routes (every /admin/*, ticket P8) ---
+# HTTP Basic auth. OFF by default: with ADMIN_USER/ADMIN_PASSWORD unset every
+# /admin/* route returns 404, so a fresh deploy never exposes customer names,
+# phone numbers or transcripts. Read per request so a rotation takes effect
+# without a restart.
 
 
-def admin_auth_configured() -> bool:
-    return bool(ADMIN_TOKEN)
+def admin_credentials() -> tuple[str, str] | None:
+    user = os.environ.get("ADMIN_USER", "")
+    password = os.environ.get("ADMIN_PASSWORD", "")
+    return (user, password) if user and password else None
 
 
 # --- Contact details, rendered into answers as {placeholders}. ---

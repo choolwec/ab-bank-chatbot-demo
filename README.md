@@ -72,8 +72,9 @@ the customer-facing flow). Two modes, decided automatically:
   `CC-2`, …) with the real fields, priority, and full masked transcript is
   appended to `data/jira_mock.jsonl`. View it rendered as Jira-style cards at
   **`GET /admin/jira-preview`** — this is what the demo uses to show what
-  contact-center staff will see, with zero real Jira access. That route has
-  no auth yet; gate it before it carries real customer data.
+  contact-center staff will see, with zero real Jira access. It needs HTTP
+  Basic auth: set `ADMIN_USER` and `ADMIN_PASSWORD` (it returns 404 until
+  both are set).
 - **Real**: set `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`,
   `JIRA_PROJECT_KEY` and issues are created for real via the Jira REST API
   (`/rest/api/2/issue`, Basic Auth) — no other code change needed.
@@ -127,7 +128,7 @@ custom plugins.
 - Opening hours, eTumba registration steps, loan product specifics (intent YAMLs)
 - Retention periods (legal): `TRANSCRIPT_RETENTION_DAYS`, `TICKET_RETENTION_DAYS`
 - CORS: set `ALLOWED_ORIGINS` env var to the bank's domain in production
-- Real Jira project/token (`JIRA_BASE_URL`/`JIRA_EMAIL`/`JIRA_API_TOKEN`/`JIRA_PROJECT_KEY` — see `docs/deployment-and-jira-setup.md` for who actually needs to provide these, not necessarily IT), and auth added to `/admin/jira-preview` before go-live
+- Real Jira project/token (`JIRA_BASE_URL`/`JIRA_EMAIL`/`JIRA_API_TOKEN`/`JIRA_PROJECT_KEY` — see `docs/deployment-and-jira-setup.md` for who actually needs to provide these, not necessarily IT), and `ADMIN_USER`/`ADMIN_PASSWORD` set for the admin pages
 - Legal sign-off of **all** answers; manual NVDA + keyboard-only pass (§3.5)
 
 ## Reports

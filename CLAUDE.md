@@ -154,11 +154,12 @@ mode**: a synthetic issue (fake key like `CC-3`, correct priority/labels/
 summary/full transcript) is appended to `data/jira_mock.jsonl` instead of
 calling the network. `GET /admin/jira-preview` renders those mock issues as
 Jira-style cards — this is what the demo uses to show "what will land in
-the contact center's Jira" without real Jira access. Gated by `ADMIN_TOKEN`
-(`config.py`): unset (today's state) leaves it wide open for the pre-launch
-demo; once set, `?token=...` must match (constant-time compare) or the
-route 403s. Set it before this carries real customer data — same
-config-driven pattern as the `JIRA_*` env vars, no code change needed.
+the contact center's Jira" without real Jira access. Every `/admin/*` route is behind HTTP Basic auth
+(`main.require_admin`, ticket P8): set `ADMIN_USER` and `ADMIN_PASSWORD`
+to turn the admin pages on; with either unset they return **404**, so a
+fresh deploy never exposes names, numbers or transcripts. New admin routes
+must add `dependencies=[Depends(require_admin)]` (`tests/test_admin.py`
+checks every registered `/admin` path).
 Once those four env vars are set (see `docs/deployment-and-jira-setup.md`
 for where each one comes from — self-service via the contact-center team's
 own Jira login in most cases, not necessarily IT), setting them flips

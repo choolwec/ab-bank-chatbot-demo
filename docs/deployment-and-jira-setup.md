@@ -91,8 +91,9 @@ ones who'd already have a working login for their own queue.
 
 ### Before it goes live with real customer data
 
-- `GET /admin/jira-preview` (the page that renders ticket previews) has
-  **no authentication yet** — gate it before real tickets flow through,
-  per `README.md`'s launch checklist.
+- `GET /admin/jira-preview` (the page that renders ticket previews) is
+  behind HTTP Basic auth and returns 404 until you set `ADMIN_USER` and
+  `ADMIN_PASSWORD`. Use a long random password and share it only with the
+  contact-centre leads who need the preview.
 - Set the four variables above the same way as `ALLOWED_ORIGINS` — via the
   Render dashboard's Environment tab if the backend is hosted there.

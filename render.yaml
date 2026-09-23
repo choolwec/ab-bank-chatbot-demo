@@ -8,3 +8,9 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
+      # P8: /admin/* is 404 until both are set. Render generates the password;
+      # read it from the dashboard's Environment tab.
+      - key: ADMIN_USER
+        value: cc-admin
+      - key: ADMIN_PASSWORD
+        generateValue: true

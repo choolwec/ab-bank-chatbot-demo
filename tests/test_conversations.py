@@ -71,7 +71,7 @@ def _current_step(session):
     if not steps:
         return None
     i = session.flow_state.get("step", 0)
-    return steps[i][0] if i < len(steps) else None
+    return steps[i] if i < len(steps) else None
 
 
 def check_turn(b, exp, before_tickets, bot_messages, where):

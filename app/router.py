@@ -6,6 +6,7 @@ PII masked before anything else sees the text.
 """
 
 from . import audit, config, guards
+from .messages import msg
 from .flows import FLOWS
 from .matcher import Matcher
 
@@ -23,58 +24,26 @@ DEFAULT_BUTTONS = [
     {"label": "Talk to a person", "payload": "human_handoff"},
 ]
 
-# §3.4 draft welcome — discloses automation, states capability, human option
-WELCOME_TEXT = (
-    "Hello! I'm the AB Bank assistant — an automated helper, not a person. "
-    "I can help with branches and agents, opening an account, eTumba, and "
-    "loans, or connect you to our team. What can I help with?"
-)
-FALLBACK_TEXT = (
-    "I didn't quite catch that. You can try different words, pick an option "
-    "below, or ask for a person at any time."
-)
-TWO_STRIKE_TEXT = (
-    "I'm sorry — I'm not getting this right. Rather than keep guessing, let "
-    "me connect you with a person who can help."
-)
-ABUSE_TEXT = (
-    "I can hear this is frustrating — I'm sorry. Let me connect you with a "
-    "person who can sort it out properly."
-)
-RESUME_FLOW_TEXT = "Welcome back — let's pick up where we left off."
-RESUME_TEXT = "Welcome back! What can I help with?"
-
-# S1 soft-urgent confirmation. Ops/Risk reviews this wording.
+# S1 soft-urgent confirmation payloads. Wording: urgent_confirm.* in
+# knowledge/system_messages.yaml (Ops/Risk reviews it).
 URGENT_YES = "urgent_yes"
 URGENT_NO = "urgent_no"
-URGENT_CONFIRM = {
-    "fraud": {
-        "text": "It sounds like something may be wrong with your money. Do you "
-        "want to report it as fraud?",
-        "buttons": [
-            {"label": "Yes, report it", "payload": URGENT_YES},
-            {"label": "No, I have a question", "payload": URGENT_NO},
-        ],
-    },
-    "lost_card": {
-        "text": "Has your card been lost or stolen? If so, I can help you block "
-        "it and report it now.",
-        "buttons": [
-            {"label": "Yes, report it", "payload": URGENT_YES},
-            {"label": "No, I have a question", "payload": URGENT_NO},
-        ],
-    },
-    "complaint": {
-        "text": "It sounds like you may not be happy with something. Would you "
-        "like to make a formal complaint?",
-        "buttons": [
-            {"label": "Yes, complain", "payload": URGENT_YES},
-            {"label": "No, I have a question", "payload": URGENT_NO},
-        ],
-    },
+_URGENT_BUTTONS = {
+    "fraud": "Yes, report it",
+    "lost_card": "Yes, report it",
+    "complaint": "Yes, complain",
 }
-URGENT_DECLINED_TEXT = "No problem. What would you like to know?"
-URGENT_DECLINED_FLOW_TEXT = "No problem — let's carry on."
+
+
+def _urgent_confirm(kind, sub):
+    key = sub if sub in _URGENT_BUTTONS else kind
+    return {
+        "text": msg(f"urgent_confirm.{key}"),
+        "buttons": [
+            {"label": _URGENT_BUTTONS[key], "payload": URGENT_YES},
+            {"label": "No, I have a question", "payload": URGENT_NO},
+        ],
+    }
 
 
 class _SafeDict(dict):
@@ -93,9 +62,10 @@ def welcome(session):
     session.greeted = True
     session.active_flow = None
     session.flow_state = {}
-    replies = [{"text": WELCOME_TEXT, "buttons": list(MENU_BUTTONS)}]
-    session.add("bot", WELCOME_TEXT)
-    audit.log_event(session.id, "bot", WELCOME_TEXT, action="welcome")
+    text = _render(msg("welcome"))
+    replies = [{"text": text, "buttons": list(MENU_BUTTONS)}]
+    session.add("bot", text)
+    audit.log_event(session.id, "bot", text, action="welcome")
     return replies
 
 
@@ -107,10 +77,10 @@ def resume(session):
     """
     if session.active_flow:
         flow = FLOWS[session.active_flow]
-        replies = [{"text": RESUME_FLOW_TEXT, "buttons": []}] + flow.resume(session)
+        replies = [{"text": msg("resume_flow"), "buttons": []}] + flow.resume(session)
         meta = {"action": "resume_flow"}
     else:
-        replies = [{"text": RESUME_TEXT, "buttons": list(MENU_BUTTONS)}]
+        replies = [{"text": msg("resume"), "buttons": list(MENU_BUTTONS)}]
         meta = {"action": "resume"}
     if not replies[-1].get("buttons"):
         replies[-1]["buttons"] = list(DEFAULT_BUTTONS)
@@ -131,14 +101,14 @@ def handle(session, text=None, payload=None):
 
     replies = []
     if findings:
-        replies.append({"text": guards.PII_WARNING, "buttons": []})
+        replies.append({"text": msg("pii_warning"), "buttons": []})
 
     routed, meta = _route(session, masked if text else None, payload)
     replies.extend(routed)
 
     # No dead ends, ever (§1 rule 1)
     if not replies:
-        replies = [{"text": FALLBACK_TEXT, "buttons": list(MENU_BUTTONS)}]
+        replies = [{"text": msg("fallback"), "buttons": list(MENU_BUTTONS)}]
     if not replies[-1].get("buttons"):
         replies[-1]["buttons"] = list(DEFAULT_BUTTONS)
 
@@ -166,14 +136,14 @@ def _route(session, text, payload):
         session.active_flow = None
         session.flow_state = {}
         return (
-            [{"text": "What can I help with?", "buttons": list(MENU_BUTTONS)}],
+            [{"text": msg("menu"), "buttons": list(MENU_BUTTONS)}],
             {"action": "menu"},
         )
     if payload == "cancel_flow":
         session.active_flow = None
         session.flow_state = {}
         return (
-            [{"text": "No problem — back to the main menu.", "buttons": list(MENU_BUTTONS)}],
+            [{"text": msg("cancelled"), "buttons": list(MENU_BUTTONS)}],
             {"action": "cancel"},
         )
     # "Talk to a person" always works, even mid-flow (§1 rule 1)
@@ -192,7 +162,7 @@ def _route(session, text, payload):
         if session.active_flow:
             return FLOWS[session.active_flow].resume(session), {"action": "stale_button"}
         return (
-            [{"text": "What can I help with?", "buttons": list(MENU_BUTTONS)}],
+            [{"text": msg("stale_button"), "buttons": list(MENU_BUTTONS)}],
             {"action": "stale_button"},
         )
     if pending and text:
@@ -234,13 +204,13 @@ def _route(session, text, payload):
         if intent:
             return _answer(session, intent, 1.0)
         return (
-            [{"text": FALLBACK_TEXT, "buttons": list(MENU_BUTTONS)}],
+            [{"text": msg("fallback"), "buttons": list(MENU_BUTTONS)}],
             {"action": "unknown_payload"},
         )
 
     if not text:
         return (
-            [{"text": "What can I help with?", "buttons": list(MENU_BUTTONS)}],
+            [{"text": msg("menu"), "buttons": list(MENU_BUTTONS)}],
             {"action": "menu"},
         )
 
@@ -249,7 +219,7 @@ def _route(session, text, payload):
         return (
             [
                 {
-                    "text": ABUSE_TEXT,
+                    "text": msg("abuse"),
                     "buttons": [
                         {"label": "Request a callback", "payload": "human_handoff"},
                         {"label": "Main menu", "payload": "menu"},
@@ -264,8 +234,7 @@ def _route(session, text, payload):
         return (
             [
                 {
-                    "text": "Free-typing is temporarily unavailable — please "
-                    "choose an option below.",
+                    "text": msg("freetext_off"),
                     "buttons": list(MENU_BUTTONS),
                 }
             ],
@@ -310,8 +279,7 @@ def _free_text(session, text, urgent_flows=True):
         return (
             [
                 {
-                    "text": "I want to make sure I get this right — did you "
-                    "mean one of these?",
+                    "text": msg("did_you_mean"),
                     "buttons": buttons,
                 }
             ],
@@ -326,7 +294,7 @@ def _free_text(session, text, urgent_flows=True):
         return (
             [
                 {
-                    "text": TWO_STRIKE_TEXT,
+                    "text": msg("two_strike"),
                     "buttons": [
                         {"label": "Request a callback", "payload": "human_handoff"},
                         {"label": "Main menu", "payload": "menu"},
@@ -336,7 +304,7 @@ def _free_text(session, text, urgent_flows=True):
             {"action": "two_strike", "confidence": round(top_score, 3)},
         )
     return (
-        [{"text": FALLBACK_TEXT, "buttons": list(MENU_BUTTONS)}],
+        [{"text": msg("fallback"), "buttons": list(MENU_BUTTONS)}],
         {"action": "fallback", "confidence": round(top_score, 3)},
     )
 
@@ -359,7 +327,7 @@ def _maybe_answer_faq_interrupt(flow, session, text):
     i = state.get("step", 0)
     if i >= len(steps):
         return None
-    field = steps[i][0]
+    field = steps[i]
     if field not in getattr(flow, "interruptible_fields", ()):
         return None
 
@@ -372,11 +340,10 @@ def _maybe_answer_faq_interrupt(flow, session, text):
         return None
 
     prompt = flow._prompt(i)
-    topic = getattr(flow, "topic_label", "request")
+    back = msg("back_to_flow", flow=flow.topic_label, prompt=prompt["text"])
     return [
         {
-            "text": intent["answer"].strip() + f"\n\nNow, back to your {topic} — "
-            + prompt["text"],
+            "text": intent["answer"].strip() + "\n\n" + back,
             "buttons": prompt["buttons"],
         }
     ]
@@ -393,9 +360,8 @@ def _start_urgent(session, kind, sub):
 
 def _ask_urgent(session, kind, sub, text, source):
     session.slots["pending_urgent"] = {"kind": kind, "sub": sub, "text": text}
-    confirm = URGENT_CONFIRM.get(sub) or URGENT_CONFIRM[kind]
     return (
-        [{"text": confirm["text"], "buttons": list(confirm["buttons"])}],
+        [_urgent_confirm(kind, sub)],
         {"action": f"urgent_confirm:{kind}", "urgent_source": source},
     )
 
@@ -408,7 +374,7 @@ def _resolve_urgent(session, pending, confirmed):
     if session.active_flow:
         flow = FLOWS[session.active_flow]
         return (
-            [{"text": URGENT_DECLINED_FLOW_TEXT, "buttons": []}] + flow.resume(session),
+            [{"text": msg("urgent_declined_flow"), "buttons": []}] + flow.resume(session),
             {"action": "urgent_declined"},
         )
     strikes = session.strikes
@@ -416,7 +382,7 @@ def _resolve_urgent(session, pending, confirmed):
     if meta.get("action") in ("fallback", "two_strike"):
         # Their message only read as urgent, so a strike would be unfair.
         session.strikes = strikes
-        replies = [{"text": URGENT_DECLINED_TEXT, "buttons": list(MENU_BUTTONS)}]
+        replies = [{"text": msg("urgent_declined"), "buttons": list(MENU_BUTTONS)}]
     meta = dict(meta, action="urgent_declined", declined_answer=meta.get("action"))
     return replies, meta
 
@@ -442,7 +408,7 @@ def _answer(session, intent, score, text=None):
     session.slots["topic"] = intent.get("category")
     answer = intent.get("answer")
     if not answer:
-        return [{"text": FALLBACK_TEXT, "buttons": list(MENU_BUTTONS)}], meta
+        return [{"text": msg("fallback"), "buttons": list(MENU_BUTTONS)}], meta
     buttons = [dict(b) for b in intent.get("buttons", [])]
     meta["action"] = "answer"
     return [{"text": answer.strip(), "buttons": buttons}], meta

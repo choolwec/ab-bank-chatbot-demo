@@ -1389,7 +1389,7 @@ that finishes the ticket.
 | E3 | Evaluation gates (held-out + out-of-scope) | 0 | W02 | 1 | — | Dev | ☑ |
 | E4 | Baseline metrics | 0 | W02 | 0.5 | E2, E3 | Dev | ☑ |
 | P8 | Admin route auth | 0 | W02 | 0.5 | — | Dev | ☑ |
-| C1 | System messages in YAML | 1 | W02 | 2 | — | Dev | ☐ |
+| C1 | System messages in YAML | 1 | W02 | 2 | — | Dev | ☑ |
 | C2 | Typed commands anywhere | 1 | W03 | 1.5 | E2, C1 | Dev | ☐ |
 | C3 | Answers to the bot's questions (yes/no, numbers, labels) | 1 | W03 | 2 | E2 | Dev | ☐ |
 | C4 | Repair: repeat / what do you mean | 1 | W03 | 1.5 | C1, C2 | Dev | ☐ |

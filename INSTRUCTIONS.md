@@ -48,6 +48,12 @@ The bot's answers live in text files here: `knowledge\intents\`
 (accounts.yaml, etumba.yaml, loans.yaml, locations.yaml, fees.yaml,
 smalltalk.yaml, urgent.yaml)
 
+Everything else the bot says — the welcome, "I didn't quite catch that",
+the questions it asks during a fraud report, complaint or callback, and the
+"your reference is…" messages — is in one file:
+`knowledge\system_messages.yaml`. Change the `text:` line; leave anything in
+`{curly brackets}` as it is (the bot fills those in).
+
 1. Open the file in any text editor (Notepad works, VS Code is nicer)
 2. Find the answer, change the wording. To help the bot understand more
    ways of asking, add lines to the `phrases:` list

@@ -3,9 +3,16 @@
 A flow returns (replies, done). Replies are dicts: {"text": str, "buttons":
 [{"label","payload"}]}. The router guarantees the last reply always carries
 at least one button (no dead ends, §1 rule 1).
+
+All wording comes from knowledge/system_messages.yaml (ticket C1), by
+convention: "<flow>.step.<field>" for each prompt, "<flow>.retry.<field>" for
+each validator's retry text, "<flow>.topic_label", and "field.<field>" for the
+confirmation summary. flows/__init__.py checks every one exists at import.
 """
 
 import re
+
+from ..messages import msg
 
 CANCEL_BUTTON = {"label": "Back to menu", "payload": "cancel_flow"}
 MENU_BUTTON = {"label": "Main menu", "payload": "menu"}
@@ -60,15 +67,12 @@ EDIT_BUTTON = {"label": "No, let me fix that", "payload": "confirm_edit"}
 
 class FormFlow:
     name = "form"
-    # Human-readable noun used in "back to your {topic_label}" resume prompts
-    # (§ mid-flow FAQ interrupt, see router._maybe_answer_faq_interrupt).
-    topic_label = "request"
-    # list of (field_key, prompt_text)
-    steps: list[tuple[str, str]] = []
-    # optional {field_key: (is_valid_fn, retry_message)} — checked before a
-    # step's answer is stored; on failure the same step re-prompts with the
-    # retry message instead of advancing.
-    validators: dict[str, tuple] = {}
+    # Field names, in order. Prompt wording: msg("<name>.step.<field>").
+    steps: list[str] = []
+    # optional {field: is_valid_fn} -- checked before a step's answer is
+    # stored; on failure the same step re-prompts with msg("<name>.retry.<field>")
+    # instead of advancing.
+    validators: dict = {}
     # Fields where a mid-flow FAQ question is safe to detect (router.py's
     # _maybe_answer_faq_interrupt) — opt-in, not opt-out. Only genuinely
     # free-narrative fields belong here: fields whose *legitimate* answers
@@ -84,6 +88,20 @@ class FormFlow:
     # the branch locator) leave this False.
     require_confirmation = False
 
+    @property
+    def topic_label(self) -> str:
+        """Noun used in "back to your {topic_label}" prompts."""
+        return msg(f"{self.name}.topic_label")
+
+    def message_keys(self) -> list[str]:
+        """Every system-message key this flow looks up by convention."""
+        keys = [f"{self.name}.topic_label"]
+        keys += [f"{self.name}.step.{f}" for f in self.steps]
+        keys += [f"{self.name}.retry.{f}" for f in self.validators]
+        if self.require_confirmation:
+            keys += [f"field.{f}" for f in self.steps]
+        return keys
+
     def intro(self, session, kind):
         return []
 
@@ -95,19 +113,19 @@ class FormFlow:
         return replies, False
 
     def _prompt(self, i):
-        return {"text": self.steps[i][1], "buttons": [CANCEL_BUTTON]}
+        return {"text": msg(f"{self.name}.step.{self.steps[i]}"), "buttons": [CANCEL_BUTTON]}
 
     def _confirmation_prompt(self, session):
         data = session.flow_state.get("data", {})
-        lines = [
-            f"- {field.replace('_', ' ').capitalize()}: {data[field]}"
-            for field, _ in self.steps
+        lines = "\n".join(
+            f"- {msg(f'field.{field}')}: {data[field]}"
+            for field in self.steps
             if data.get(field)
-        ]
-        text = (
-            "Here's what I've got:\n" + "\n".join(lines) + "\n\nShall I submit this?"
         )
-        return {"text": text, "buttons": [CONFIRM_BUTTON, EDIT_BUTTON, CANCEL_BUTTON]}
+        return {
+            "text": msg("confirm.summary", lines=lines),
+            "buttons": [CONFIRM_BUTTON, EDIT_BUTTON, CANCEL_BUTTON],
+        }
 
     def resume(self, session):
         """Re-issue the current step's prompt without touching collected data.
@@ -135,7 +153,7 @@ class FormFlow:
             if payload == "confirm_yes":
                 return self.finish(session), True
             if payload == "confirm_edit":
-                last_field = self.steps[-1][0]
+                last_field = self.steps[-1]
                 state.get("data", {}).pop(last_field, None)
                 state["step"] = len(self.steps) - 1
                 state["confirming"] = False
@@ -144,14 +162,12 @@ class FormFlow:
             return [self._confirmation_prompt(session)], False
 
         i = state.get("step", 0)
-        field = self.steps[i][0]
+        field = self.steps[i]
         value = (text or payload or "").strip()
 
-        validator = self.validators.get(field)
-        if validator:
-            is_valid, retry_text = validator
-            if not is_valid(value):
-                return [{"text": retry_text, "buttons": [CANCEL_BUTTON]}], False
+        is_valid = self.validators.get(field)
+        if is_valid and not is_valid(value):
+            return [{"text": msg(f"{self.name}.retry.{field}"), "buttons": [CANCEL_BUTTON]}], False
 
         value = self.store_value(field, value)
         state.setdefault("data", {})[field] = value

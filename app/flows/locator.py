@@ -7,6 +7,7 @@ offer instead of trapping the user (mirrors the two-strike rule).
 import json
 
 from .. import config
+from ..messages import msg
 from .base import CANCEL_BUTTON, HUMAN_BUTTON, MENU_BUTTON
 
 
@@ -14,8 +15,37 @@ def _load() -> dict:
     return json.loads(config.BRANCHES_FILE.read_text(encoding="utf-8"))
 
 
+def find_branches(needle: str) -> list[dict]:
+    """Branches whose city or name contains `needle` (case-insensitive)."""
+    needle = (needle or "").lower().strip()
+    if not needle:
+        return []
+    return [
+        b for b in _load()["branches"]
+        if needle in b["city"].lower() or needle in b["name"].lower()
+    ]
+
+
+def branch_lines(branches: list[dict]) -> str:
+    return "\n".join(
+        msg(
+            "locator.branch_line",
+            name=b["name"], address=b["address"], city=b["city"],
+            phone=b["phone"], hours=b["hours"],
+        )
+        for b in branches
+    )
+
+
 class LocatorFlow:
     name = "locator"
+
+    @property
+    def topic_label(self) -> str:
+        return msg("locator.topic_label")
+
+    def message_keys(self):
+        return ["locator.topic_label"]
 
     def start(self, session, kind=None):
         session.active_flow = self.name
@@ -25,13 +55,12 @@ class LocatorFlow:
             session.flow_state = {}
             return self._agents(), True
         if kind == "branch":
-            return [self._city_prompt("Happy to help you find a branch.")], False
+            return [self._city_prompt(msg("locator.city_intro"))], False
         return [self._mode_prompt()], False
 
     def _mode_prompt(self):
         return {
-            "text": "Are you looking for a branch, or an eTumba cash-in/"
-            "cash-out agent?",
+            "text": msg("locator.mode"),
             "buttons": [
                 {"label": "A branch", "payload": "loc_branch"},
                 {"label": "An eTumba agent", "payload": "loc_agent"},
@@ -60,21 +89,15 @@ class LocatorFlow:
 
     def _city_prompt(self, prefix):
         cities = sorted({b["city"] for b in _load()["branches"]})
-        text = (prefix + " " if prefix else "") + "Which town or city are you in?"
+        text = (prefix + " " if prefix else "") + msg("locator.city")
         buttons = [{"label": c, "payload": c} for c in cities] + [CANCEL_BUTTON]
         return {"text": text, "buttons": buttons}
 
     def _agents(self):
         networks = ", ".join(n["name"] for n in _load()["agent_networks"])
-        text = (
-            "You can put money into or take money out of your eTumba wallet at "
-            f"any AB Bank branch, and at these agent networks countrywide: "
-            f"{networks}. Look for their signage at shops and kiosks near you. "
-            "[CONFIRM: guidance for finding a specific nearby agent.]"
-        )
         return [
             {
-                "text": text,
+                "text": msg("locator.agents", networks=networks),
                 "buttons": [
                     {"label": "Find a branch", "payload": "branch_locator"},
                     {"label": "About eTumba", "payload": "etumba_what_is"},
@@ -83,48 +106,29 @@ class LocatorFlow:
             }
         ]
 
+    def found_reply(self, session, matches):
+        session.slots["city"] = matches[0]["city"]
+        return {
+            "text": msg("locator.found", lines=branch_lines(matches)),
+            "buttons": [
+                {"label": "eTumba agents", "payload": "agent_locator"},
+                {"label": "Opening hours", "payload": "opening_hours"},
+                MENU_BUTTON,
+            ],
+        }
+
     def _branch_lookup(self, session, city):
-        branches = _load()["branches"]
-        needle = city.lower().strip()
-        matches = [
-            b
-            for b in branches
-            if needle and (needle in b["city"].lower() or needle in b["name"].lower())
-        ]
+        matches = find_branches(city)
         if matches:
-            session.slots["city"] = matches[0]["city"]
-            lines = [
-                f"- {b['name']} — {b['address']}, {b['city']}. "
-                f"Phone: {b['phone']}. Hours: {b['hours']}"
-                for b in matches
-            ]
-            text = "Here's what I found:\n" + "\n".join(lines)
-            return [
-                {
-                    "text": text,
-                    "buttons": [
-                        {"label": "eTumba agents", "payload": "agent_locator"},
-                        {"label": "Opening hours", "payload": "opening_hours"},
-                        MENU_BUTTON,
-                    ],
-                }
-            ], True
+            return [self.found_reply(session, matches)], True
         state = session.flow_state
         state["misses"] = state.get("misses", 0) + 1
-        cities = sorted({b["city"] for b in branches})
+        cities = sorted({b["city"] for b in _load()["branches"]})
         if state["misses"] >= 2:
-            text = (
-                "I couldn't find a listed branch there. We currently list "
-                f"branches in: {', '.join(cities)}. Our team can help you find "
-                "the nearest service point."
-            )
+            text = msg("locator.not_found_final", cities=", ".join(cities))
             return [{"text": text, "buttons": [HUMAN_BUTTON, MENU_BUTTON]}], True
-        text = (
-            f"I don't have a branch listed for '{city}' yet. Try one of these "
-            "towns, or ask for a person:"
-        )
         buttons = [{"label": c, "payload": c} for c in cities] + [
             HUMAN_BUTTON,
             CANCEL_BUTTON,
         ]
-        return [{"text": text, "buttons": buttons}], False
+        return [{"text": msg("locator.not_found", city=city), "buttons": buttons}], False

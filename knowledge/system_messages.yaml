@@ -1,0 +1,226 @@
+# ============================================================================
+# System messages (ticket C1): every built-in text the bot sends that is NOT
+# an intent answer -- welcome, fallbacks, flow prompts, retries, finish texts.
+# Same rules as knowledge/intents/*.yaml: customer-facing wording, reviewed by
+# legal, exported by `python -m admin.legal_export`, and content edits are
+# deploys (run pytest before committing).
+#
+#   key:       dotted name used in code as msg("key")
+#   status:    draft | legal_review | approved
+#   text:      the wording. {contact_phone}, {emergency_phone} and the other
+#              app/config.py CONTACTS are filled in automatically; other
+#              {placeholders} are filled by the code that sends the message
+#              (listed in `fills:` so reviewers know what appears there).
+#
+# Button labels are not here yet (they move with tickets C11/P3).
+# ============================================================================
+
+messages:
+  # --- Session ---------------------------------------------------------------
+  welcome:
+    status: draft
+    text: |
+      Hello! I'm the AB Bank assistant — an automated helper, not a person. I can help with branches and agents, opening an account, eTumba, and loans, or connect you to our team. What can I help with?
+  resume:
+    status: draft
+    text: Welcome back! What can I help with?
+  resume_flow:
+    status: draft
+    text: Welcome back — let's pick up where we left off.
+  menu:
+    status: draft
+    text: What can I help with?
+  cancelled:
+    status: draft
+    text: No problem — back to the main menu.
+  stale_button:
+    status: draft
+    text: What can I help with?
+
+  # --- Understanding ------------------------------------------------------------
+  fallback:
+    status: draft
+    text: I didn't quite catch that. You can try different words, pick an option below, or ask for a person at any time.
+  two_strike:
+    status: draft
+    text: I'm sorry — I'm not getting this right. Rather than keep guessing, let me connect you with a person who can help.
+  did_you_mean:
+    status: draft
+    text: I want to make sure I get this right — did you mean one of these?
+  freetext_off:
+    status: draft
+    text: Free-typing is temporarily unavailable — please choose an option below.
+  abuse:
+    status: draft
+    text: I can hear this is frustrating — I'm sorry. Let me connect you with a person who can sort it out properly.
+  back_to_flow:
+    status: draft
+    fills: [flow, prompt]
+    text: "Now, back to your {flow} — {prompt}"
+
+  # --- Guards -------------------------------------------------------------------
+  pii_warning:
+    status: draft
+    text: Please don't share card numbers, PINs or passwords in chat — I never need them, and no genuine member of staff will ever ask for them.
+
+  # --- S1 soft-urgent confirmation (Ops/Risk reviews) ----------------------------
+  urgent_confirm.fraud:
+    status: draft
+    text: It sounds like something may be wrong with your money. Do you want to report it as fraud?
+  urgent_confirm.lost_card:
+    status: draft
+    text: Has your card been lost or stolen? If so, I can help you block it and report it now.
+  urgent_confirm.complaint:
+    status: draft
+    text: It sounds like you may not be happy with something. Would you like to make a formal complaint?
+  urgent_declined:
+    status: draft
+    text: No problem. What would you like to know?
+  urgent_declined_flow:
+    status: draft
+    text: No problem — let's carry on.
+
+  # --- Shared flow texts ------------------------------------------------------------
+  confirm.summary:
+    status: draft
+    fills: [lines]
+    text: |-
+      Here's what I've got:
+      {lines}
+
+      Shall I submit this?
+  read_back:
+    status: draft
+    fills: [value]
+    text: "Got it: {value}."
+
+  # Field names shown in the confirmation summary.
+  field.what_happened: {status: draft, text: What happened}
+  field.when: {status: draft, text: When}
+  field.channel: {status: draft, text: Channel}
+  field.contact: {status: draft, text: Contact}
+  field.topic: {status: draft, text: Topic}
+  field.details: {status: draft, text: Details}
+  field.name: {status: draft, text: Name}
+  field.phone: {status: draft, text: Phone}
+  field.time: {status: draft, text: Time}
+
+  # --- Fraud flow -------------------------------------------------------------------
+  fraud.topic_label: {status: draft, text: fraud report}
+  fraud.intro.lost_card:
+    status: draft
+    text: |-
+      I'm sorry to hear that — let's secure your card straight away.
+      Call us now on {emergency_phone} to block your card immediately.
+      I'll also take a few details so our team can follow up with you.
+  fraud.intro.fraud:
+    status: draft
+    text: |-
+      I'm sorry this has happened. You've done the right thing by reporting it, and I'm treating it as urgent.
+      If money is at risk right now, call us immediately on {emergency_phone}.
+      I'll take a few details for our fraud team, and a person will follow up with you.
+  fraud.step.what_happened:
+    status: draft
+    text: Please tell me briefly what happened.
+  fraud.step.when:
+    status: draft
+    text: "When did this happen? (For example: today, yesterday, or a date.)"
+  fraud.step.channel:
+    status: draft
+    text: Which service was involved — card or ATM, eTumba, internet banking, or a branch?
+  fraud.step.contact:
+    status: draft
+    text: What's the best phone number to reach you on right now, so our fraud team can follow up immediately? (An email address works too.)
+  fraud.retry.contact:
+    status: draft
+    text: That doesn't look like a valid number — please send it as 09XXXXXXX (10 digits), 260XXXXXXXXX (12 digits), or +260XXXXXXXXX, or an email address, so our fraud team can actually reach you. You can also type 'skip'.
+  fraud.contact_skipped:
+    status: draft
+    text: Without a number we can't call you back. Please call {contact_phone} so our team can help you.
+  fraud.finish:
+    status: draft
+    fills: [ref]
+    text: |-
+      Thank you. I've raised an urgent case for our team — your reference is {ref}. A member of staff will contact you as a priority.
+      This case stays open until a person from the bank has resolved it with you — I won't close it myself.
+      For immediate help at any time, call {emergency_phone}.
+
+  # --- Complaint flow -----------------------------------------------------------------
+  complaint.topic_label: {status: draft, text: complaint}
+  complaint.step.topic:
+    status: draft
+    text: |-
+      I'm sorry you've had a poor experience — I'll log a formal complaint for you.
+      First: what is your complaint about? (For example: an account, eTumba, a loan, service at a branch.)
+  complaint.step.details:
+    status: draft
+    text: Thank you. Please describe what happened.
+  complaint.step.contact:
+    status: draft
+    text: What's the best phone number or email for updates on this complaint? (Type 'skip' if you'd rather not — it is logged either way.)
+  complaint.finish:
+    status: draft
+    fills: [ref]
+    text: |-
+      Your complaint has been logged with reference {ref} and goes straight to our complaints team, who handle it under the Bank of Zambia's complaints-handling requirements. [CONFIRM: response-time commitment to quote here.]
+      Please keep your reference number — any member of staff can look it up.
+
+  # --- Callback (lead) flow -------------------------------------------------------------
+  lead.topic_label: {status: draft, text: callback request}
+  lead.step.name:
+    status: draft
+    text: |-
+      Of course — I'll arrange for our team to call you back.
+      What's your name?
+  lead.step.phone:
+    status: draft
+    text: Thanks. What phone number should we call?
+  lead.step.topic:
+    status: draft
+    text: And what would you like to discuss?
+  lead.step.time:
+    status: draft
+    text: When is best to call — morning or afternoon?
+  lead.retry.phone:
+    status: draft
+    text: That doesn't look like a valid number — please send it as 09XXXXXXX (10 digits), 260XXXXXXXXX (12 digits), or +260XXXXXXXXX, so our team can actually reach you.
+  lead.finish:
+    status: draft
+    fills: [ref]
+    text: |-
+      Done — that's everything I need. Our team will call you within one working day. Your reference is {ref}.
+      Is there anything else I can help with in the meantime?
+
+  # --- Branch & agent locator ----------------------------------------------------------
+  locator.topic_label: {status: draft, text: branch search}
+  locator.mode:
+    status: draft
+    text: Are you looking for a branch, or an eTumba cash-in/cash-out agent?
+  locator.city:
+    status: draft
+    text: Which town or city are you in?
+  locator.city_intro:
+    status: draft
+    text: Happy to help you find a branch.
+  locator.agents:
+    status: draft
+    fills: [networks]
+    text: "You can put money into or take money out of your eTumba wallet at any AB Bank branch, and at these agent networks countrywide: {networks}. Look for their signage at shops and kiosks near you. [CONFIRM: guidance for finding a specific nearby agent.]"
+  locator.found:
+    status: draft
+    fills: [lines]
+    text: |-
+      Here's what I found:
+      {lines}
+  locator.branch_line:
+    status: draft
+    fills: [name, address, city, phone, hours]
+    text: "- {name} — {address}, {city}. Phone: {phone}. Hours: {hours}"
+  locator.not_found:
+    status: draft
+    fills: [city]
+    text: "I don't have a branch listed for '{city}' yet. Try one of these towns, or ask for a person:"
+  locator.not_found_final:
+    status: draft
+    fills: [cities]
+    text: "I couldn't find a listed branch there. We currently list branches in: {cities}. Our team can help you find the nearest service point."

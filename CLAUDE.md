@@ -179,7 +179,14 @@ code change.
 ### Knowledge base = content, not code (`knowledge/`)
 `intents/*.yaml` (schema documented in a comment block at the top of
 `intents/smalltalk.yaml`) holds phrases/answers/buttons; `branches.json`
-holds branch/agent locator data; `faq/*.md` is source prose intended for a
+holds branch/agent locator data; `system_messages.yaml` holds every
+built-in text that isn't an intent answer (welcome, fallbacks, flow prompts,
+retries, finish texts), read through `app/messages.msg(key, **fmt)`. No
+customer-facing reply text may be a Python literal (an AST test enforces
+it; button labels are the one exception until C11). Flows look keys up by
+convention (`<flow>.step.<field>`, `<flow>.retry.<field>`), and both
+`messages.verify()` and `flows.verify_messages()` fail at import on a
+missing key; `faq/*.md` is source prose intended for a
 future RAG layer and is not currently loaded by the running app. **Content
 edits are deploys**: the regression suite asserts every declared phrase
 actually matches its own intent, that no answer is a dead end, and that PII

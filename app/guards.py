@@ -30,10 +30,7 @@ _STRIP_CODEPOINTS = (
 )
 CONTROL_RE = re.compile("[" + re.escape("".join(chr(c) for c in _STRIP_CODEPOINTS)) + "]")
 
-PII_WARNING = (
-    "Please don't share card numbers, PINs or passwords in chat — I never "
-    "need them, and no genuine member of staff will ever ask for them."
-)
+# The warning shown when PII is detected is msg("pii_warning") (C1).
 
 # --- Urgent-topic scan (§3.1C, ticket S1) ---------------------------------
 #

@@ -171,9 +171,20 @@ estimated WhatsApp cost (US$, illustrative rates marked [VERIFY]), leads and
 campaigns, and the top unmatched questions. The figures are drafts for a
 qualified person to check before they go into any management report.
 
+**`GET /admin/analytics`** (staff only, behind the admin login) shows the same
+numbers as a dashboard for any date range and channel: traffic per day,
+understanding, safety (fraud, lost cards, complaints, how fast they were
+raised), people (hand-offs, callbacks, out of hours, CSAT), marketing (leads,
+consent, campaign sources) and health. Counts only, computed by the weekly
+report's own functions so the two never disagree; self-hosted with no
+script, tracker or cookie. `GET /admin/analytics.csv` exports the aggregates
+(no customer free text), and `python -m admin.analytics --from YYYY-MM-DD
+--to YYYY-MM-DD [--channel whatsapp] [--csv]` prints them.
+
 ```powershell
 # Reports
 .venv\Scripts\python -m admin.report --days 7            # writes data/report.md (--stdout prints, --out elsewhere, --skip-eval)
+.venv\Scripts\python -m admin.analytics --from 2026-09-01 --to 2026-09-24   # dashboard numbers as JSON (--csv, --channel)
 .venv\Scripts\python -m admin.baseline_report            # metrics snapshot (--out docs/metrics-m2.md)
 .venv\Scripts\python -m admin.shadow_report --days 7     # shadow-mode disagreements for the weekly review
 .venv\Scripts\python -m admin.legal_export               # regenerate docs/intent-review.md for Legal

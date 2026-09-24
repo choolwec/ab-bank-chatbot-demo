@@ -65,6 +65,14 @@ def _ratio(a, b):
     return a / b if b else None
 
 
+def _window(column: str, since: str, until: str | None) -> tuple[str, tuple]:
+    """SQL for `column` in [since, until); until None = up to now. Shared with
+    admin.analytics, whose date range has an end."""
+    if until is None:
+        return f"{column} >= ?", (since,)
+    return f"{column} >= ? AND {column} < ?", (since, until)
+
+
 # --- Reading the audit trail ---------------------------------------------------
 
 
@@ -122,14 +130,15 @@ class Traffic:
         return None if share is None else share * 5
 
 
-def collect(con, since: str) -> Traffic:
+def collect(con, since: str, until: str | None = None) -> Traffic:
     t = Traffic()
     conversations = collections.defaultdict(set)
     prev = None
+    where, params = _window("ts", since, until)
     rows = con.execute(
-        "SELECT session_id, role, action, channel, text FROM events WHERE ts >= ? "
+        f"SELECT session_id, role, action, channel, text FROM events WHERE {where} "
         "ORDER BY session_id, id",
-        (since,),
+        params,
     )
     for session_id, role, action, channel, text in rows:
         ch = channel or "web"
@@ -161,10 +170,11 @@ def _shadow_agrees(text) -> bool:
         return False
 
 
-def load_tickets(con, since: str) -> list[tuple[str, str, dict]]:
+def load_tickets(con, since: str, until: str | None = None) -> list[tuple[str, str, dict]]:
     out = []
+    where, params = _window("created", since, until)
     for kind, channel, raw in con.execute(
-        "SELECT type, channel, fields FROM tickets WHERE created >= ?", (since,)
+        f"SELECT type, channel, fields FROM tickets WHERE {where}", params
     ):
         try:
             fields = json.loads(raw or "{}")
@@ -174,19 +184,23 @@ def load_tickets(con, since: str) -> list[tuple[str, str, dict]]:
     return out
 
 
-def top_unmatched(con, since: str) -> tuple[list[tuple[str, int]], int]:
+def top_unmatched(con, since: str, until: str | None = None, channel: str | None = None,
+                  limit: int = UNMATCHED_SHOWN) -> tuple[list[tuple[str, int]], int]:
     """The most frequent unmatched messages, and how many distinct ones were
     withheld because they still look personal."""
+    where, params = _window("ts", since, until)
+    if channel is not None:
+        where, params = where + " AND channel = ?", params + (channel,)
     rows = con.execute(
         "SELECT lower(text), COUNT(*) AS n FROM events WHERE action='unmatched' "
-        "AND ts >= ? GROUP BY lower(text) ORDER BY n DESC, lower(text)",
-        (since,),
+        f"AND {where} GROUP BY lower(text) ORDER BY n DESC, lower(text)",
+        params,
     ).fetchall()
     shown, withheld = [], 0
     for text, n in rows:
         if looks_personal(text or ""):
             withheld += 1
-        elif len(shown) < UNMATCHED_SHOWN:
+        elif len(shown) < limit:
             shown.append((text, n))
     return shown, withheld
 
@@ -647,45 +661,59 @@ def build_report(days: int = 7, offline: dict | None = None, run_offline: bool =
     return "\n".join(lines)
 
 
-def _campaigns(con, since) -> list[str]:
-    """MK3: sessions and callbacks per campaign source, marketing consent and
-    opt-outs. Counts only -- names and numbers stay in Jira."""
+def campaign_counts(con, since: str, until: str | None = None, channel: str | None = None) -> dict:
+    """MK3: per campaign source, the sessions it brought, their callbacks and
+    the callbacks with marketing consent (read as _consent does, D16), plus
+    the marketing opt-outs. Counts only -- names and numbers stay in Jira.
+    Shared with admin.analytics."""
+    ev_where, ev_params = _window("ts", since, until)
+    tk_where, tk_params = _window("created", since, until)
+    if channel is not None:
+        ev_where, ev_params = ev_where + " AND channel = ?", ev_params + (channel,)
+        tk_where, tk_params = tk_where + " AND channel = ?", tk_params + (channel,)
     sessions = dict(
         con.execute(
             "SELECT substr(text, 9), COUNT(DISTINCT session_id) FROM events "
-            "WHERE action='session_source' AND ts >= ? GROUP BY text",
-            (since,),
+            f"WHERE action='session_source' AND {ev_where} GROUP BY text",
+            ev_params,
         ).fetchall()
     )
-    callbacks, consent = {}, {}
-    for (raw,) in con.execute(
-        "SELECT fields FROM tickets WHERE type='callback' AND created >= ?", (since,)
-    ):
+    callbacks, consent = collections.Counter(), collections.Counter()
+    for (raw,) in con.execute(f"SELECT fields FROM tickets WHERE type='callback' AND {tk_where}", tk_params):
         try:
             fields = json.loads(raw or "{}")
         except ValueError:
             fields = {}
+        if not isinstance(fields, dict):
+            fields = {}
         source = fields.get("source") or "unknown"
-        callbacks[source] = callbacks.get(source, 0) + 1
-        if fields.get("marketing_consent") == "yes":
-            consent[source] = consent.get(source, 0) + 1
+        callbacks[source] += 1
+        if _consent(fields) == "yes":
+            consent[source] += 1
     opt_outs = con.execute(
-        "SELECT COUNT(*) FROM events WHERE action='marketing_opt_out' AND role='system' AND ts >= ?",
-        (since,),
+        f"SELECT COUNT(*) FROM events WHERE action='marketing_opt_out' AND role='system' AND {ev_where}",
+        ev_params,
     ).fetchone()[0]
+    rows = [
+        (source, sessions.get(source, 0), callbacks[source], consent[source])
+        for source in sorted(set(sessions) | set(callbacks), key=lambda s: (-callbacks[s], s))
+    ]
+    return {"rows": rows, "opt_outs": opt_outs}
+
+
+def _campaigns(con, since) -> list[str]:
+    counts = campaign_counts(con, since)
     lines = [
         "",
         "## Campaigns (source from data-campaign, utm_* or a wa.me ref: token)",
         "",
-        f"Marketing opt-outs: {opt_outs}",
+        f"Marketing opt-outs: {counts['opt_outs']}",
         "",
         "| Source | Sessions | Callbacks | Callbacks with marketing consent |",
         "|---|---|---|---|",
     ]
-    for source in sorted(set(sessions) | set(callbacks), key=lambda s: (-callbacks.get(s, 0), s)):
-        lines.append(
-            f"| {source} | {sessions.get(source, 0)} | {callbacks.get(source, 0)} | {consent.get(source, 0)} |"
-        )
+    for source, sessions, callbacks, consent in counts["rows"]:
+        lines.append(f"| {_cell(source)} | {sessions} | {callbacks} | {consent} |")
     return lines
 
 

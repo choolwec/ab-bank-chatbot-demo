@@ -73,6 +73,7 @@ Admin scripts (full list in `README.md`; on the VM run them through
 `deploy/admin.sh <command>`):
 ```powershell
 .venv\Scripts\python -m admin.report --days 7   # writes data/report.md (--stdout, --out, --skip-eval)
+.venv\Scripts\python -m admin.analytics --from 2026-09-01 --csv  # /admin/analytics numbers (JSON by default)
 .venv\Scripts\python -m admin.legal_export       # regenerate docs/intent-review.md for legal sign-off
 .venv\Scripts\python -m admin.eval_report        # held-out accuracy vs the E3 gates
 .venv\Scripts\python -m admin.alerts --dry-run   # R1: cron runs it every minute on the VM (--test posts one card)
@@ -168,7 +169,7 @@ self-describing (`loc_city:Lusaka`, `time:Morning`) because WhatsApp keeps
 old buttons tappable. `main.py` is only
 the app shell: CORS, `/health`, the demo page, admin routes (all behind
 `adminauth.require_admin`, including `GET /admin/timing`, P9's server-side
-latency windows), and mounting the channel routers.
+latency windows, and `/admin/analytics`), and mounting the channel routers.
 
 **Campaign source (MK3, `app/campaign.py`).** The widget sends `source` with
 every `/chat` post (its `data-campaign`, else `utm_campaign` / `utm_source`).
@@ -478,6 +479,26 @@ data), tickets, CSAT, an estimated WhatsApp cost in US$ only
 channel, topic group, source and consent, campaigns (sessions, callbacks and
 consenting callbacks per source, opt-outs), and top unmatched. No names,
 phone numbers, session ids or hashes. The figures are drafts for review.
+
+### Analytics dashboard (`admin/analytics.py`, `app/admin_analytics.py`)
+`GET /admin/analytics?from=&to=&channel=` (behind `require_admin`) and
+`/admin/analytics.csv`. One Lusaka-day range (default last 7 days, capped at
+366, never past today) and an optional channel scope every number. The
+calculations are `admin.report`'s own (`collect`, `load_tickets`,
+`top_unmatched`, `campaign_counts`, `_consent`, `topic_group`, which take an
+optional `until`), so the dashboard and the weekly report never disagree:
+change a definition there, not in the dashboard. Lines only the dashboard
+has: conversations per day, answers split typed/tapped (the preceding user
+event starts `[button] `), time to raise a fraud/complaint ticket (from the
+start of the visit in its transcript, split at `IDLE_REGREET_MINUTES` gaps),
+and tickets raised out of contact-centre hours. Counts only: the only free
+text is the masked unmatched messages (the report's `looks_personal()`
+filter) and campaign codes; the CSV has no free text and neutralises
+formula cells. Server-rendered HTML with inline SVG and CSS: no script, no
+external asset, no cookie, `Cache-Control: no-store` and a strict CSP. Its
+"today" is the real Lusaka date (`analytics.lusaka_today()`), not
+`hours.now()`, which the test suite pins. `audit.init_db()` adds indexes on
+`events(ts)` and `tickets(created)` for the date-range reads.
 
 ### Production deployment (`deploy/`, P7)
 systemd (`abz-chatbot.service`, **one** uvicorn worker, non-root user

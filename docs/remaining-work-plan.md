@@ -31,6 +31,7 @@ they differ; the ticket plans in section 3 are kept as the design record.
 | P9 | `research/load/load.py`, `/admin/timing`, real Jira push moved off the request path; local 5-minute run: `/chat` p95 18.9 ms, no errors | `load-test-results.md` |
 | H5 | Sampled one-tap CSAT (20% by `user_hash`, never after fraud, once per session) | CLAUDE.md, request pipeline |
 | H6 | Weekly report v2 written to `data/report.md`: per channel, launch targets PASS/FAIL/n/a, WhatsApp cost estimate (US$, [VERIFY]), leads, campaigns | `admin/report.py` |
+| Analytics | `/admin/analytics` dashboard (date range, channel, CSV export): traffic, understanding, safety, people, marketing, health. Counts only, the report's own calculations, no outside tracker | `admin/analytics.py`, `app/admin_analytics.py` |
 | H2 | Chatwoot desk for WhatsApp handoffs (`app/desk/`), masked and phone-redacted, `CHATWOOT_ENABLED` kill switch | `chatwoot-setup.md` |
 | H4 | `admin/export_bot_wrong.py`: `bot-wrong` labels from Chatwoot and Jira into `data/utterances.csv` | `chatwoot-setup.md` |
 | Matcher | Negation handled in both modes, `out_of_scope` phrases, broader phrases, recalibration (`EMB_MEDIUM` 0.435), gates tightened. Character: right 0.670 / wrong 0.044 / OOS 0.067. Hybrid: right 0.835 / wrong 0.022 / OOS 0.067 (targets 0.85 / 0.02 / 0.03) | `metrics-matcher-2026-09-24.md` |

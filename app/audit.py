@@ -63,6 +63,9 @@ def init_db() -> None:
             )"""
         )
         _migrate(con)
+        # Date-range reads (admin.report, /admin/analytics) scan by time.
+        con.execute("CREATE INDEX IF NOT EXISTS events_ts ON events(ts)")
+        con.execute("CREATE INDEX IF NOT EXISTS tickets_created ON tickets(created)")
         con.commit()
         con.close()
         _init_done = True

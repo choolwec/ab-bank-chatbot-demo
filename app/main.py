@@ -18,7 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import admin_cases, audit, config, jira_export, metrics
+from . import admin_analytics, admin_cases, audit, config, jira_export, metrics
 from . import health as health_checks
 from . import inbox as inbox_mod
 from .adminauth import require_admin
@@ -65,6 +65,7 @@ app.include_router(whatsapp.api)
 app.include_router(messenger.api)
 app.include_router(bridge.api)  # the agent desk's webhook (H2)
 app.include_router(admin_cases.api)
+app.include_router(admin_analytics.api)  # counts only; same numbers as admin.report
 
 
 @app.get("/health")

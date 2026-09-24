@@ -292,6 +292,9 @@ env file overrides `flags.json` and needs a restart to change.
 - **Latency and memory:** `GET /admin/timing` (staff only) gives the server's
   own p50/p95/p99 per route and per webhook message, the inbox queue and RSS
   (P9, `docs/load-test-results.md`).
+- **Analytics:** `GET /admin/analytics` (staff only) is the dashboard for
+  any date range and channel, with a CSV export; its figures match
+  `admin.report` for the same window.
 - **Kill switches:** `sudoedit /etc/abz-chatbot/flags.json`; no restart
   needed. The incident runbook (R1) lists which switch does what.
 

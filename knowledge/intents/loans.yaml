@@ -291,4 +291,4 @@ intents:
     buttons:
       - {label: "Loan requirements", payload: "loan_requirements"}
       - {label: "Find a branch", payload: "branch_locator"}
-      - {label: "Request a callback", payload: "human_handoff"}
+      - {label: "Request a callback", payload: "request_callback"}

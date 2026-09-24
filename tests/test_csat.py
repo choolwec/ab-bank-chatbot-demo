@@ -107,7 +107,7 @@ def test_sampled_customer_is_asked_once_after_goodbye(bot, rate):
     b.say("thanks")
     assert _asked(b)
     ask = b.last[0][-1]
-    assert b.buttons == [CSAT_UP, CSAT_DOWN, "menu"]
+    assert b.buttons == [CSAT_UP, CSAT_DOWN, "human_handoff"]
     assert "tell us how I did" in ask["text"]
     assert b.session.slots["csat_asked"] == "thanks_goodbye"
     (event,) = _events("csat_asked")
@@ -137,7 +137,7 @@ def test_asked_when_a_callback_or_complaint_finishes(bot, rate, steps, resolved)
     b = _run(_customer(bot), steps)
     assert _asked(b)
     assert b.session.slots["csat_asked"] == resolved
-    assert b.buttons == [CSAT_UP, CSAT_DOWN, "menu"]
+    assert b.buttons == [CSAT_UP, CSAT_DOWN, "human_handoff"]
     assert "reference" in b.last[0][0]["text"].lower()  # the ticket reply comes first
 
 
@@ -261,7 +261,7 @@ def test_whatsapp_gets_one_bubble_with_three_reply_buttons(bot, rate):
     (message,) = render.whatsapp(reply)
     assert message["interactive"]["type"] == "button"  # one tap, not a list
     ids = [x["reply"]["id"] for x in message["interactive"]["action"]["buttons"]]
-    assert ids == [CSAT_UP, CSAT_DOWN, "menu"]
+    assert ids == [CSAT_UP, CSAT_DOWN, "human_handoff"]
 
 
 def test_web_keeps_the_ticket_reply_and_the_question_apart(bot, rate):
@@ -278,7 +278,7 @@ def test_whatsapp_webhook_round_trip(meta_env, monkeypatch):
     say(meta_env, "thanks")
     last = meta_env.outbox("whatsapp")[-1]
     assert last["interactive"]["type"] == "button"
-    assert [b["reply"]["id"] for b in last["interactive"]["action"]["buttons"]] == [CSAT_UP, CSAT_DOWN, "menu"]
+    assert [b["reply"]["id"] for b in last["interactive"]["action"]["buttons"]] == [CSAT_UP, CSAT_DOWN, "human_handoff"]
     body = payload("button_reply")
     message = body["entry"][0]["changes"][0]["value"]["messages"][0]
     message["interactive"]["button_reply"]["id"] = CSAT_DOWN
@@ -301,7 +301,7 @@ def test_widget_endpoint_carries_the_question(client, monkeypatch, isolated_data
     chat(client, sid, message="what is etumba")
     data = chat(client, sid, message="thanks")
     assert data["meta"].get("csat") == "asked"
-    assert [b["payload"] for b in data["replies"][-1]["buttons"]] == [CSAT_UP, CSAT_DOWN, "menu"]
+    assert [b["payload"] for b in data["replies"][-1]["buttons"]] == [CSAT_UP, CSAT_DOWN, "human_handoff"]
     data = chat(client, sid, payload=CSAT_UP)
     assert data["meta"]["action"] == "csat:up"
     with store.web_session(sid) as (session, _):
@@ -318,3 +318,55 @@ def test_thanks_followed_by_a_new_question_is_not_resolved(bot, rate):
     assert b.last[1].get("intents") == ["thanks_goodbye", "opening_hours"]
     assert not _asked(b)
     assert CSAT_UP not in b.buttons
+
+
+# --- the way to a person survives the question (CLAUDE.md invariant) --------------------
+
+
+def _rendered_payloads(channel, reply):
+    if channel == "whatsapp":
+        out = set()
+        for m in render.whatsapp(reply):
+            inter = m.get("interactive") or {}
+            if inter.get("type") == "button":
+                out |= {x["reply"]["id"] for x in inter["action"]["buttons"]}
+            elif inter.get("type") == "list":
+                out |= {r["id"] for s in inter["action"]["sections"] for r in s["rows"]}
+        return out
+    if channel == "messenger":
+        return {q["payload"] for q in render.messenger(reply)[-1].get("quick_replies", [])}
+    return {x["payload"] for x in reply["buttons"]}
+
+
+@pytest.mark.parametrize("channel", ["web", "whatsapp", "messenger"])
+@pytest.mark.parametrize("steps,resolved", [(CALLBACK, "callback"), (COMPLAINT, "complaint")])
+def test_talk_to_a_person_survives_the_feedback_question(bot, rate, monkeypatch, channel, steps, resolved):
+    monkeypatch.setenv("HANDOFF_MODE_MESSENGER", "callback")  # CALLBACK taps human_handoff
+    b = _run(_customer(bot, channel=channel), steps)
+    assert _asked(b) and b.session.slots["csat_asked"] == resolved
+    replies = b.last[0]
+    assert len(replies) == (2 if channel == "web" else 1)  # P5: one billable bubble
+    final = replies[-1]
+    assert CSAT_UP in b.buttons and CSAT_DOWN in b.buttons
+    assert "human_handoff" in b.buttons, "the merged bubble dropped Talk to a person"
+    for reply in replies:
+        if any(x["payload"] == "human_handoff" for x in reply["buttons"]):
+            assert "human_handoff" in _rendered_payloads(channel, reply)
+    assert {CSAT_UP, CSAT_DOWN, "human_handoff"} <= _rendered_payloads(channel, final)
+    if channel == "whatsapp":
+        (message,) = render.whatsapp(final)
+        assert message["interactive"]["type"] == "button"  # still one tap, not a list
+
+
+def test_merging_never_drops_talk_to_a_person():
+    from app.router import merge_replies
+
+    human = {"label": "Talk to a person", "payload": "human_handoff"}
+    menu = {"label": "Main menu", "payload": "menu"}
+    (merged,) = merge_replies([{"text": "a", "buttons": [menu, human]},
+                               {"text": "b", "buttons": [{"label": "Yes", "payload": "y"}]}])
+    assert [x["payload"] for x in merged["buttons"]] == ["y", "human_handoff"]
+    (merged,) = merge_replies([{"text": "a", "buttons": []}, {"text": "b", "buttons": [menu]}])
+    assert [x["payload"] for x in merged["buttons"]] == ["menu"]  # nothing to keep
+    (merged,) = merge_replies([{"text": "a", "buttons": [human]}, {"text": "b", "buttons": [human, menu]}])
+    assert [x["payload"] for x in merged["buttons"]] == ["human_handoff", "menu"]  # never twice

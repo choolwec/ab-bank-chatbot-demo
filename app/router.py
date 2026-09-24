@@ -15,7 +15,7 @@ from .messages import button, has, msg
 from .flows import FLOWS
 from .flows.lead import record_opt_out
 from .flows.locator import CITY_PREFIX, branches_mentioned
-from .render import MORE_PAYLOAD
+from .render import HUMAN_PAYLOAD, MORE_PAYLOAD
 from .matcher import CLAUSE_MIN_WORDS, CLAUSE_SPLIT_RE as _CLAUSE_SPLIT_RE, Matcher
 
 matcher = Matcher()
@@ -63,6 +63,8 @@ COMMANDS = {
         ],
         "human_handoff",
     ),
+    # The "Request a callback" button's label, typed: always the lead flow.
+    **dict.fromkeys(["request a callback", "request callback"], "request_callback"),
     "help": "help",
     # MK2: stop marketing. The bare word "stop" stays "cancel" (above).
     **dict.fromkeys(
@@ -93,6 +95,12 @@ COMMANDS = {
 # Words that are commands elsewhere but a legitimate answer inside a flow:
 # the locator asks "a branch, or an eTumba agent?".
 COMMAND_ANSWERS = {"locator": {"agent", "an agent"}}
+# "Request a callback": ALWAYS the lead flow (name, phone, topic, time,
+# marketing consent, campaign source), on every channel. "Talk to a person"
+# (human_handoff) is the live-agent path where one exists (handoff_mode
+# "inbox": Messenger's Page Inbox, WhatsApp with the agent desk) and the same
+# lead flow elsewhere.
+REQUEST_CALLBACK = "request_callback"
 CANCEL_YES = "cancel_yes"
 CANCEL_NO = "cancel_no"
 OPT_OUT = "marketing_opt_out"
@@ -176,11 +184,20 @@ MERGE_REPLIES_CHANNELS = frozenset({"whatsapp", "messenger"})
 
 def merge_replies(replies):
     """Join consecutive replies into one, keeping the LAST reply's buttons
-    (and its yes/no meaning) -- e.g. the PII warning plus the answer."""
+    (and its yes/no meaning) -- e.g. the PII warning plus the answer. If an
+    earlier reply offered "Talk to a person" and the last one doesn't, the
+    merged bubble keeps it: merging must never drop the way to a human."""
     if len(replies) <= 1:
         return replies
     text = "\n\n".join(r["text"] for r in replies if r.get("text"))
-    return [dict(replies[-1], text=text)]
+    merged = dict(replies[-1], text=text)
+    buttons = list(merged.get("buttons") or [])
+    earlier = [b for r in replies[:-1] for b in r.get("buttons") or []]
+    if any(b["payload"] == HUMAN_PAYLOAD for b in earlier) and not any(
+        b["payload"] == HUMAN_PAYLOAD for b in buttons
+    ):
+        merged["buttons"] = buttons + [button("talk_to_a_person", HUMAN_PAYLOAD)]
+    return [merged]
 
 
 def _should_merge(session, merge):
@@ -348,12 +365,13 @@ def _route(session, text, payload):
     # "Talk to a person" always works, even mid-flow (§1 rule 1)
     if payload == "human_handoff" and config.handoff_mode(session.channel) == "inbox":
         return _handoff_to_inbox(session)
-    if payload == "human_handoff":
+    if payload in ("human_handoff", REQUEST_CALLBACK):
         session.strikes = 0
         replies, done = FLOWS["lead"].start(session)
         if done:
             session.active_flow = None
-        return replies, {"intent": "human_handoff", "action": "flow_start"}
+        intent = "request_callback" if payload == REQUEST_CALLBACK else "human_handoff"
+        return replies, {"intent": intent, "action": "flow_start"}
     # H5: a feedback tap. Before flows and intents, so a stale thumbs-up
     # (WhatsApp keeps old buttons tappable) is never stored as a flow answer.
     if payload in (CSAT_UP, CSAT_DOWN):
@@ -476,10 +494,7 @@ def _route(session, text, payload):
             [
                 {
                     "text": msg("abuse"),
-                    "buttons": [
-                        button("request_a_callback", "human_handoff"),
-                        button("main_menu", "menu"),
-                    ],
+                    "buttons": _callback_person_menu(),
                 }
             ],
             {"action": "abuse"},
@@ -647,12 +662,14 @@ def _maybe_ask_csat(session, replies, meta):
     ask = {
         "text": msg("csat.ask"),
         # Three buttons stay one tap on WhatsApp (a fourth makes it a list).
-        # Main menu is the way on for anyone who'd rather not answer; a
-        # thumbs-down then offers a person directly.
+        # On WhatsApp and Messenger this bubble REPLACES the resolving reply's
+        # buttons (P5 merge), so the third is always the way to a person
+        # (CLAUDE.md: never drop "Talk to a person"). "menu" still works typed,
+        # and both thanks replies carry the menu.
         "buttons": [
             button("csat_up", CSAT_UP),
             button("csat_down", CSAT_DOWN),
-            button("main_menu", "menu"),
+            button("talk_to_a_person", "human_handoff"),
         ],
         # A typed yes/no still answers the resolving reply ("anything else?").
         "yes": last.get("yes"),
@@ -769,10 +786,7 @@ def _free_text(session, text, urgent_flows=True):
             [
                 {
                     "text": msg("two_strike"),
-                    "buttons": [
-                        button("request_a_callback", "human_handoff"),
-                        button("main_menu", "menu"),
-                    ],
+                    "buttons": _callback_person_menu(),
                 }
             ],
             {"action": "two_strike", "confidence": round(top_score, 3)},
@@ -844,6 +858,16 @@ def _more_options(session):
     if not rest:
         return [{"text": msg("menu"), "buttons": list(MENU_BUTTONS)}], {"action": "more_options"}
     return [{"text": msg("more_options"), "buttons": rest}], {"action": "more_options"}
+
+
+def _callback_person_menu():
+    """Both ways to a human, then the menu (two strikes, abuse). Three
+    buttons stay one tap on WhatsApp."""
+    return [
+        button("request_a_callback", REQUEST_CALLBACK),
+        button("talk_to_a_person", "human_handoff"),
+        button("main_menu", "menu"),
+    ]
 
 
 def _handoff_to_inbox(session):

@@ -17,6 +17,7 @@ from conftest import chat
 
 WA = Path(__file__).parent / "data" / "wa"
 HUMAN = "human_handoff"
+CALLBACK = "request_callback"
 
 
 def _to_summary(b, consent=None):
@@ -399,10 +400,13 @@ def test_every_product_answer_offers_a_callback_in_one_tap(bot):
             continue
         b = bot()
         b.tap(name)
-        if HUMAN not in b.buttons:
+        # "Request a callback" (request_callback) or, on the website where it
+        # means the same, "Talk to a person".
+        tap = next((p for p in (CALLBACK, HUMAN) if p in b.buttons), None)
+        if not tap:
             missing.append(name)
             continue
-        b.tap(HUMAN)
+        b.tap(tap)
         if b.session.active_flow != "lead":
             missing.append(name)
     assert not missing, f"product answers without a callback button: {missing}"
@@ -415,7 +419,143 @@ def test_intent_files_declare_the_callback_button():
         for intent in yaml.safe_load(path.read_text(encoding="utf-8"))["intents"]:
             if intent.get("category") in PRODUCT_CATEGORIES and not intent.get("flow"):
                 payloads = [b["payload"] for b in intent.get("buttons", [])]
-                assert HUMAN in payloads, intent["intent"]
+                assert HUMAN in payloads or CALLBACK in payloads, intent["intent"]
+
+
+def test_every_request_a_callback_button_uses_the_callback_payload():
+    """A "Request a callback" button must start the lead flow on every
+    channel, so it never carries human_handoff (a live-agent handoff on
+    Messenger, and on WhatsApp with the desk: no consent, no source)."""
+    root = Path(__file__).parent.parent / "knowledge" / "intents"
+    found = []
+    for path in root.glob("*.yaml"):
+        for intent in yaml.safe_load(path.read_text(encoding="utf-8"))["intents"]:
+            for b in intent.get("buttons", []):
+                if "callback" in b["label"].lower():
+                    found.append(intent["intent"])
+                    assert b["payload"] == CALLBACK, (intent["intent"], b)
+    assert found
+
+
+# --- "Request a callback" always means the lead flow ---------------------------------------
+
+
+def _inbox_everywhere(monkeypatch):
+    """Messenger's default, and WhatsApp once the agent desk is set up."""
+    monkeypatch.setenv("HANDOFF_MODE_WHATSAPP", "inbox")
+    monkeypatch.delenv("HANDOFF_MODE_MESSENGER", raising=False)
+
+
+@pytest.mark.parametrize("channel", ["web", "whatsapp", "messenger"])
+def test_request_a_callback_starts_the_lead_flow_on_every_channel(bot, jira_mock, monkeypatch, channel):
+    _inbox_everywhere(monkeypatch)
+    b = bot(channel=channel)
+    b.session.user_hash = "0" * 32
+    campaign.record(b.session, "cairo01")
+    b.tap("savings_account")
+    assert CALLBACK in b.buttons
+    b.tap(CALLBACK)
+    assert b.session.active_flow == "lead"
+    assert b.last[1] == {"intent": "request_callback", "action": "flow_start"}
+    assert not b.session.slots.get("handoff_requested")  # no live-agent handoff
+    b.say("Mary Banda")
+    b.say("0977123456")
+    b.say("a loan")
+    b.tap("time:Morning")
+    assert "news and offers" in b.text  # MK2: consent is asked
+    b.tap("marketing_consent:yes")
+    b.tap("confirm_yes")
+    (kind, fields), = _tickets()
+    assert kind == "callback"
+    assert fields["marketing_consent"] == "yes" and fields["source"] == "cairo01"
+
+
+@pytest.mark.parametrize("channel", ["whatsapp", "messenger"])
+def test_talk_to_a_person_keeps_its_live_agent_meaning(bot, monkeypatch, channel):
+    _inbox_everywhere(monkeypatch)
+    b = bot(channel=channel)
+    b.tap(HUMAN)
+    assert b.action == "handoff_inbox" and b.session.active_flow is None
+
+
+@pytest.mark.parametrize("channel", ["web", "whatsapp", "messenger"])
+@pytest.mark.parametrize("typed", ["Request a callback", "request callback", "5"])
+def test_typed_label_or_number_picks_the_callback(bot, monkeypatch, channel, typed):
+    _inbox_everywhere(monkeypatch)
+    b = bot(channel=channel)
+    b.tap("account_types_overview")  # five buttons, the fifth "Request a callback"
+    assert b.buttons[4] == CALLBACK
+    b.say(typed)
+    assert b.session.active_flow == "lead", b.last
+    assert b.last[1].get("intent") == "request_callback"
+
+
+def test_typed_request_a_callback_works_without_the_button(bot, monkeypatch):
+    _inbox_everywhere(monkeypatch)
+    b = bot(channel="messenger")
+    b.say("request a callback")
+    assert b.session.active_flow == "lead"
+
+
+@pytest.mark.parametrize("channel", ["web", "whatsapp", "messenger"])
+def test_two_strikes_offer_both_ways_to_a_human(bot, monkeypatch, channel):
+    _inbox_everywhere(monkeypatch)
+    b = bot(channel=channel)
+    b.say("flurb zzqx vortblatt")
+    b.say("wibble vortz maximally")
+    assert b.action == "two_strike"
+    assert b.buttons == [CALLBACK, HUMAN, "menu"]
+
+
+def test_rendered_ids_carry_the_callback_payload(bot):
+    from app import render
+
+    b = bot(channel="whatsapp")
+    b.tap("savings_account")
+    ids = set()
+    for m in render.whatsapp(b.last[0][-1]):
+        inter = m.get("interactive") or {}
+        if inter.get("type") == "list":
+            ids |= {r["id"] for sec in inter["action"]["sections"] for r in sec["rows"]}
+        elif inter.get("type") == "button":
+            ids |= {x["reply"]["id"] for x in inter["action"]["buttons"]}
+    assert CALLBACK in ids
+    quick = render.messenger(b.last[0][-1])[-1]["quick_replies"]
+    assert CALLBACK in {q["payload"] for q in quick}
+
+
+def _wa_tap(meta_env, button_id):
+    body = json.loads((WA / "button_reply.json").read_text(encoding="utf-8").replace("TS", str(int(time.time()))))
+    m = body["entry"][0]["changes"][0]["value"]["messages"][0]
+    m["interactive"]["button_reply"]["id"] = button_id
+    m["id"] = f"wamid.{time.time_ns()}"
+    assert meta_env.post("whatsapp", body).status_code == 200
+    meta_env.process()
+
+
+def test_whatsapp_webhook_callback_tap_starts_the_lead_flow_with_the_desk_on(meta_env, monkeypatch):
+    monkeypatch.setenv("HANDOFF_MODE_WHATSAPP", "inbox")
+    _wa_say(meta_env, "hello ref:cairo01")
+    _wa_tap(meta_env, CALLBACK)
+    assert "name" in meta_env.sent_texts("whatsapp")[-1].lower()
+    for text in ["Mary", "0977123456", "a loan", "morning", "yes", "yes"]:
+        _wa_say(meta_env, text)
+    kind, fields = _tickets()[-1]
+    assert kind == "callback" and fields["source"] == "cairo01"
+    assert fields["marketing_consent"] == "yes"
+    assert not [t for t in _tickets() if t[0] == "handoff"]
+
+
+def test_messenger_webhook_callback_quick_reply_starts_the_lead_flow(meta_env):
+    body = json.loads((Path(__file__).parent / "data" / "ms" / "quick_reply.json").read_text(encoding="utf-8"))
+    ev = body["entry"][0]["messaging"][0]
+    ev["message"]["quick_reply"]["payload"] = CALLBACK
+    ev["message"]["mid"] = f"m_{time.time_ns()}"
+    ev["timestamp"] = int(time.time() * 1000)
+    assert meta_env.post("messenger", body).status_code == 200
+    meta_env.process()
+    assert "name" in meta_env.sent_texts("messenger")[-1].lower()
+    assert not [t for t in _tickets() if t[0] == "handoff"]
 
 
 # --- Measuring campaigns: the weekly report ---------------------------------------------------

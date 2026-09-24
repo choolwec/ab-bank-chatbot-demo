@@ -40,7 +40,7 @@ intents:
       - {label: "Current account (Tamanga)", short_label: "Tamanga account", payload: "current_account"}
       - {label: "Business account", payload: "business_account"}
       - {label: "How to open an account", short_label: "Opening an account", payload: "account_opening_how"}
-      - {label: "Request a callback", payload: "human_handoff"}
+      - {label: "Request a callback", payload: "request_callback"}
 
   - intent: savings_account
     label: "Savings account"
@@ -82,7 +82,7 @@ intents:
       - {label: "Savings Plan account", payload: "savings_plan_account"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Fees & charges", payload: "fees_charges"}
-      - {label: "Request a callback", payload: "human_handoff"}
+      - {label: "Request a callback", payload: "request_callback"}
 
   - intent: current_account
     label: "Current account (Tamanga)"

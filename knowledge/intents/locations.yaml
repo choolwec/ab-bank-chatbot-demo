@@ -122,6 +122,6 @@ intents:
         Or ask me for a callback and our team will phone you within one
         working day.
     buttons:
-      - {label: "Request a callback", payload: "human_handoff"}
+      - {label: "Request a callback", payload: "request_callback"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Opening hours", payload: "opening_hours"}

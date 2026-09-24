@@ -76,8 +76,10 @@ class Alert:
 
 # issue -> (severity, title, first step). Severities follow the R1 table in
 # docs/execution-plan.md: nothing answering on any channel (fraud reports
-# included) is Sev 1; a degraded channel is Sev 2 ("channel outage; webhook
-# failures"). Sev 3 (a wrong-but-safe answer) comes from reviews, not a monitor.
+# included) is Sev 1, and so is a broken flags.json, which silently undoes
+# the kill switches that are the Sev 1 response; a degraded channel is Sev 2
+# ("channel outage; webhook failures"). Sev 3 (a wrong-but-safe answer)
+# comes from reviews, not a monitor.
 ISSUES = {
     "health_down": (
         1, "The chatbot is not responding (/health down)",
@@ -110,6 +112,12 @@ ISSUES = {
         2, "Signed Meta webhooks are being rejected",
         "Usually a wrong or rotated WA_APP_SECRET or MS_APP_SECRET in the environment file. Compare it with "
         "the Meta app dashboard and restart the service.",
+    ),
+    "flags_file": (
+        1, "flags.json is broken: kill switches are back at their defaults",
+        "Fix flags.json now: python -m json.tool flags.json shows a syntax error, and every value must be "
+        "true or false without quotes. Until then every switch is at its default (free text, widget, "
+        "WhatsApp and Messenger on; Jira off).",
     ),
     "embedding_model": (
         2, "The local model did not verify",
@@ -176,6 +184,11 @@ def describe(name: str, check: dict) -> tuple[str, str]:
         if name == "webhook_rejected":
             return (f"{check['count']} in the last {check['window_minutes']} min",
                     f"more than {check['threshold']}")
+        if name == "flags_file":
+            if not check.get("readable", True):
+                return "not valid JSON", "valid JSON with true/false values"
+            return ("not true/false: " + ", ".join(check.get("invalid") or []),
+                    "valid JSON with true/false values")
         if name == "embedding_model":
             needed = ", ".join(check.get("needed_by") or []) or "nothing"
             return ("verified" if check.get("verified") else f"not verified (needed by {needed})",

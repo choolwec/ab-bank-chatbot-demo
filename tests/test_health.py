@@ -173,6 +173,36 @@ def test_embedding_model_verified(monkeypatch):
     assert health.embedding_model()["ok"] is True
 
 
+@pytest.mark.parametrize("content, expected", [
+    ('{"FREE_TEXT_ENABLED": false, "JIRA_ENABLED": true}', {"ok": True, "readable": True, "invalid": []}),
+    # a kill switch written as a string is ignored by config.flag(): still ON
+    ('{"FREE_TEXT_ENABLED": "false", "WIDGET_ENABLED": 0}',
+     {"ok": False, "readable": True, "invalid": ["FREE_TEXT_ENABLED", "WIDGET_ENABLED"]}),
+    ('{"FREE_TEXT_ENABLED": false,}', {"ok": False, "readable": False, "invalid": []}),  # trailing comma
+    ('["FREE_TEXT_ENABLED"]', {"ok": False, "readable": False, "invalid": []}),
+    (None, {"ok": True, "readable": True, "invalid": []}),  # no file: the defaults
+])
+def test_flags_file_check(tmp_path, monkeypatch, content, expected):
+    from app import config
+
+    path = tmp_path / "flags.json"
+    if content is not None:
+        path.write_text(content, encoding="utf-8")
+    monkeypatch.setattr(config, "FLAGS_FILE", path)
+    assert health.flags_file() == expected
+
+
+def test_a_quoted_false_really_is_ignored(tmp_path, monkeypatch):
+    """Why the flags_file check exists: this switch looks off but is on."""
+    from app import config
+
+    path = tmp_path / "flags.json"
+    path.write_text('{"FREE_TEXT_ENABLED": "false"}', encoding="utf-8")
+    monkeypatch.setattr(config, "FLAGS_FILE", path)
+    monkeypatch.delenv("FREE_TEXT_ENABLED", raising=False)
+    assert config.free_text_enabled() is True
+
+
 class BrokenInbox:
     def __getattr__(self, name):
         def fail(*args, **kwargs):

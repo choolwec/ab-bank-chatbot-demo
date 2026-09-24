@@ -37,6 +37,7 @@ def healthy() -> dict:
                            "threshold": 0.01, "window_minutes": 60},
         "webhook_rejected": {"ok": True, "count": 0, "threshold": 2, "window_minutes": 60},
         "embedding_model": {"ok": True, "verified": True, "needed_by": ["URGENT_MODEL_ENABLED"]},
+        "flags_file": {"ok": True, "readable": True, "invalid": []},
     }}
 
 
@@ -93,6 +94,9 @@ def test_health_down_is_sev1():
     ("webhook_errors", dict(requests=200, count_5xx=3, rate=0.015), 2, "1.5% (3 of 200", "more than 1%"),
     ("webhook_rejected", dict(count=7), 2, "7 in the last 60 min", "more than 2"),
     ("embedding_model", dict(verified=False), 2, "not verified (needed by URGENT_MODEL_ENABLED)", "verified"),
+    ("flags_file", dict(readable=False), 1, "not valid JSON", "valid JSON with true/false values"),
+    ("flags_file", dict(invalid=["FREE_TEXT_ENABLED"]), 1, "not true/false: FREE_TEXT_ENABLED",
+     "valid JSON with true/false values"),
 ])
 def test_each_failing_check_maps_to_an_alert(name, fields, severity, value_bit, threshold):
     [alert] = alerts.evaluate(failing(name, **fields))

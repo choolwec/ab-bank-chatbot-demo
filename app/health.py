@@ -14,10 +14,16 @@ Nothing here ever carries an id, a user hash or message text.
   webhook_errors      share of /webhooks/* responses that were 5xx
   webhook_rejected    signed Meta requests refused with a 4xx (a wrong secret)
   embedding_model     whether the model verified, when a feature needs it
+  flags_file          flags.json parses and every value is true/false: anything
+                      else is silently ignored by config.flag(), which puts
+                      each switch back to its default -- a kill switch undone
+                      by a typo
 
 A check that cannot be computed at all (an unreadable inbox.db) raises
 ChecksBroken, and /health answers 503: that is "the app itself is broken".
 """
+
+import json
 
 from . import config, embedder, guards, metrics, shadow, urgent_model
 from . import inbox as inbox_mod
@@ -133,6 +139,20 @@ def embedding_model() -> dict:
     return {"ok": verified or not needed_by, "verified": verified, "needed_by": needed_by}
 
 
+def flags_file() -> dict:
+    """Flag NAMES only in `invalid` (config keys, never customer data)."""
+    try:
+        data = json.loads(config.FLAGS_FILE.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {"ok": True, "readable": True, "invalid": []}  # no file: the defaults, on purpose
+    except (OSError, ValueError):
+        return {"ok": False, "readable": False, "invalid": []}
+    if not isinstance(data, dict):
+        return {"ok": False, "readable": False, "invalid": []}
+    invalid = sorted(str(k) for k, v in data.items() if not isinstance(v, bool))
+    return {"ok": not invalid, "readable": True, "invalid": invalid}
+
+
 CHECKS = {
     "worker_queue": worker_queue,
     "failed_messages": failed_messages,
@@ -140,6 +160,7 @@ CHECKS = {
     "webhook_errors": webhook_errors,
     "webhook_rejected": webhook_rejected,
     "embedding_model": embedding_model,
+    "flags_file": flags_file,
 }
 
 

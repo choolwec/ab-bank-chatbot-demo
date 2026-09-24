@@ -14,7 +14,12 @@ runs every retention rule:
                webhook [VERIFY: Meta's retry window, documented as up to 7 days].
 
 The Housekeeper runs purge_all() at PURGE_HOUR (Lusaka time) every night,
-inside the one app process, like the inbox worker: no cron entry needed.
+inside the one app process, like the inbox worker: no cron entry needed. An
+invalid PURGE_HOUR falls back to 02:00 with a warning (config.purge_hour()).
+
+At start-up, purge_at_startup() runs the same purge but never stops the app:
+a locked or corrupt database is logged (the exception type only, never its
+message) and the app starts anyway; the nightly run tries again.
 """
 
 import asyncio
@@ -39,9 +44,19 @@ def purge_all() -> dict:
     return purged
 
 
+def purge_at_startup() -> dict | None:
+    """purge_all() for main.lifespan: a failure is logged, never raised."""
+    try:
+        return purge_all()
+    except Exception as exc:  # noqa: BLE001 -- start-up must go on
+        log.error("start-up retention purge failed (%s); starting anyway, the nightly run retries",
+                  type(exc).__name__)
+        return None
+
+
 def seconds_until_next_run(now: dt.datetime | None = None) -> float:
     now = (now or hours.now()).astimezone(hours.LUSAKA)
-    target = now.replace(hour=config.PURGE_HOUR, minute=0, second=0, microsecond=0)
+    target = now.replace(hour=config.purge_hour(), minute=0, second=0, microsecond=0)
     if target <= now:
         target += dt.timedelta(days=1)
     return (target - now).total_seconds()

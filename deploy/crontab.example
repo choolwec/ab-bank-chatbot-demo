@@ -10,6 +10,14 @@ MAILTO=""
 # is also written to syslog with the tag abz-backup.
 30 1 * * * root /opt/abz-chatbot/current/deploy/backup.sh >>/var/log/abz-chatbot/backup.log 2>&1
 
-# R1: health alerts every minute. Uncomment once admin/alerts.py has landed
-# and ALERT_WEBHOOK_URL is set in /etc/abz-chatbot/env.
-# * * * * * root /opt/abz-chatbot/current/deploy/admin.sh alerts >>/var/log/abz-chatbot/alerts.log 2>&1
+# R1: health alerts every minute (admin/alerts.py). Without
+# ALERT_TEAMS_WEBHOOK_URL in /etc/abz-chatbot/env the Teams cards go to
+# data/alerts_mock.jsonl (mock mode); Jira alerts follow JIRA_ENABLED.
+# Silent unless a send failed.
+* * * * * root /opt/abz-chatbot/current/deploy/admin.sh alerts >>/var/log/abz-chatbot/alerts.log 2>&1
+
+# Weekly, Monday morning: the quality report (data/report.md) at 06:00, then
+# H4's "bot-wrong" export (customer turns agents tagged bot-wrong in the desk
+# and Jira, appended to data/utterances.csv for labelling) at 06:15.
+0 6 * * 1 root /opt/abz-chatbot/current/deploy/admin.sh report --days 7 >>/var/log/abz-chatbot/report.log 2>&1
+15 6 * * 1 root /opt/abz-chatbot/current/deploy/admin.sh export_bot_wrong --days 7 >>/var/log/abz-chatbot/export_bot_wrong.log 2>&1

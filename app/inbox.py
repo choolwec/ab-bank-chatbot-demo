@@ -13,9 +13,11 @@ messages in order.
   user_ref  the raw platform user id, SEALED (identity.seal) -- needed to
             reply; cleared as soon as the row is processed
 A row that keeps failing is retried up to MAX_ATTEMPTS, then marked failed
-(with failed_at, for the R1 alert); a crash mid-row leaves it 'new', so it is
-picked up again after a restart. Processed and failed rows are purged on the
-transcript retention schedule (housekeeping.py).
+(with failed_at, for the R1 alert); its error column holds the exception's
+type name only, never its message (which can quote user text or ids). A
+crash mid-row leaves it 'new', so it is picked up again after a restart.
+Processed and failed rows are purged on the transcript retention schedule
+(housekeeping.py).
 """
 
 import dataclasses
@@ -29,6 +31,12 @@ from .channels.base import InboundMessage
 from .identity import seal, unseal, user_hash
 
 MAX_ATTEMPTS = 5
+
+
+def error_code(exc: BaseException) -> str:
+    """What the error column keeps: the exception's type name only. str(exc)
+    can carry the customer's text, a user id or a key, so it is never stored."""
+    return type(exc).__name__[:100]
 
 
 class Inbox:
@@ -116,7 +124,7 @@ class Inbox:
                 except Exception as exc:  # retried; never loses the row
                     attempts += 1
                     status = "failed" if attempts >= MAX_ATTEMPTS else "new"
-                    self._finish(row_id, status, error=f"{type(exc).__name__}: {exc}"[:500], attempts=attempts)
+                    self._finish(row_id, status, error=error_code(exc), attempts=attempts)
                     continue
                 self._finish(row_id, "done")
                 done += 1

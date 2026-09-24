@@ -6,6 +6,7 @@ re-read on every check. Env var wins over file, file wins over default.
 """
 
 import json
+import logging
 import os
 from pathlib import Path
 
@@ -341,8 +342,24 @@ FAILED_MESSAGES_MAX = 0
 WEBHOOK_REJECTED_MAX = int(os.environ.get("ALERT_WEBHOOK_REJECTED_MAX", "2"))
 
 # The retention purges run at start-up and then every night at this hour,
-# Lusaka time (housekeeping.py).
-PURGE_HOUR = int(os.environ.get("PURGE_HOUR", "2"))
+# Lusaka time (housekeeping.py). Read each night, so a typo in PURGE_HOUR
+# falls back to the default with a warning instead of stopping the purge.
+PURGE_HOUR_DEFAULT = 2
+
+
+def purge_hour() -> int:
+    raw = os.environ.get("PURGE_HOUR", "").strip()
+    if not raw:
+        return PURGE_HOUR_DEFAULT
+    try:
+        value = int(raw)
+    except ValueError:
+        value = -1
+    if not 0 <= value <= 23:
+        logging.getLogger("abz.config").warning(
+            "PURGE_HOUR must be a whole hour from 0 to 23; using %d", PURGE_HOUR_DEFAULT)
+        return PURGE_HOUR_DEFAULT
+    return value
 
 # admin/alerts.py, run by cron on the VM. The Teams URL is a secret (anyone
 # holding it can post into the chat): environment only, never flags.json or git.

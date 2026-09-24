@@ -57,7 +57,7 @@ def test_purge_all_covers_audit_sessions_and_inbox(stores, monkeypatch):
 
 def test_lifespan_runs_the_purge_and_starts_the_nightly_job(monkeypatch):
     calls = []
-    monkeypatch.setattr(main, "purge_all", lambda: calls.append("purge") or {})
+    monkeypatch.setattr(housekeeping, "purge_all", lambda: calls.append("purge") or {})
     monkeypatch.setattr(main.worker, "start", lambda: calls.append("worker"))
     monkeypatch.setattr(main.housekeeper, "start", lambda: calls.append("housekeeper"))
 
@@ -123,3 +123,55 @@ def test_the_nightly_loop_waits_for_the_purge_hour(monkeypatch):
     with pytest.raises(asyncio.CancelledError):
         asyncio.run(housekeeping.Housekeeper()._run())
     assert waits == [16 * 3600]  # the suite runs at 10:00 Lusaka (conftest)
+
+
+def _run_lifespan(monkeypatch, calls):
+    monkeypatch.setattr(main.worker, "start", lambda: calls.append("worker"))
+    monkeypatch.setattr(main.housekeeper, "start", lambda: calls.append("housekeeper"))
+
+    async def stopped():
+        calls.append("stopped")
+
+    monkeypatch.setattr(main.worker, "stop", stopped)
+    monkeypatch.setattr(main.housekeeper, "stop", stopped)
+
+    async def go():
+        async with main.lifespan(main.app):
+            calls.append("serving")
+
+    asyncio.run(go())
+
+
+def test_a_failing_startup_purge_never_stops_the_app(monkeypatch, caplog):
+    """A locked or corrupt database at start-up: log the exception TYPE only
+    (its message can hold a path or data) and keep starting."""
+    calls = []
+
+    def locked():
+        calls.append("purge")
+        raise sqlite3.OperationalError("database is locked: /srv/secret/audit.db")
+
+    monkeypatch.setattr(housekeeping, "purge_all", locked)
+    with caplog.at_level("ERROR", logger="abz.housekeeping"):
+        _run_lifespan(monkeypatch, calls)
+    assert calls == ["purge", "worker", "housekeeper", "serving", "stopped", "stopped"]
+    assert "OperationalError" in caplog.text
+    assert "secret" not in caplog.text and "locked:" not in caplog.text
+
+
+@pytest.mark.parametrize("raw, expected", [
+    ("", 2), ("3", 3), ("0", 0), ("23", 23), (" 4 ", 4),
+    ("two", 2), ("24", 2), ("-1", 2), ("2.5", 2),
+])
+def test_an_invalid_purge_hour_falls_back_to_2(monkeypatch, caplog, raw, expected):
+    monkeypatch.setenv("PURGE_HOUR", raw)
+    with caplog.at_level("WARNING", logger="abz.config"):
+        assert config.purge_hour() == expected
+    warned = "PURGE_HOUR" in caplog.text
+    assert warned == (raw.strip() not in ("", "3", "0", "23", "4"))
+
+
+def test_the_nightly_loop_survives_an_invalid_purge_hour(monkeypatch):
+    monkeypatch.setenv("PURGE_HOUR", "2am")
+    now = dt.datetime(2026, 9, 23, 10, 0, tzinfo=hours.LUSAKA)
+    assert housekeeping.seconds_until_next_run(now) == 16 * 3600  # 02:00 tomorrow

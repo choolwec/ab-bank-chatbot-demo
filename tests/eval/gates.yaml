@@ -18,6 +18,9 @@
 #   2026-09-24  N1: BANKING77 gates added at their baselines. b77_urgent_recall
 #               0.352 is a real S1 gap ("a payment I didn't make", "freeze my
 #               card"), addressed next.
+#   2026-09-24  S1 follow-up: b77_urgent_recall 0.352 -> 0.749 (patterns tuned on
+#               the BANKING77 TRAIN split: 0.746 there, so no overfit gap);
+#               false fraud triggers on our own data unchanged.
 gates:
   right_direct_min: 0.527
   wrong_direct_max: 0.044
@@ -30,4 +33,4 @@ gates:
   b77_wrong_direct_max: 0.008
   b77_oos_direct_max: 0.003
   # the share of BANKING77 fraud / lost-card reports the S1 scan routes
-  b77_urgent_recall_min: 0.352
+  b77_urgent_recall_min: 0.749

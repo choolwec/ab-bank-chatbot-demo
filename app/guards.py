@@ -72,8 +72,10 @@ LOST_CARD_PHRASES = [
 # missed): a card word within a few words of a loss/theft word also counts.
 _LOSS = r"(?:lost|lose|misplaced|missing|stolen|stollen|gone|taken)"
 LOST_CARD_RE = re.compile(
-    rf"(?i)\b{_LOSS}\s+(?:\w+\s+){{0,2}}(?:atm\s+|debit\s+|visa\s+)?cards?\b"
+    rf"(?i)\b{_LOSS}\s+(?:\w+\s+){{0,6}}(?:atm\s+|debit\s+|credit\s+|visa\s+)?cards?\b"
     rf"|\bcards?\s+(?:\w+\s+){{0,2}}{_LOSS}\b"
+    r"|\b(?:can'?t|cannot|can\s+not|unable\s+to|could\s*n'?t|could\s+not)\s+(?:find|locate|trace)\s+"
+    r"(?:\w+\s+){0,2}cards?\b"
 )
 
 # Unambiguous theft/fraud vocabulary, with the misspellings seen in real
@@ -83,7 +85,7 @@ FRAUD_HARD_RE = re.compile(
     r"stole|stolen|stollen|stoled|steal|steals|stealing|steeling|"
     r"theft|thief|thieves|thieved|"
     r"hack\w*|unauthori[sz]\w*|conned|cheated|"
-    r"phish\w*|skimm\w*|cloned|impersonat\w*|swindl\w*|duped)\b"
+    r"phish\w*|skimm\w*|cloned|impersonat\w*|swindl\w*|duped|compromis\w*)\b"
 )
 
 # Multi-word hard signals. These are the S1 misses: none of them contain a
@@ -115,6 +117,73 @@ THEFT_RE = re.compile(
     # the money word within five words of the verb: "they took my documents
     # at the branch, when will my account be ready" is not a theft
     r"(?:\W+\w+){0,5}?\W+(?:all\s+)?(?:money|k\s?\d[\d,]*|zmw|kwacha|savings|balance|wallet|e-?tumba|funds|cash)\b"
+)
+
+_TX = (r"(?:payments?|transactions?|charges?|withdrawals?|withdrawls?|debits?|direct\s+debits?|"
+       r"purchases?|transfers?|deductions?|fees?)")
+# Found with BANKING77 (N1): the S1 rules routed only a third of its fraud
+# and lost-card reports. These cover the classes it missed, in general form.
+UNRECOGNISED_TX_RE = re.compile(
+    # "I don't recognise this payment", "a transaction I do not recognise"
+    rf"(?i)\b(?:do\s*n'?t|dont|do\s+not|did\s*n'?t|didnt|did\s+not|can'?t|cannot)\s+recogni[sz]e\s+"
+    rf"(?:\w+\s+){{0,3}}{_TX}\b"
+    rf"|\b{_TX}\s+(?:\w+\s+){{0,4}}(?:that\s+)?(?:i|we)\s+(?:do\s*n'?t|dont|do\s+not|did\s*n'?t|didnt|did\s+not)\s+recogni[sz]e\b"
+    rf"|\b(?:unrecogni[sz]ed|not\s+recogni[sz]ed)\s+(?:\w+\s+){{0,2}}{_TX}\b"
+    rf"|\b{_TX}\s+(?:\w+\s+){{0,2}}(?:is\s+|was\s+)?(?:unrecogni[sz]ed|not\s+recogni[sz]ed)\b"
+    # "I don't recall making that payment"
+    r"|\b(?:do\s*n'?t|dont|do\s+not|did\s*n'?t|didnt|did\s+not|can'?t)\s+(?:recall|remember)\s+"
+    r"(?:making|doing|authori[sz]ing|approving|sending)\b"
+    # "a payment that is not mine", "wasn't done by me", "that is not me"
+    rf"|\b{_TX}\s+(?:\w+\s+){{0,4}}(?:(?:is|are|was|were)\s+not|is\s*n'?t|isnt|are\s*n'?t|was\s*n'?t|"
+    rf"that'?s\s+not|thats\s+not|does\s*n'?t\s+belong\s+to|does\s+not\s+belong\s+to)\s+(?:mine|me)\b"
+    # "I am not recognising a debit"
+    rf"|\bnot\s+recogni[sz]ing\s+(?:\w+\s+){{0,2}}{_TX}\b"
+    # "a payment showing even though I haven't used my card"
+    r"|\b(?:have\s*n'?t|havent|have\s+not|did\s*n'?t|didnt|did\s+not)\s+(?:even\s+)?used\s+my\s+card\b"
+    rf"|\b{_TX}\s+(?:\w+\s+){{0,5}}(?:was\s*n'?t|wasnt|was\s+not|were\s*n'?t|not)\s+(?:done|made|authori[sz]ed)\s+by\s+me\b"
+    rf"|\b{_TX}\s+(?:\w+\s+){{0,4}}(?:i|we)\s+(?:did\s*n'?t|didnt|did\s+not|never)\s+set\s+up\b"
+)
+# "a payment I didn't make" -- the reverse word order of SOFT_DID_NOT_MAKE_RE,
+# soft for the same reason (it has innocent readings: a forgotten payment).
+SOFT_TX_NOT_MADE_RE = re.compile(
+    rf"(?i)\b{_TX}\s+(?:\w+\s+){{0,5}}?(?:that\s+|which\s+)?(?:i|we)\s+"
+    r"(?:did\s*n'?t|didnt|did\s+not|never|have\s*n'?t|have\s+not)\s+"
+    r"(?:make|made|do|done|authori[sz]e\w*|approve\w*|create\w*|complete\w*|set\s+up)\b"
+    # "it says I made a withdrawal, but I did not"
+    rf"|\b(?:withdr\w+|witdr\w+|{_TX})\b.{{0,60}}\bbut\s+i\s+(?:did\s*n'?t|didnt|did\s+not|never|have\s*n'?t|have\s+not)\b"
+    # "I didn't withdraw cash but I see it", "money go out that I didn't withdraw"
+    r"|\b(?:i|we)\s+(?:did\s*n'?t|didnt|did\s+not|never|have\s*n'?t|have\s+not)\s+(?:withdraw|withdrew|take\s+out|took\s+out)\b"
+    # "a debit I wasn't aware of", "a withdrawal I am unsure of"
+    rf"|\b{_TX}\s+(?:\w+\s+){{0,4}}(?:i|we)\s+(?:was\s*n'?t|wasnt|was\s+not|am\s+not|'?m\s+not|am|'?m)\s+"
+    r"(?:aware\s+of|unsure\s+of|sure\s+about)\b"
+)
+# "strange / unknown payment on my statement" -- soft
+SOFT_ODD_TX_RE = re.compile(
+    rf"(?i)\b(?:strange|unknown|uknown|unkown|suspicious|unfamiliar|odd|weird|mysterious|unexplained|funny|"
+    rf"random|false|questionable|bogus|incorrect|unusual|unexpected)\s+(?:\w+\s+)?{_TX}\b"
+    # "what is this charge?", "i don't know what this payment is for"
+    rf"|\bwhat\s+is\s+(?:this|that)\s+(?:\w+\s+)?{_TX}\b"
+    rf"|\b(?:do\s*n'?t|dont|do\s+not)\s+know\s+what\s+(?:this|that)\s+(?:\w+\s+){{0,2}}{_TX}\b"
+    rf"|\bcharged\s+by\s+mistake\b"
+)
+# "please freeze my card", "block my account" -- someone wants it stopped NOW
+FREEZE_RE = re.compile(
+    # not "deactivate my account": that is closing it, not stopping fraud
+    r"(?i)\b(?:freeze|block|lock|suspend|disable)\s+(?:\w+\s+){0,3}(?:cards?|accounts?|wallet|e-?tumba)\b"
+    r"|\bput\s+a\s+(?:freeze|block|stop|hold)\s+on\s+(?:\w+\s+){0,2}(?:cards?|accounts?|wallet)\b"
+)
+# "someone used my card", "somebody has accessed my account"
+SOMEONE_USED_RE = re.compile(
+    r"(?i)\b(?:someone|somebody|some\s+one|a\s+stranger|another\s+person|people|they)\s+(?:else\s+)?"
+    r"(?:(?:may|might|could|must)\s+)?(?:has\s+|have\s+|had\s+|is\s+|are\s+|was\s+|be\s+|been\s+|just\s+)*"
+    r"(?:used|using|accessed|accessing|access\s+to|gained\s+access\s+to|got\s+into|entered|made|making)\s+"
+    r"(?:\w+\s+){0,3}(?:cards?|accounts?|wallet|e-?tumba|app|payments?|purchases?|withdrawals?|transactions?)\b"
+    # "my card is being used by someone else", "has been used by somebody"
+    r"|\b(?:cards?|accounts?|wallet|e-?tumba)\s+(?:\w+\s+){0,2}(?:is\s+being|has\s+been|was|being)\s+used\s+by\s+"
+    r"(?:someone|somebody|some\s+one|another|a\s+stranger)\b"
+    # "my card data has been exposed", "a security breach"
+    r"|\b(?:card|account|pin|details|data|info\w*)\s+(?:\w+\s+){0,3}(?:exposed|leaked|breached)\b"
+    r"|\bsecurity\s+breach\b|\bdata\s+breach\b"
 )
 
 # Consistent with fraud, but with a plausible innocent reading -> confirm.
@@ -172,6 +241,23 @@ NEGATED_COMPLAINT_RE = re.compile(
 RUDE_QUESTION_RE = re.compile(
     r"(?i)\b(?:is|was|would|will|isn'?t|wouldn'?t)\s+it\s+(?:be\s+)?rude\b"
     r"|\bam\s+i\s+(?:being\s+)?rude\b|\bwas\s+i\s+rude\b"
+)
+# "how do i unblock my card", "my account is frozen, please unfreeze it":
+# a locked-out customer, not a report.
+UNFREEZE_RE = re.compile(
+    r"(?i)\b(?:unblock|unfreeze|unlock|reactivate|re-?activate)\w*\b"
+    r"|\b(?:take|get|remove|lift)\s+(?:the\s+|a\s+|this\s+)?(?:block|freeze|hold)\s+(?:off|from)\b"
+)
+# "I found my lost card", "the card I reported lost turned up": no longer lost.
+FOUND_CARD_RE = re.compile(
+    r"(?i)\bfound\s+(?:\w+\s+){0,3}cards?\b|\bcards?\s+(?:\w+\s+){0,3}(?:found|turned\s+up)\b"
+    r"|\bran\s+across\s+(?:it|my\s+card)\b"
+)
+# "the ATM took / swallowed / kept my card": retained, not stolen -- but a
+# retained card can be a skimming trap, so ask rather than ignore.
+ATM_RETAINED_RE = re.compile(
+    r"(?i)\b(?:atm|machine|cash\s+machine)\s+(?:\w+\s+){0,2}(?:took|swallowed|kept|ate|stole|retained|has|captured)\s+"
+    r"(?:\w+\s+){0,1}cards?\b|\bcard\s+(?:\w+\s+){0,3}(?:swallowed|stuck|retained)\b"
 )
 NO_PROBLEM_RE = re.compile(r"(?i)\bno\s+(?:problem|worries|issue|complaints?)\b")
 # "how do i protect myself from scams" is a question ABOUT fraud, not a
@@ -235,6 +321,11 @@ def mask(text: str) -> tuple[str, list[str]]:
     return masked, findings
 
 
+def _has_phrase(t: str, phrases) -> bool:
+    """Whole-word phrase match ("block my card" is not in "unblock my card")."""
+    return any(re.search(rf"(?<![\w']){re.escape(p)}(?![\w'])", t) for p in phrases)
+
+
 def _fraud_sub(t: str) -> str:
     """Card-block intro only if a card was actually mentioned (S1 change 3)."""
     return "lost_card" if CARD_MENTION_RE.search(t) else "fraud"
@@ -259,10 +350,18 @@ def urgent_scan(text: str) -> UrgentSignal | None:
     # 1. Hard fraud. Negation only suppresses when it sits directly on the
     # signal word ("nothing was stolen"); anything looser keeps the report.
     if not NEGATED_FRAUD_RE.search(t):
-        if any(p in t for p in LOST_CARD_PHRASES) or LOST_CARD_RE.search(t):
+        if ATM_RETAINED_RE.search(t):
+            return UrgentSignal("fraud", "lost_card", "soft")
+        if (_has_phrase(t, LOST_CARD_PHRASES) or LOST_CARD_RE.search(t)) and not FOUND_CARD_RE.search(t):
             strength = "soft" if EDUCATION_RE.search(t) else "hard"
             return UrgentSignal("fraud", "lost_card", strength)
-        if FRAUD_HARD_RE.search(t) or THEFT_RE.search(t) or any(p in t for p in FRAUD_HARD_PHRASES):
+        if FREEZE_RE.search(t) and not UNFREEZE_RE.search(t):
+            strength = "soft" if EDUCATION_RE.search(t) else "hard"
+            return UrgentSignal("fraud", _fraud_sub(t), strength)
+        if UNRECOGNISED_TX_RE.search(t) or SOMEONE_USED_RE.search(t):
+            strength = "soft" if EDUCATION_RE.search(t) else "hard"
+            return UrgentSignal("fraud", _fraud_sub(t), strength)
+        if FRAUD_HARD_RE.search(t) or THEFT_RE.search(t) or _has_phrase(t, FRAUD_HARD_PHRASES):
             strength = "soft" if EDUCATION_RE.search(t) else "hard"
             return UrgentSignal("fraud", _fraud_sub(t), strength)
 
@@ -271,12 +370,13 @@ def urgent_scan(text: str) -> UrgentSignal | None:
     )
 
     # 2. Explicit intent to complain still starts the complaint flow directly.
-    if not complaint_negated and any(p in t for p in COMPLAINT_HARD_PHRASES):
+    if not complaint_negated and _has_phrase(t, COMPLAINT_HARD_PHRASES):
         return UrgentSignal("complaint", None, "hard")
 
     # 3. Soft money signals -> confirmation question.
     if not NO_PROBLEM_RE.search(t):
-        if any(p in t for p in SOFT_MONEY_PHRASES) or SOFT_DID_NOT_MAKE_RE.search(t):
+        if (_has_phrase(t, SOFT_MONEY_PHRASES) or SOFT_DID_NOT_MAKE_RE.search(t)
+                or SOFT_TX_NOT_MADE_RE.search(t) or SOFT_ODD_TX_RE.search(t)):
             return UrgentSignal("fraud", _fraud_sub(t), "soft")
 
     # 4. Soft complaint vocabulary -> confirmation question.

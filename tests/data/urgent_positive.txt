@@ -66,6 +66,22 @@ fraud | he withdrew K2000 from my account without telling me
 fraud | a man deducted money from my wallet at the agent
 fraud | someone has withdrawn all my savings
 
+# --- unrecognised transactions (found via BANKING77, our own wording) ---
+fraud | i don't recognise this etumba payment
+fraud | there is a withdrawal on my statement that is not mine
+fraud | a debit that i did not set up is on my account
+fraud | somebody made a purchase with my card
+fraud | my card is being used by someone else
+fraud | i think someone may be using my etumba
+fraud | my card details were leaked
+fraud | please freeze my card now
+fraud | block my account there are strange transactions
+fraud | the app says i withdrew K800 but i did not
+fraud | i didn't withdraw that money but it shows on my statement
+fraud | there is an unusual charge on my account
+complaint | i want to dispute a payment on my account
+fraud | there is a payment even though i haven't used my card
+
 # --- lost / stolen card (card wording) ---
 fraud | i lost my card
 fraud | my card was stolen at the market
@@ -75,6 +91,8 @@ fraud | please block my card
 fraud | my card is missing
 fraud | someone has my card
 fraud | cancel my card
+fraud | i cannot find my debit card anywhere
+fraud | i lost my purse today with my bank cards inside
 
 # --- soft signals: confirmation, then the fraud flow ---
 fraud | my money is gone

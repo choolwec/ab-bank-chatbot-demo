@@ -275,6 +275,11 @@ class FormFlow:
     def _apply_correction(self, session, field, value):
         state = session.flow_state
         state.setdefault("data", {})[field] = value
+        # H6: counted in the weekly report. The field name only, never the value.
+        audit.log_event(
+            session.id, "system", f"correction: {self.name}.{field}", action="correction",
+            channel=session.channel, user_hash=session.user_hash,
+        )
         label = msg(f"field.{field}").lower()
         note = msg("corrected", field=label, value=read_back(value))
         return [_with_ack(note, self.resume(session)[-1])], False

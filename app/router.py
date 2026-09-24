@@ -570,6 +570,8 @@ def _two_questions(session, text):
             buttons.append(dict(b))
     session.strikes = 0
     session.slots["context"] = {"intent": second, "age": 0}
+    # H6: counted in the weekly report (the reply itself logs action=answer).
+    _log(session, "system", f"multi_answer: {first} + {second}", intent=first, action="multi_answer")
     return (
         [{"text": text1 + "\n\n" + msg("and_also") + "\n" + text2, "buttons": buttons}],
         {"action": "answer", "intent": first, "intents": [first, second]},

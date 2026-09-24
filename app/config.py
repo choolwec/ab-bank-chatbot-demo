@@ -201,6 +201,16 @@ def csat_sample_rate() -> float:
     return min(max(rate, 0.0), 1.0)
 
 
+# --- Estimated WhatsApp cost in the weekly report (H6) -----------------------
+# [VERIFY] US$ per service message at Meta's Rest-of-Africa utility rate, which
+# applies to bot replies from 1 Oct 2026. 0.004 is the ILLUSTRATIVE figure from
+# docs/multi-platform-research.md §8, not a published rate: replace it (env var)
+# with the current Meta rate card before the estimate goes into a budget.
+WA_UTILITY_RATE = float(os.environ.get("WA_UTILITY_RATE", "0.004"))
+# [VERIFY] free service messages per WhatsApp number per calendar month.
+WA_FREE_SERVICE_MESSAGES = int(os.environ.get("WA_FREE_SERVICE_MESSAGES", "1000"))
+
+
 def _flags_from_file() -> dict:
     try:
         return json.loads(FLAGS_FILE.read_text(encoding="utf-8"))

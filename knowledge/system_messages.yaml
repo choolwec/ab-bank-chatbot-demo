@@ -132,6 +132,11 @@ messages:
   messenger.ice_breaker.3: {status: draft, text: "I want to report fraud"}
   messenger.ice_breaker.4: {status: draft, text: "I'd like to talk to a person"}
 
+  out_of_hours_pickup:
+    status: draft
+    fills: [when]
+    text: Our team is away right now and will pick this up {when}.
+
   # --- Guards -------------------------------------------------------------------
   pii_warning:
     status: draft
@@ -292,6 +297,12 @@ messages:
   lead.step.time:
     status: draft
     text: When is best to call — morning or afternoon?
+  lead.finish_out_of_hours:
+    status: draft
+    fills: [ref, when]
+    text: |-
+      Done — that's everything I need. Our team is away right now, so they'll call you {when}, as soon as they're back. Your reference is {ref}.
+      Is there anything else I can help with in the meantime?
   lead.retry.phone:
     status: draft
     text: That doesn't look like a valid number — please send it as 09XXXXXXX (10 digits), 260XXXXXXXXX (12 digits), or +260XXXXXXXXX, so our team can actually reach you.

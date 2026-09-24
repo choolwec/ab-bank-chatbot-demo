@@ -23,7 +23,7 @@ class ComplaintFlow(FormFlow):
     validators = {"contact": is_valid_contact}
 
     def message_keys(self):
-        return super().message_keys() + ["complaint.finish", "read_back"]
+        return super().message_keys() + ["complaint.finish", "out_of_hours_pickup", "read_back"]
 
     def store_value(self, field, value):
         return store_contact(value) if field == "contact" else value
@@ -36,4 +36,9 @@ class ComplaintFlow(FormFlow):
     def finish(self, session):
         data = dict(session.flow_state.get("data", {}))
         ref = self.create_ticket(session, "complaint", data)
-        return [{"text": msg("complaint.finish", ref=ref), "buttons": [HUMAN_BUTTON, MENU_BUTTON]}]
+        from .. import hours
+
+        text = msg("complaint.finish", ref=ref)
+        if not hours.is_open():
+            text += "\n" + msg("out_of_hours_pickup", when=hours.when_phrase())
+        return [{"text": text, "buttons": [HUMAN_BUTTON, MENU_BUTTON]}]

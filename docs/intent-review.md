@@ -945,7 +945,7 @@ Submitted to Meta under these names; `{{1}}` is the case reference.
 > Hello, this is AB Bank. Your callback request {{1}} is booked, and our team will call you within one working day.
 
 
-## System messages (130 texts)
+## System messages (132 texts)
 
 Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts, retries, confirmations. Source: `knowledge/system_messages.yaml`. `{placeholders}` are filled in by the bot (contact details from `app/config.py`, or the values listed).
 
@@ -1192,6 +1192,13 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Status: **draft**
 
 > I'd like to talk to a person
+
+### `out_of_hours_pickup`
+
+- Status: **draft**
+- Filled in by the bot: `{when}`
+
+> Our team is away right now and will pick this up {when}.
 
 ### `pii_warning`
 
@@ -1492,6 +1499,14 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Status: **draft**
 
 > When is best to call — morning or afternoon?
+
+### `lead.finish_out_of_hours`
+
+- Status: **draft**
+- Filled in by the bot: `{ref}`, `{when}`
+
+> Done — that's everything I need. Our team is away right now, so they'll call you {when}, as soon as they're back. Your reference is {ref}.
+> Is there anything else I can help with in the meantime?
 
 ### `lead.retry.phone`
 

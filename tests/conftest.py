@@ -162,3 +162,17 @@ def meta_env(tmp_path, monkeypatch, client, isolated_data):
     env.inbox, env.store = box, store
     yield env
     user_limiter.hits.clear()
+
+
+@pytest.fixture(autouse=True)
+def _office_hours(monkeypatch):
+    """Every test runs at a fixed in-hours moment (Wednesday 10:00 Lusaka),
+    so no test depends on when the suite runs (H3). Out-of-hours tests set
+    their own time."""
+    import datetime as dt
+
+    from app import hours
+
+    fixed = dt.datetime(2026, 9, 23, 10, 0, tzinfo=hours.LUSAKA)
+    monkeypatch.setattr(hours, "now", lambda: fixed)
+    return fixed

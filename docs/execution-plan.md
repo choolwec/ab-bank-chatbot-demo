@@ -1435,7 +1435,7 @@ that finishes the ticket.
 | M5 | Private replies to urgent comments | 3c | W17 | 2 | M2, S1 | Dev + SM | ☑ |
 | H1 | Tickets carry channel and reply address | 4 | W15 | 1 | P6 | Dev 2 | ☑ |
 | H2 | Chatwoot agent desk | 4 | W17–19 | 6 | H1, W4, M2 | Dev 2 | ☐ |
-| H3 | Opening hours and out-of-hours promises | 4 | W16 | 1 | O1 | Dev 2 | ☐ |
+| H3 | Opening hours and out-of-hours promises | 4 | W16 | 1 | O1 | Dev 2 | ☑ |
 | H4 | "Bot got this wrong" loop | 4 | W19 | 1.5 | H2, N1 | Dev | ☐ |
 | H5 | Sampled CSAT | 4 | W17 | 1.5 | — | Dev | ☐ |
 | H6 | Quality report v2 | 4 | W19 | 2 | P6, C2–C11 | Dev | ☐ |

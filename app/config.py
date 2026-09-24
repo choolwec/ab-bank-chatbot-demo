@@ -163,6 +163,24 @@ def embeddings_enabled() -> bool:
     return flag("EMBEDDINGS_ENABLED", False)
 
 
+# --- Contact-centre hours (H3), Lusaka time --------------------------------
+# weekday (0 = Monday) -> (open, close). From the opening_hours answer:
+# Monday-Friday 08:00-17:00, "Saturday morning only". The Saturday times are
+# [CONFIRM: exact Saturday Contact Centre hours] -- Operations (O1).
+CONTACT_CENTRE_HOURS = {
+    0: ("08:00", "17:00"), 1: ("08:00", "17:00"), 2: ("08:00", "17:00"),
+    3: ("08:00", "17:00"), 4: ("08:00", "17:00"), 5: ("08:00", "12:00"),
+}
+# ISO dates the Contact Centre is closed. [CONFIRM: the bank's holiday list
+# for each year] -- set PUBLIC_HOLIDAYS=2026-10-18,2026-10-24,... or extend here.
+_DEFAULT_HOLIDAYS = "2026-10-18,2026-10-24,2026-12-25,2027-01-01"
+
+
+def public_holidays() -> set[str]:
+    raw = os.environ.get("PUBLIC_HOLIDAYS", _DEFAULT_HOLIDAYS)
+    return {d.strip() for d in raw.split(",") if d.strip()}
+
+
 def _flags_from_file() -> dict:
     try:
         return json.loads(FLAGS_FILE.read_text(encoding="utf-8"))

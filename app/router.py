@@ -744,8 +744,13 @@ def _handoff_to_inbox(session):
     session.flow_state = {}
     ref = FLOWS["lead"].create_ticket(session, "handoff", data)
     session.slots["handoff_requested"] = ref
+    from . import hours
+
+    text = msg("handoff_inbox", ref=ref)
+    if not hours.is_open():
+        text += "\n" + msg("out_of_hours_pickup", when=hours.when_phrase())
     return (
-        [{"text": msg("handoff_inbox", ref=ref), "buttons": [button("main_menu", "menu")]}],
+        [{"text": text, "buttons": [button("main_menu", "menu")]}],
         {"intent": "human_handoff", "action": "handoff_inbox"},
     )
 

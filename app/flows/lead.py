@@ -24,7 +24,7 @@ class LeadFlow(FormFlow):
     validators = {"phone": is_valid_zambian_phone}
 
     def message_keys(self):
-        return super().message_keys() + ["lead.finish", "read_back"]
+        return super().message_keys() + ["lead.finish", "lead.finish_out_of_hours", "read_back"]
 
     def store_value(self, field, value):
         # One canonical form for the contact centre: "0977123456".
@@ -54,9 +54,12 @@ class LeadFlow(FormFlow):
     def finish(self, session):
         data = dict(session.flow_state.get("data", {}))
         ref = self.create_ticket(session, "callback", data)
+        from .. import hours
+
+        key = "lead.finish" if hours.is_open() else "lead.finish_out_of_hours"
         return [
             {
-                "text": msg("lead.finish", ref=ref),
+                "text": msg(key, ref=ref, when=hours.when_phrase()),
                 "buttons": [DONE_BUTTON, MENU_BUTTON],
                 # "Is there anything else?" -- typed yes/no answer it (C3).
                 "yes": "menu",

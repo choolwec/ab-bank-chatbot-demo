@@ -129,3 +129,15 @@ def test_every_long_label_has_a_short_label():
                 if not short or len(short) > 20:
                     missing.append((name, item["label"], short))
     assert not missing, missing
+
+
+
+@pytest.mark.parametrize(
+    "query",
+    ["where is the passport office", "how do i pay my zra tax", "my zesco power is off",
+     "what is the kwacha exchange rate"],
+)
+def test_other_organisations_services_get_the_out_of_scope_answer(query):
+    """N6: hard lookalikes get "that's not something I can help with"."""
+    ranked = matcher.match(query)
+    assert ranked[0][0] == "out_of_scope", (query, ranked[:3])

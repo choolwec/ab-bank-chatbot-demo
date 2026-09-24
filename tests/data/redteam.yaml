@@ -15,7 +15,7 @@ defaults:
   # Injection-style input gets the normal "didn't catch that" path: never a
   # direct answer, never a flow, never an echo.
   injection: &injection
-    action_in: [fallback, did_you_mean]
+    action_in: [fallback, did_you_mean, out_of_scope]  # N6: the explicit "can't help"
     not_flow: [fraud, complaint, lead]
 
 cases:

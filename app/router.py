@@ -154,6 +154,9 @@ def resume(session, merge=None):
     return replies, meta
 
 
+# N6: the explicit "that's not something I can help with" intent.
+OUT_OF_SCOPE = "out_of_scope"
+
 # P5: channels where every bubble is a billable message get ONE bubble per
 # turn. The web keeps separate bubbles (the content owner may switch it).
 MERGE_REPLIES_CHANNELS = frozenset({"whatsapp", "messenger"})
@@ -607,10 +610,15 @@ def _free_text(session, text, urgent_flows=True):
             return _ask_urgent(session, kind, sub, text, source="matcher")
         return _answer(session, intent, top_score, text=text)
 
+    # N6: when the best match is "not a banking question", say so plainly
+    # rather than suggesting banking topics for a passport question.
+    if top_name == OUT_OF_SCOPE and top_score >= config.MEDIUM_CONFIDENCE:
+        return _answer(session, matcher.get(OUT_OF_SCOPE), top_score, text=text)
+
     if top_name and top_score >= config.MEDIUM_CONFIDENCE:
         suggested = [
             name for name, score in ranked[: config.SUGGESTION_COUNT]
-            if score >= config.MEDIUM_CONFIDENCE
+            if score >= config.MEDIUM_CONFIDENCE and name != OUT_OF_SCOPE
         ]
         buttons = [
             {
@@ -619,7 +627,7 @@ def _free_text(session, text, urgent_flows=True):
                 "payload": name,
             }
             for name, score in ranked[: config.SUGGESTION_COUNT]
-            if score >= config.MEDIUM_CONFIDENCE
+            if score >= config.MEDIUM_CONFIDENCE and name != OUT_OF_SCOPE
         ]
         buttons.append(button("talk_to_a_person", "human_handoff"))
         return (
@@ -900,7 +908,7 @@ def _answer(session, intent, score, text=None, keep_context=False):
     if not answer:
         return [{"text": msg("fallback"), "buttons": list(MENU_BUTTONS)}], meta
     buttons = [dict(b) for b in intent.get("buttons", [])]
-    meta["action"] = "answer"
+    meta["action"] = "out_of_scope" if intent["intent"] == OUT_OF_SCOPE else "answer"
     reply = {"text": answer.strip(), "buttons": buttons}
     # An answer that ends in a yes/no question declares what each means (C3).
     if intent.get("on_yes"):

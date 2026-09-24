@@ -1,0 +1,10 @@
+id: n6-out-of-scope-answer
+turns:
+  - say: where is the passport office
+    expect:
+      action: out_of_scope
+      strikes: 0
+      text_contains: ["not something I can help with"]
+      last_buttons_include: [human_handoff]
+  - say: loan
+    expect: {action: did_you_mean, last_buttons_include: [human_handoff]}

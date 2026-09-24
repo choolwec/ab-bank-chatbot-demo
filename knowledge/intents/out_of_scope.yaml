@@ -1,0 +1,67 @@
+# N6: an explicit "that's not something I can help with" intent.
+#
+# Phrases describe OTHER organisations' services and non-banking topics --
+# the hard lookalikes that a string matcher otherwise answers with the wrong
+# banking topic ("where is the zra branch" -> our branch finder). They were
+# written from categories, NOT copied from tests/eval/*.yaml (a test enforces
+# that), so the E3 gates stay a fair measure. Grow this from real traffic.
+#
+# The E3 gates count a match here as a CORRECT abstention.
+
+intents:
+  - intent: out_of_scope
+    label: "Something else"
+    category: out_of_scope
+    status: draft
+    phrases:
+      - "passport office application"
+      - "renew national registration card at the registration office"
+      - "rtsa driving licence and road tax"
+      - "zra tax return and tpin"
+      - "pacra company registration"
+      - "police station report"
+      - "i need legal advice about my landlord"
+      - "hospital or clinic appointment"
+      - "ecz exam results"
+      - "unza admission and university fees"
+      - "job vacancies and recruitment"
+      - "airtel data bundles"
+      - "mtn sim card registration"
+      - "zamtel line problem"
+      - "zesco power outage in my area"
+      - "lusaka water and sewerage bill"
+      - "dstv or gotv subscription"
+      - "my facebook or instagram account problem"
+      - "gmail or email password"
+      - "wifi router and internet at home"
+      - "laptop or phone repair"
+      - "supermarket or mall opening times"
+      - "bus or flight tickets"
+      - "weather forecast"
+      - "football scores and fixtures"
+      - "kwacha exchange rate"
+      - "bitcoin and cryptocurrency"
+      - "shares on the stock exchange"
+      - "napsa pension contributions"
+      - "nhima health insurance"
+      - "car or life insurance claim"
+      - "an account with zanaco stanbic absa or fnb"
+      - "western union or moneygram transfers"
+      - "farming advice and fertiliser prices"
+      - "cooking recipes"
+      - "can you tell jokes"
+      - "news and politics"
+      - "church or school savings group rules"
+      - "government bursaries and student loans"
+      - "birth marriage or death certificates"
+    answer: |
+      That's not something I can help with here. I can help with accounts,
+      eTumba, loans and branches, or connect you to our team.
+    answer_simple: >-
+      I can't help with that. I can help with accounts, eTumba, loans and branches.
+    buttons:
+      - {label: "Open an account", payload: "account_types_overview"}
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Loans", payload: "msme_loan"}
+      - {label: "Branches & agents", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}

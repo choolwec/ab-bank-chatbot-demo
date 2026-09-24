@@ -1407,7 +1407,7 @@ that finishes the ticket.
 | N3 | Local embedding model in the matcher | 2 | W07–08 | 4 | E3, N1 | Dev | ☐ |
 | N4 | Shadow mode and report | 2 | W08 | 2 | N3 | Dev | ☐ |
 | N5 | Threshold calibration | 2 | W09 | 1.5 | N1–N3 | Dev | ☐ |
-| N6 | Out-of-scope intent | 2 | W08 | 1.5 | N2 | Dev + CO | ☐ |
+| N6 | Out-of-scope intent | 2 | W08 | 1.5 | N2 | Dev + CO | ☑ |
 | N7 | Model-based second urgent check | 2 | W09 | 1.5 | N3, S1 | Dev | ☐ |
 | N8 | Code-mixed phrases and multilingual test | 2 | W09 | 1 | N1 | Dev | ☐ |
 | P1 | Persistent session store | 3a | W07 | 3 | — | Dev 2 | ☑ |

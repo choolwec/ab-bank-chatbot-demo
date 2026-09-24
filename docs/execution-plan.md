@@ -1403,7 +1403,7 @@ that finishes the ticket.
 | K1 | Short labels, simple answers, tone guide | 1 | W02–06 | — | — | CO | ☑ |
 | K2 | Resolve the 17 `[CONFIRM` placeholders | 1–2 | W01–10 | — | — | Business | ☐ |
 | N1 | Golden evaluation set pipeline and workshop | 2 | W04–07 | 1.5 | E3 | Dev + CO | ☐ |
-| N2 | Out-of-scope set (≥ 300) | 2 | W07 | 1 | — | Dev + CO | ☐ |
+| N2 | Out-of-scope set (≥ 300) | 2 | W07 | 1 | — | Dev + CO | ☑ |
 | N3 | Local embedding model in the matcher | 2 | W07–08 | 4 | E3, N1 | Dev | ☐ |
 | N4 | Shadow mode and report | 2 | W08 | 2 | N3 | Dev | ☐ |
 | N5 | Threshold calibration | 2 | W09 | 1.5 | N1–N3 | Dev | ☐ |

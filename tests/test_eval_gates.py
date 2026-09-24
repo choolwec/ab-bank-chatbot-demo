@@ -34,7 +34,10 @@ def test_heldout_never_copied_into_intent_phrases():
         for p in intent.get("phrases", [])
     }
     heldout = load_heldout()
-    leaked = [c["text"] for c in heldout["in_scope"] + heldout["out_of_scope"] if c["text"].lower().strip() in phrases
+    from admin.eval_report import load_oos
+
+    leaked = [c["text"] for c in heldout["in_scope"] + heldout["out_of_scope"] + load_oos()
+              if c["text"].lower().strip() in phrases
               and c["text"].lower().strip() not in GRANDFATHERED_OVERLAP]
     assert not leaked, leaked
 
@@ -70,3 +73,13 @@ def test_gates_fail_when_a_lookalike_starts_getting_answered():
     other = heldout["out_of_scope"] + [{"text": "how do i open a facebook account"}]
     tampered = evaluate(_LookalikeAnswered(), {**heldout, "out_of_scope": other})
     assert tampered.oos_direct[-1][0] == "how do i open a facebook account"
+
+
+
+def test_n2_out_of_scope_set_is_large_and_unique():
+    from admin.eval_report import load_oos
+
+    items = load_oos()
+    texts = [i["text"].lower().strip() for i in items]
+    assert len(items) >= 300 and len(set(texts)) == len(texts)
+    assert all(i.get("category") for i in items)

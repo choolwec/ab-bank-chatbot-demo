@@ -1,0 +1,622 @@
+# N2: out-of-scope evaluation set (>= 300). Questions the bot does NOT cover
+# and must NOT answer directly: it should say it can't help, suggest, or hand
+# over -- never answer confidently with the wrong topic.
+#
+# Our own items only. CLINC150's out-of-scope queries may be added once its
+# licence has been confirmed for this use (the spec requires confirming first).
+# Many are HARD LOOKALIKES: other organisations' services phrased with banking
+# words ("where is the zra branch in kitwe", "i lost my passport"), which is
+# where a string matcher fails. Add every real out-of-scope message from the
+# staff trial here (text only, no personal details).
+#
+# NEVER copy these into an intent's phrases: -- a test enforces it.
+
+out_of_scope:
+- text: how do i apply for a passport
+  category: government services
+- text: how do i renew my nrc
+  category: government services
+- text: where do i get a birth certificate
+  category: government services
+- text: how do i register a business with pacra
+  category: government services
+- text: how do i get a tpin from zra
+  category: government services
+- text: how do i pay my income tax
+  category: government services
+- text: what are the requirements for a driving licence
+  category: government services
+- text: how do i renew my road tax
+  category: government services
+- text: where is the passport office
+  category: government services
+- text: how do i get a police clearance
+  category: government services
+- text: how do i register to vote
+  category: government services
+- text: how do i apply for a work permit
+  category: government services
+- text: how long does it take to get a passport
+  category: government services
+- text: how do i replace a lost nrc
+  category: government services
+- text: how do i get a marriage certificate
+  category: government services
+- text: how do i apply for a government job
+  category: government services
+- text: when is the next census
+  category: government services
+- text: how do i pay a traffic fine
+  category: government services
+- text: how do i register land
+  category: government services
+- text: how do i get a title deed
+  category: government services
+- text: how do i apply for a bursary
+  category: government services
+- text: how do i get a death certificate
+  category: government services
+- text: what documents do i need for a visa
+  category: government services
+- text: how do i apply for citizenship
+  category: government services
+- text: how do i get an import permit
+  category: government services
+- text: where do i pay council rates
+  category: government services
+- text: how do i get a building permit
+  category: government services
+- text: how do i register a car
+  category: government services
+- text: how do i change my name legally
+  category: government services
+- text: how do i report a lost passport
+  category: government services
+- text: how do i buy airtel data bundles
+  category: telecoms and utilities
+- text: my mtn line is not working
+  category: telecoms and utilities
+- text: how do i port my number to zamtel
+  category: telecoms and utilities
+- text: why is my airtel signal so bad
+  category: telecoms and utilities
+- text: how do i check my mtn airtime balance
+  category: telecoms and utilities
+- text: how do i get a new sim card
+  category: telecoms and utilities
+- text: how do i register my sim card
+  category: telecoms and utilities
+- text: how do i reset my wifi router
+  category: telecoms and utilities
+- text: my internet is slow
+  category: telecoms and utilities
+- text: how much is a zamtel data bundle
+  category: telecoms and utilities
+- text: who do i call when zesco cuts power
+  category: telecoms and utilities
+- text: when will zesco restore power in my area
+  category: telecoms and utilities
+- text: how do i report a water leak to lusaka water
+  category: telecoms and utilities
+- text: why is my water bill so high
+  category: telecoms and utilities
+- text: how do i get a new zesco meter
+  category: telecoms and utilities
+- text: how do i report load shedding
+  category: telecoms and utilities
+- text: how do i apply for a water connection
+  category: telecoms and utilities
+- text: what is the load shedding schedule
+  category: telecoms and utilities
+- text: my airtel money pin is blocked
+  category: telecoms and utilities
+- text: how do i reverse an mtn money transaction
+  category: telecoms and utilities
+- text: how do i open an airtel money account
+  category: telecoms and utilities
+- text: how do i become an mtn money agent
+  category: telecoms and utilities
+- text: what is the zamtel customer care number
+  category: telecoms and utilities
+- text: how do i unlock my phone
+  category: telecoms and utilities
+- text: how do i get a postpaid line
+  category: telecoms and utilities
+- text: how do i transfer airtime to another phone
+  category: telecoms and utilities
+- text: my whatsapp is not working
+  category: telecoms and utilities
+- text: how do i recover my facebook account
+  category: telecoms and utilities
+- text: how do i reset my facebook password
+  category: telecoms and utilities
+- text: how do i delete my instagram
+  category: telecoms and utilities
+- text: what time does shoprite close
+  category: other companies and shops
+- text: does pick n pay deliver
+  category: other companies and shops
+- text: how much is a bag of mealie meal at shoprite
+  category: other companies and shops
+- text: where is the nearest game store
+  category: other companies and shops
+- text: what time does manda hill open
+  category: other companies and shops
+- text: is levy junction open on sunday
+  category: other companies and shops
+- text: how do i order from hungry lion
+  category: other companies and shops
+- text: what is the kfc menu price
+  category: other companies and shops
+- text: how do i track my dhl parcel
+  category: other companies and shops
+- text: where is the zampost office
+  category: other companies and shops
+- text: how do i send a parcel with postnet
+  category: other companies and shops
+- text: does spar sell airtime
+  category: other companies and shops
+- text: how do i become a kazang agent
+  category: other companies and shops
+- text: how do i open a zoona account
+  category: other companies and shops
+- text: what are the mukuba mall opening hours
+  category: other companies and shops
+- text: how do i book a bus to livingstone
+  category: other companies and shops
+- text: what time does the mazhandu bus leave
+  category: other companies and shops
+- text: how much is a bus ticket to kitwe
+  category: other companies and shops
+- text: how do i book a flight to johannesburg
+  category: other companies and shops
+- text: what are the proflight fares
+  category: other companies and shops
+- text: is zambia airways flying to ndola
+  category: other companies and shops
+- text: where can i buy a car in lusaka
+  category: other companies and shops
+- text: how much is a toyota vitz
+  category: other companies and shops
+- text: where can i fix my laptop
+  category: other companies and shops
+- text: how do i get a job at shoprite
+  category: other companies and shops
+- text: how do i apply for a job at airtel
+  category: other companies and shops
+- text: how do i get a job at zesco
+  category: other companies and shops
+- text: is the zambian breweries factory hiring
+  category: other companies and shops
+- text: how do i become a trade kings distributor
+  category: other companies and shops
+- text: where can i buy solar panels
+  category: other companies and shops
+- text: how do i open a zanaco account
+  category: other banks and financial firms
+- text: what is the stanbic swift code
+  category: other banks and financial firms
+- text: how do i get an fnb loan
+  category: other banks and financial firms
+- text: where is the nearest absa atm
+  category: other banks and financial firms
+- text: how do i contact atlas mara
+  category: other banks and financial firms
+- text: what are indo zambia bank opening hours
+  category: other banks and financial firms
+- text: how do i open a natsave account
+  category: other banks and financial firms
+- text: what is the zanaco xpress limit
+  category: other banks and financial firms
+- text: how do i apply for a stanbic credit card
+  category: other banks and financial firms
+- text: how do i reset my fnb app password
+  category: other banks and financial firms
+- text: how do i join a savings group chilimba
+  category: other banks and financial firms
+- text: what is the bank of zambia policy rate
+  category: other banks and financial firms
+- text: what is the kwacha to dollar exchange rate today
+  category: other banks and financial firms
+- text: how do i buy shares on the lusaka stock exchange
+  category: other banks and financial firms
+- text: how do i invest in government bonds
+  category: other banks and financial firms
+- text: how do i buy treasury bills
+  category: other banks and financial firms
+- text: how do i claim my napsa pension
+  category: other banks and financial firms
+- text: how do i check my napsa contributions
+  category: other banks and financial firms
+- text: how do i claim insurance from madison
+  category: other banks and financial firms
+- text: how much is car insurance
+  category: other banks and financial firms
+- text: how do i get life insurance
+  category: other banks and financial firms
+- text: how do i send money with western union
+  category: other banks and financial firms
+- text: how do i receive money from moneygram
+  category: other banks and financial firms
+- text: what is bitcoin
+  category: other banks and financial firms
+- text: how do i buy bitcoin in zambia
+  category: other banks and financial firms
+- text: is forex trading legal in zambia
+  category: other banks and financial firms
+- text: how do i get a loan from a microfinance
+  category: other banks and financial firms
+- text: how do i check my credit score with trans union
+  category: other banks and financial firms
+- text: what is the inflation rate in zambia
+  category: other banks and financial firms
+- text: how do i open a bank account in south africa
+  category: other banks and financial firms
+- text: how do i apply to unza
+  category: jobs, schools and health
+- text: when do unza applications open
+  category: jobs, schools and health
+- text: what are the grade 12 results
+  category: jobs, schools and health
+- text: how do i check my ecz results
+  category: jobs, schools and health
+- text: how do i get a student loan from the higher education loans board
+  category: jobs, schools and health
+- text: how do i apply for nursing school
+  category: jobs, schools and health
+- text: where is the nearest hospital
+  category: jobs, schools and health
+- text: what are the covid vaccination centres
+  category: jobs, schools and health
+- text: how do i book a doctor appointment at uth
+  category: jobs, schools and health
+- text: what are the symptoms of malaria
+  category: jobs, schools and health
+- text: where can i get an hiv test
+  category: jobs, schools and health
+- text: how do i register with nhima
+  category: jobs, schools and health
+- text: what does nhima cover
+  category: jobs, schools and health
+- text: how do i get a medical report
+  category: jobs, schools and health
+- text: how do i write a cv
+  category: jobs, schools and health
+- text: how do i apply for a scholarship abroad
+  category: jobs, schools and health
+- text: are there any job vacancies
+  category: jobs, schools and health
+- text: how do i get an internship
+  category: jobs, schools and health
+- text: how do i become a teacher
+  category: jobs, schools and health
+- text: where can i study accounting
+  category: jobs, schools and health
+- text: is ab bank hiring graduates
+  category: jobs, schools and health
+- text: how do i apply for a job at ab bank
+  category: jobs, schools and health
+- text: does ab bank have internships
+  category: jobs, schools and health
+- text: what is the salary of a bank teller
+  category: jobs, schools and health
+- text: how do i become a bank manager
+  category: jobs, schools and health
+- text: how do i join the police
+  category: jobs, schools and health
+- text: how do i join the army
+  category: jobs, schools and health
+- text: what are the zambia air force recruitment requirements
+  category: jobs, schools and health
+- text: how do i get a tevet certificate
+  category: jobs, schools and health
+- text: where can i learn to drive
+  category: jobs, schools and health
+- text: i need a lawyer
+  category: law, safety and emergencies (not banking)
+- text: how do i report a crime to the police
+  category: law, safety and emergencies (not banking)
+- text: how do i get a divorce
+  category: law, safety and emergencies (not banking)
+- text: my landlord is evicting me
+  category: law, safety and emergencies (not banking)
+- text: how do i sue someone
+  category: law, safety and emergencies (not banking)
+- text: someone is threatening me
+  category: law, safety and emergencies (not banking)
+- text: how do i report domestic violence
+  category: law, safety and emergencies (not banking)
+- text: where is the nearest police station
+  category: law, safety and emergencies (not banking)
+- text: how do i get legal aid
+  category: law, safety and emergencies (not banking)
+- text: my employer has not paid my salary
+  category: law, safety and emergencies (not banking)
+- text: how do i report my employer to the labour office
+  category: law, safety and emergencies (not banking)
+- text: what is the minimum wage in zambia
+  category: law, safety and emergencies (not banking)
+- text: how many days of leave am i entitled to
+  category: law, safety and emergencies (not banking)
+- text: how do i write a will
+  category: law, safety and emergencies (not banking)
+- text: how do i get custody of my child
+  category: law, safety and emergencies (not banking)
+- text: my neighbour stole my goat
+  category: law, safety and emergencies (not banking)
+- text: how do i call an ambulance
+  category: law, safety and emergencies (not banking)
+- text: what is the fire brigade number
+  category: law, safety and emergencies (not banking)
+- text: how do i report a car accident
+  category: law, safety and emergencies (not banking)
+- text: my house was broken into
+  category: law, safety and emergencies (not banking)
+- text: what is the capital of zambia
+  category: general knowledge and chit-chat
+- text: who is the president of zambia
+  category: general knowledge and chit-chat
+- text: when is independence day
+  category: general knowledge and chit-chat
+- text: what is the weather in lusaka today
+  category: general knowledge and chit-chat
+- text: will it rain tomorrow
+  category: general knowledge and chit-chat
+- text: what is the time
+  category: general knowledge and chit-chat
+- text: tell me a joke
+  category: general knowledge and chit-chat
+- text: what is your favourite colour
+  category: general knowledge and chit-chat
+- text: do you like football
+  category: general knowledge and chit-chat
+- text: who won the afcon
+  category: general knowledge and chit-chat
+- text: when is the next chipolopolo match
+  category: general knowledge and chit-chat
+- text: what is the score of the arsenal game
+  category: general knowledge and chit-chat
+- text: sing me a song
+  category: general knowledge and chit-chat
+- text: what is the meaning of life
+  category: general knowledge and chit-chat
+- text: are you married
+  category: general knowledge and chit-chat
+- text: how old are you
+  category: general knowledge and chit-chat
+- text: where do you live
+  category: general knowledge and chit-chat
+- text: what is 2 plus 2
+  category: general knowledge and chit-chat
+- text: translate hello to bemba
+  category: general knowledge and chit-chat
+- text: what does muli bwanji mean
+  category: general knowledge and chit-chat
+- text: what is the population of zambia
+  category: general knowledge and chit-chat
+- text: how far is lusaka from livingstone
+  category: general knowledge and chit-chat
+- text: what is the tallest building in lusaka
+  category: general knowledge and chit-chat
+- text: recommend a good restaurant in lusaka
+  category: general knowledge and chit-chat
+- text: what movie should i watch
+  category: general knowledge and chit-chat
+- text: what is the news today
+  category: general knowledge and chit-chat
+- text: who is the richest man in zambia
+  category: general knowledge and chit-chat
+- text: how do i cook nshima
+  category: general knowledge and chit-chat
+- text: what is the best phone to buy
+  category: general knowledge and chit-chat
+- text: can you help me with my homework
+  category: general knowledge and chit-chat
+- text: how do i install windows 11
+  category: tech and other apps
+- text: my laptop is not charging
+  category: tech and other apps
+- text: how do i recover deleted photos
+  category: tech and other apps
+- text: how do i update my android phone
+  category: tech and other apps
+- text: how do i download tiktok
+  category: tech and other apps
+- text: how do i make a website
+  category: tech and other apps
+- text: how do i create a gmail account
+  category: tech and other apps
+- text: i forgot my gmail password
+  category: tech and other apps
+- text: how do i use chatgpt
+  category: tech and other apps
+- text: how do i open a facebook account
+  category: tech and other apps
+- text: how do i make money on youtube
+  category: tech and other apps
+- text: how do i fix a cracked screen
+  category: tech and other apps
+- text: how do i connect to wifi
+  category: tech and other apps
+- text: how do i print from my phone
+  category: tech and other apps
+- text: how do i block a number on whatsapp
+  category: tech and other apps
+- text: how do i hide my last seen on whatsapp
+  category: tech and other apps
+- text: how do i back up my phone
+  category: tech and other apps
+- text: why is my phone so slow
+  category: tech and other apps
+- text: how do i scan a qr code
+  category: tech and other apps
+- text: how do i transfer files from phone to laptop
+  category: tech and other apps
+- text: how do i open a facebook business account
+  category: hard lookalikes with banking words
+- text: how do i open a youtube channel
+  category: hard lookalikes with banking words
+- text: how do i open a bar in lusaka
+  category: hard lookalikes with banking words
+- text: what documents do i need for a driving licence
+  category: hard lookalikes with banking words
+- text: what documents do i need to rent a house
+  category: hard lookalikes with banking words
+- text: what documents do i need to travel to zimbabwe
+  category: hard lookalikes with banking words
+- text: requirements to open a school
+  category: hard lookalikes with banking words
+- text: requirements to open a pharmacy
+  category: hard lookalikes with banking words
+- text: how do i apply for a passport loan
+  category: hard lookalikes with banking words
+- text: can i borrow a car
+  category: hard lookalikes with banking words
+- text: how do i borrow a book from the library
+  category: hard lookalikes with banking words
+- text: how do i transfer my land title
+  category: hard lookalikes with banking words
+- text: how do i transfer my car ownership
+  category: hard lookalikes with banking words
+- text: how do i transfer to another university
+  category: hard lookalikes with banking words
+- text: what is the branch of government that makes laws
+  category: hard lookalikes with banking words
+- text: where is the nearest branch of the ministry of health
+  category: hard lookalikes with banking words
+- text: where is the zra branch in kitwe
+  category: hard lookalikes with banking words
+- text: where is the napsa office in ndola
+  category: hard lookalikes with banking words
+- text: opening hours of the passport office
+  category: hard lookalikes with banking words
+- text: what time does the post office close
+  category: hard lookalikes with banking words
+- text: what time does the zra office open
+  category: hard lookalikes with banking words
+- text: how much does a passport cost
+  category: hard lookalikes with banking words
+- text: what are the fees at unza
+  category: hard lookalikes with banking words
+- text: how much are school fees at a private school
+  category: hard lookalikes with banking words
+- text: what are the charges for a marriage certificate
+  category: hard lookalikes with banking words
+- text: i lost my passport
+  category: hard lookalikes with banking words
+- text: i lost my phone
+  category: hard lookalikes with banking words
+- text: i lost my nrc card and my house keys
+  category: hard lookalikes with banking words
+- text: my phone was stolen, how do i track it
+  category: hard lookalikes with banking words
+- text: someone hacked my facebook
+  category: hard lookalikes with banking words
+- text: my instagram was hacked
+  category: hard lookalikes with banking words
+- text: my email was hacked
+  category: hard lookalikes with banking words
+- text: i was scammed on a job site, where do i report to the police
+  category: hard lookalikes with banking words
+- text: how do i reset my netflix password
+  category: hard lookalikes with banking words
+- text: i forgot my wifi password
+  category: hard lookalikes with banking words
+- text: i can't log in to my school portal
+  category: hard lookalikes with banking words
+- text: my zamtel account is suspended
+  category: hard lookalikes with banking words
+- text: how do i unblock my airtel money
+  category: hard lookalikes with banking words
+- text: my mtn money pin is wrong
+  category: hard lookalikes with banking words
+- text: how do i check my airtel balance
+  category: hard lookalikes with banking words
+- text: how do i check my zesco balance
+  category: hard lookalikes with banking words
+- text: what is my napsa number
+  category: hard lookalikes with banking words
+- text: how do i get a statement from napsa
+  category: hard lookalikes with banking words
+- text: how do i reactivate my facebook
+  category: hard lookalikes with banking words
+- text: my gym account is dormant
+  category: hard lookalikes with banking words
+- text: how do i save money on electricity
+  category: hard lookalikes with banking words
+- text: how do i save a word document
+  category: hard lookalikes with banking words
+- text: how do i save photos to google drive
+  category: hard lookalikes with banking words
+- text: savings tips for students
+  category: hard lookalikes with banking words
+- text: what is a good savings plan for a wedding
+  category: hard lookalikes with banking words
+- text: how do i open a savings group at church
+  category: hard lookalikes with banking words
+- text: what is the interest on a hire purchase from game store
+  category: hard lookalikes with banking words
+- text: how much is the interest at a pawn shop
+  category: hard lookalikes with banking words
+- text: can i pay my rent with airtel money
+  category: hard lookalikes with banking words
+- text: can i pay my dstv with mtn money
+  category: hard lookalikes with banking words
+- text: how do i pay my dstv subscription
+  category: hard lookalikes with banking words
+- text: how do i pay for gotv
+  category: hard lookalikes with banking words
+- text: how do i pay my school fees online
+  category: hard lookalikes with banking words
+- text: how do i buy a bus ticket online
+  category: hard lookalikes with banking words
+- text: how do i buy electricity with mtn money
+  category: hard lookalikes with banking words
+- text: how do i buy airtime with airtel money
+  category: hard lookalikes with banking words
+- text: what is the swift code of zanaco
+  category: hard lookalikes with banking words
+- text: what is the sort code for stanbic
+  category: hard lookalikes with banking words
+- text: what is the account number for zra payments
+  category: hard lookalikes with banking words
+- text: how do i open an account with dstv
+  category: hard lookalikes with banking words
+- text: how do i open a netflix account
+  category: hard lookalikes with banking words
+- text: how do i open a paypal account
+  category: hard lookalikes with banking words
+- text: how do i receive money on paypal in zambia
+  category: hard lookalikes with banking words
+- text: how do i get a visa card from a supermarket
+  category: hard lookalikes with banking words
+- text: how do i get a loyalty card at shoprite
+  category: hard lookalikes with banking words
+- text: how do i get a library card
+  category: hard lookalikes with banking words
+- text: how do i get a nhima card
+  category: hard lookalikes with banking words
+- text: is my money safe under my mattress
+  category: hard lookalikes with banking words
+- text: should i buy a house or rent
+  category: hard lookalikes with banking words
+- text: is it a good time to buy land
+  category: hard lookalikes with banking words
+- text: how do i start a chicken business
+  category: hard lookalikes with banking words
+- text: how do i start a farm
+  category: hard lookalikes with banking words
+- text: what crops grow best in eastern province
+  category: hard lookalikes with banking words
+- text: how much fertiliser do i need for maize
+  category: hard lookalikes with banking words
+- text: where can i sell my maize
+  category: hard lookalikes with banking words
+- text: what is the price of soya beans
+  category: hard lookalikes with banking words
+- text: how do i get a tractor
+  category: hard lookalikes with banking words
+- text: how do i register a cooperative
+  category: hard lookalikes with banking words
+- text: where can i get seeds on credit
+  category: hard lookalikes with banking words

@@ -1416,9 +1416,9 @@ that finishes the ticket.
 | P4 | Per-channel kill switches, per-user limits | 3a | W11 | 1.5 | P2 | Dev 2 | ☑ |
 | P5 | Fewer message bubbles | 3a | W11 | 1 | — | Dev 2 | ☑ |
 | P6 | Audit channel column and HMAC identities | 3a | W08 | 2 | P1 | Dev 2 | ☑ |
-| P7 | Lusaka production hosting and runbook | 3a | W09–10 | 3 | Procurement | Dev 2 | ☐ |
-| P9 | Load and soak test | 3a | W10, W20 | 1 | P1, P7 | Dev | ☐ |
-| W1 | Meta onboarding | 3b | W01–12 | — | — | PO | ☐ |
+| P7 | Lusaka production hosting and runbook | 3a | W09–10 | 3 | Procurement | Dev 2 | ◐ |
+| P9 | Load and soak test | 3a | W10, W20 | 1 | P1, P7 | Dev | ◐ |
+| W1 | Meta onboarding | 3b | W01–12 | — | — | PO | ◐ |
 | W2 | WhatsApp webhook (signature, inbox, worker) | 3b | W11 | 3 | P2, P6 | Dev | ☑ |
 | W3 | WhatsApp inbound parser | 3b | W12 | 2 | W2 | Dev | ☑ |
 | W4 | WhatsApp sender | 3b | W12 | 3 | P3, W3 | Dev | ☑ |
@@ -1427,23 +1427,62 @@ that finishes the ticket.
 | W7 | Utility templates | 3b | W14 | 1 | W4, L6 | Dev + Legal | ☑ |
 | W8 | 24-h window and stale messages | 3b | W12 | 1.5 | W2, P1 | Dev 2 | ☑ |
 | W9 | WhatsApp content variants | 3b | W12 | 0.5 | P3 | Dev 2 + CO | ☑ |
-| W10 | Pilot runbook | 3b | W14–17 | — | — | PO + CC | ☐ |
+| W10 | Pilot runbook | 3b | W14–17 | — | — | PO + CC | ◐ |
+| W11 | WhatsApp coexistence pause (bot stops when staff reply from the Business app; `COEXISTENCE_ENABLED`) | 3b | before W15 | — | W2, W4 | Dev | ◐ |
 | M1 | Messenger App Review pack | 3c | W15 | 1 | M2 | PO + Legal | ☑ |
 | M2 | Messenger adapter | 3c | W15 | 3 | P2, P3 | Dev | ☑ |
 | M3 | Page profile (Get Started, menu, ice breakers) | 3c | W15 | 1 | M2 | Dev | ☑ |
 | M4 | Handover to the Page Inbox | 3c | W18 | 2.5 | M2, H1 | Dev | ☑ |
 | M5 | Private replies to urgent comments | 3c | W17 | 2 | M2, S1 | Dev + SM | ☑ |
 | H1 | Tickets carry channel and reply address | 4 | W15 | 1 | P6 | Dev 2 | ☑ |
-| H2 | Chatwoot agent desk | 4 | W17–19 | 6 | H1, W4, M2 | Dev 2 | ☐ |
+| H2 | Chatwoot agent desk | 4 | W17–19 | 6 | H1, W4, M2 | Dev 2 | ◐ |
 | H3 | Opening hours and out-of-hours promises | 4 | W16 | 1 | O1 | Dev 2 | ☑ |
-| H4 | "Bot got this wrong" loop | 4 | W19 | 1.5 | H2, N1 | Dev | ☐ |
-| H5 | Sampled CSAT | 4 | W17 | 1.5 | — | Dev | ☐ |
-| H6 | Quality report v2 | 4 | W19 | 2 | P6, C2–C11 | Dev | ☐ |
-| R1 | Runbooks and alerts | 4 | W14 | 2 | P7 | Dev + PO | ☐ |
-| R2 | Go/no-go checklists | 4 | W10–22 | — | — | PO | ☐ |
+| H4 | "Bot got this wrong" loop | 4 | W19 | 1.5 | H2, N1 | Dev | ◐ |
+| H5 | Sampled CSAT | 4 | W17 | 1.5 | — | Dev | ☑ |
+| H6 | Quality report v2 | 4 | W19 | 2 | P6, C2–C11 | Dev | ☑ |
+| R1 | Runbooks and alerts | 4 | W14 | 2 | P7 | Dev + PO | ◐ |
+| R2 | Go/no-go checklists | 4 | W10–22 | — | — | PO | ◐ |
+| MK2 | Marketing consent in the callback flow; opt-out commands | 4 | — | 1 | C7 | Dev + Legal | ☑ |
+| MK3 | Campaign source attribution (widget, WhatsApp `ref:`) and the "Continue on WhatsApp" link | 4 | — | 1 | P2, W3 | Dev + Marketing | ☑ |
 | L1–L8, H-P, O1, O2, MK1 | Non-engineering tracks (§10) | — | W01+ | — | — | As listed | ☐ |
 
 **Engineering total ≈ 101 developer-days.**
+
+**Status notes (24/09/2026).** Where a row says ◐ the code is done and the
+rest needs infrastructure or people. Details, owners and open decisions:
+`remaining-work-plan.md`, section "Update 24/09/2026".
+- **P7:** `deploy/` and `docs/runbook-production.md` built; acceptance (two
+  deploys, two rollbacks, one restore, `/health` green from outside) needs
+  the Lusaka VM, TLS certificate and off-VM backup target from IT.
+- **P9:** `research/load/load.py` and a local 5-minute run (`/chat` p95
+  18.9 ms, no errors) in `docs/load-test-results.md`; the 30-minute staging
+  and VM runs are pending.
+- **R1:** `/health` checks, `admin/alerts.py`, nightly purges and
+  `docs/runbook-incidents.md` built. Alerts go to a Microsoft Teams group
+  chat (Power Automate Workflow webhook, `ALERT_TEAMS_WEBHOOK_URL`) and Jira
+  (label `chatbot-alert`, Highest for Sev 1, High for Sev 2). Two extra
+  checks: `flags_file` (Sev 1) and `webhook_rejected` (Sev 2). ☑ when alerts
+  point at the real Teams chat and Jira project on the VM.
+- **H2 / H4:** built and tested against mocked Chatwoot and Jira
+  (`docs/chatwoot-setup.md`). Pending: the Chatwoot VM, the licence check,
+  the [VERIFY] checks against a live instance, and agent training (W19).
+- **H5 / H6:** done. The report now writes `data/report.md`.
+- **N3 / N5 / N6 / E3:** negation handled in both modes, `out_of_scope`
+  phrases added, recalibrated (`EMB_MEDIUM` 0.41 → 0.435), gates tightened.
+  Hybrid right 0.835 / wrong 0.022 / out of scope 0.067 against targets
+  0.85 / 0.02 / 0.03 (`metrics-matcher-2026-09-24.md`). `EMBEDDINGS_ENABLED`
+  stays off until the shadow reviews.
+- **R2, W10, W1, L1, N1, N8:** drafts (`go-no-go.md`,
+  `pilot-runbook-whatsapp.md`, `meta-onboarding-guide.md`, `dpia-draft.md`,
+  `phrase-workshop-kit.md`) are on branch `wip/launch-docs-review` and not
+  yet merged into this branch; they await PO sign-off. W10's widget link is
+  built (MK3).
+- **MK2 / MK3:** built; also every product answer now reaches the callback
+  flow in one tap, and `docs/marketing-launch-kit.md` is a draft for
+  Legal/Compliance. `WA_LINK_ENABLED` stays off until the WhatsApp number is
+  confirmed. MK1 stays with Marketing.
+- **W11:** the coexistence pause is being built in parallel; not in this
+  branch yet.
 
 ## Appendix B: the ticket-to-target map
 

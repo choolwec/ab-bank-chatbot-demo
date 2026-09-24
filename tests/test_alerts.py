@@ -492,3 +492,28 @@ def test_no_pii_or_ids_in_any_alert_payload(env, client, monkeypatch):
                  "stole", "K5000", "4012", "123456/78", identity.user_hash(f"whatsapp:{raw_number}"),
                  identity.user_hash(f"whatsapp:{psid}"), "failed for"]
     assert not [f for f in forbidden if f in sent]
+
+
+def test_failed_rows_keep_only_the_exception_type(env):
+    """The error column is read by admins and survives until the retention
+    purge: never the exception's message, which can quote the customer's
+    text, a raw user id or a key."""
+    import sqlite3
+
+    box = inbox_mod.Inbox(env / "inbox.db")
+    box.store(InboundMessage(channel="whatsapp", user_key="260977123456",
+                             text="call me on 0977123456", msg_id="wamid.ERR-1"))
+
+    def explode(msg, findings):
+        raise ValueError(f"bad row for {msg.user_key}: {msg.text} token=EAAGsecret")
+
+    box.process_pending(explode)  # a retry keeps the row 'new' with its error
+    con = sqlite3.connect(env / "inbox.db")
+    (status, error), = con.execute("SELECT status, error FROM inbound").fetchall()
+    assert (status, error) == ("new", "ValueError")
+    for _ in range(inbox_mod.MAX_ATTEMPTS):
+        box.process_pending(explode)
+    (status, error, failed_at), = con.execute("SELECT status, error, failed_at FROM inbound").fetchall()
+    con.close()
+    assert (status, error) == ("failed", "ValueError") and failed_at
+    assert len(box.failed_since(3600)) == 1  # the R1 alert still counts it

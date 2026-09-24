@@ -257,13 +257,25 @@ def firing_card(alert: Alert, since: float, env: str) -> dict:
     )
 
 
+# failed_messages is counted over a rolling window, so it "clears" when the
+# failures age out of that window, not when anyone has answered the customers
+# concerned. Its resolved card must not read as "fixed".
+_RESOLVED_NOTE = {
+    "failed_messages": (
+        "No new failures within the window. The customers whose messages failed earlier still had no "
+        "reply: follow them up through the Jira issue, which stays open until a person closes it."
+    ),
+}
+
+
 def resolved_card(title: str, value: str, threshold: str, since: float | None,
-                  now: float, env: str) -> dict:
+                  now: float, env: str, issue: str = "") -> dict:
     lasted = _duration(now - since) if since else "unknown"
     return teams_payload(
         f"Resolved · {title}", "Good",
         [("Now", value), ("Threshold", threshold), ("Lasted", lasted), ("Environment", env)],
-        "Back within its threshold. Any Jira issue raised for it stays open until a person closes it.",
+        _RESOLVED_NOTE.get(issue, "Back within its threshold. Any Jira issue raised for it stays open "
+                                  "until a person closes it."),
     )
 
 
@@ -413,7 +425,7 @@ def run(now: float | None = None, dry_run: bool = False, health: dict | None = N
             check = (health or {}).get("checks", {}).get(name)
             title = ISSUES.get(name, _UNKNOWN)[1]
             value, threshold = describe(name, check) if isinstance(check, dict) else ("no longer reported", "-")
-        card = resolved_card(title, value, threshold, st.get("since"), now, env)
+        card = resolved_card(title, value, threshold, st.get("since"), now, env, issue=name)
         if dry_run:
             if st.get("notified"):
                 out(f"[dry run] Teams, resolved {name}:\n" + json.dumps(card, indent=2, ensure_ascii=False))

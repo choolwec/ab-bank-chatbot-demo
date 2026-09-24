@@ -353,6 +353,16 @@ def test_resolved_message_once_when_it_clears(env):
     assert len(jira_export.read_mock_issues()) == 1  # people close Jira issues, not the script
 
 
+def test_failed_messages_resolved_card_does_not_claim_the_customers_were_answered(env):
+    """The failed-row count clears when rows age out of the window, not when
+    anyone replied to those customers: the card must say they still need it."""
+    alerts.run(now=T0, health=failing("failed_messages", count=1))
+    alerts.run(now=T0 + 3600, health=healthy())
+    [post] = teams_posts(env, "resolved")
+    note = post["payload"]["attachments"][0]["content"]["body"][2]["text"]
+    assert "still had no reply" in note and "Back within its threshold" not in note
+
+
 def test_a_new_episode_after_resolution_respects_the_15_minutes(env):
     body = failing("worker_queue", **QUEUE_STUCK)
     alerts.run(now=T0, health=body)

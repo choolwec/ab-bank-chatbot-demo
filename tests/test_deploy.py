@@ -175,6 +175,17 @@ def test_nginx_forwards_the_client_address_and_leaves_webhook_bodies_alone():
     assert "deny all;" in admin
 
 
+def test_staging_fetches_the_model_and_shadows_without_switching_over():
+    import yaml
+
+    service = yaml.safe_load((ROOT / "render.yaml").read_text(encoding="utf-8"))["services"][0]
+    assert "python -m admin.fetch_model" in service["buildCommand"]
+    env = {v["key"]: v.get("value") for v in service["envVars"]}
+    assert env["SHADOW_MATCHER"] == "true" and env["EMBEDDINGS_ENABLED"] == "false"
+    assert env["PROXY_HOPS"] == "1"
+    assert "--workers" not in service["startCommand"]
+
+
 # --- the scripts, run against a temporary tree ---------------------------------------
 
 # The scripts target the Linux VM; on Windows they are covered by CI.

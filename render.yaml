@@ -3,7 +3,10 @@ services:
     name: ab-bank-chatbot-demo
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    # N3/N7: fetch and sha256-verify the embedding model at build time, as
+    # deploy.sh does on the VM. Without it staging silently runs without the
+    # model-based urgent check and cannot shadow the hybrid matcher.
+    buildCommand: pip install -r requirements.txt && python -m admin.fetch_model
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
@@ -14,3 +17,24 @@ services:
         value: cc-admin
       - key: ADMIN_PASSWORD
         generateValue: true
+      # Render's edge proxy is one hop in front of the app; without this every
+      # visitor shares one rate-limit bucket (docs/deployment-and-jira-setup.md).
+      - key: PROXY_HOPS
+        value: "1"
+      # N4: score every staging message with the hybrid matcher too, for the
+      # weekly review (python -m admin.shadow_report). Customers are still
+      # answered by the character matcher: EMBEDDINGS_ENABLED stays off until
+      # two shadow reviews pass.
+      - key: SHADOW_MATCHER
+        value: "true"
+      - key: EMBEDDINGS_ENABLED
+        value: "false"
+    # The free plan's disk is wiped on every deploy, restart and spin-down,
+    # which takes the shadow-mode audit events with it. A week of shadow data
+    # needs a persistent disk, which needs a paid instance type. [VERIFY: the
+    # current Render plan and disk prices] Then uncomment, with plan: starter:
+    # disk:
+    #   name: abz-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    # and add the env var ABZ_DATA_DIR=/var/data above.

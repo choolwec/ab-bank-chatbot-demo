@@ -20,6 +20,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # P7: the deploy scripts run as root on the production VM. shellcheck
+      # is preinstalled on GitHub's Ubuntu runners.
+      - name: Shellcheck the deploy scripts
+        run: shellcheck -x deploy/*.sh
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"

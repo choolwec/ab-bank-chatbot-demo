@@ -1,0 +1,7 @@
+# N1 golden evaluation set: real customer phrasings, each label agreed by
+# TWO reviewers (admin/import_labels.py). Grows from the staff trial and
+# production traffic via admin/export_utterances.py. Never copy these into
+# intent phrases (a test enforces it).
+
+in_scope: []
+out_of_scope: []

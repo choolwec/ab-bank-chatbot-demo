@@ -27,6 +27,8 @@ from app import config
 HELDOUT_FILE = config.BASE_DIR / "tests" / "eval" / "heldout.yaml"
 GATES_FILE = config.BASE_DIR / "tests" / "eval" / "gates.yaml"
 OOS_FILE = config.BASE_DIR / "tests" / "eval" / "oos.yaml"
+BANKING77_FILE = config.BASE_DIR / "tests" / "eval" / "banking77.yaml"
+URGENT_INTENTS = {"fraud_scam", "lost_stolen_card"}
 # N6: matching the explicit out_of_scope intent is a CORRECT abstention.
 ABSTAIN_INTENTS = {"out_of_scope"}
 
@@ -51,11 +53,52 @@ def load_oos(path: Path = OOS_FILE) -> list[dict]:
     return yaml.safe_load(path.read_text(encoding="utf-8"))["out_of_scope"]
 
 
+def load_banking77(path: Path = BANKING77_FILE) -> dict:
+    """N1: BANKING77 (CC BY 4.0) mapped onto our intents."""
+    if not path.exists():
+        return {"in_scope": [], "out_of_scope": []}
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+
 def load_gates(path: Path = GATES_FILE) -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))["gates"]
 
 
-def evaluate(matcher, heldout: dict | None = None, oos_large: list | None = None) -> EvalResult:
+def _banking77_metrics(matcher, b77: dict) -> dict:
+    """Matcher accuracy on BANKING77, plus how many of its fraud and lost-card
+    reports the S1 urgent scan routes (the safety-critical number)."""
+    from app import guards
+
+    high = config.HIGH_CONFIDENCE
+    ins, oos = b77.get("in_scope", []), b77.get("out_of_scope", [])
+    if not ins:
+        return {}
+    right = wrong = 0
+    for case in ins:
+        ranked = matcher.match(case["text"])
+        top, score = ranked[0] if ranked else (None, 0.0)
+        if top in ABSTAIN_INTENTS or score < high:
+            continue
+        right += top == case["intent"]
+        wrong += top != case["intent"]
+    oos_direct = 0
+    for case in oos:
+        ranked = matcher.match(case["text"])
+        top, score = ranked[0] if ranked else (None, 0.0)
+        oos_direct += top not in ABSTAIN_INTENTS and score >= high
+    urgent = [c for c in ins if c["intent"] in URGENT_INTENTS]
+    caught = sum(1 for c in urgent if (s := guards.urgent_scan(c["text"])) and s.kind == "fraud")
+    return {
+        "b77_right_direct": round(right / len(ins), 3),
+        "b77_wrong_direct": round(wrong / len(ins), 3),
+        "b77_oos_direct": round(oos_direct / len(oos), 3) if oos else 0.0,
+        "b77_urgent_recall": round(caught / len(urgent), 3) if urgent else 0.0,
+        "n_b77": len(ins) + len(oos),
+    }
+
+
+def evaluate(matcher, heldout: dict | None = None, oos_large: list | None = None,
+             b77: dict | None = None) -> EvalResult:
     heldout = heldout or load_heldout()
     oos_large = load_oos() if oos_large is None else oos_large
     high, medium, n_suggest = (
@@ -111,6 +154,7 @@ def evaluate(matcher, heldout: dict | None = None, oos_large: list | None = None
         "n_in_scope": len(ins),
         "n_out_of_scope": len(oos),
     }
+    result.metrics.update(_banking77_metrics(matcher, b77 if b77 is not None else load_banking77()))
     return result
 
 
@@ -142,7 +186,7 @@ def format_report(result: EvalResult, gates: dict, show_all: bool = False) -> st
     lines.append(f"        oos_suggested  {m['oos_suggested']:.3f}   (informational)")
     lines += ["", "Out-of-scope questions answered DIRECTLY:"]
     lines += [f"  {s:.2f}  {t!r} -> {g}" for t, g, s in result.oos_direct] or ["  (none)"]
-    lines.append(f"        (N2 set: {m['n_oos_large']} out-of-scope questions)")
+    lines.append(f"        (N2 set: {m['n_oos_large']} out-of-scope questions; BANKING77: {m.get('n_b77', 0)})")
     if show_all:
         lines += ["", "N2 out-of-scope questions answered DIRECTLY:"]
         lines += [f"  {s:.2f}  {t!r} -> {g}" for t, g, s in result.oos_large_direct] or ["  (none)"]

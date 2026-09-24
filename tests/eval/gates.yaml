@@ -15,6 +15,9 @@
 #               slipped to 0.697/0.692. Both are still the top suggestion
 #               (one_tap unchanged at 0.923); not re-tuned against the
 #               held-out set on purpose. N3/N5 are expected to recover it.
+#   2026-09-24  N1: BANKING77 gates added at their baselines. b77_urgent_recall
+#               0.352 is a real S1 gap ("a payment I didn't make", "freeze my
+#               card"), addressed next.
 gates:
   right_direct_min: 0.527
   wrong_direct_max: 0.044
@@ -22,3 +25,9 @@ gates:
   one_tap_min: 0.923
   # N2: the >= 300 out-of-scope set (tests/eval/oos.yaml)
   oos_large_direct_max: 0.155
+  # N1: BANKING77 (CC BY 4.0) mapped onto our intents (tests/eval/banking77.yaml)
+  b77_right_direct_min: 0.053
+  b77_wrong_direct_max: 0.008
+  b77_oos_direct_max: 0.003
+  # the share of BANKING77 fraud / lost-card reports the S1 scan routes
+  b77_urgent_recall_min: 0.352

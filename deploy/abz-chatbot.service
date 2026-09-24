@@ -1,0 +1,70 @@
+# AB Bank Zambia chatbot: systemd unit (ticket P7).
+# Install: cp deploy/abz-chatbot.service /etc/systemd/system/
+#          systemctl daemon-reload && systemctl enable --now abz-chatbot
+# Layout and first install: docs/runbook-production.md.
+#
+# Exactly ONE uvicorn worker: session locks, rate-limit buckets and the
+# webhook inbox worker live in process memory (CLAUDE.md). Never add
+# --workers; scaling out means Redis, a code change.
+
+[Unit]
+Description=AB Bank Zambia chatbot (uvicorn, one worker)
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
+[Service]
+Type=simple
+User=abz
+Group=abz
+# /opt/abz-chatbot/current is a symlink to the active release (deploy.sh).
+WorkingDirectory=/opt/abz-chatbot/current
+# Every secret and setting lives here: root:root, chmod 600. systemd reads it
+# before dropping to the abz user, so the app user can't read the file itself.
+EnvironmentFile=/etc/abz-chatbot/env
+Environment=PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+# nginx terminates TLS and sets X-Forwarded-For; the app reads it itself
+# (PROXY_HOPS in the env file), so uvicorn's own proxy-header handling is off.
+# No access log here: nginx keeps one without query strings.
+ExecStart=/opt/abz-chatbot/current/.venv/bin/python -m uvicorn app.main:app \
+    --host 127.0.0.1 --port 8000 --workers 1 \
+    --no-proxy-headers --no-server-header --no-access-log
+Restart=always
+RestartSec=2
+TimeoutStopSec=20
+
+# /var/lib/abz-chatbot (databases, keys) is the only writable path.
+StateDirectory=abz-chatbot
+StateDirectoryMode=0750
+UMask=0077
+
+# Hardening. The app needs outbound HTTPS (Meta, Jira) and nothing else.
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RemoveIPC=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged
+# MemoryDenyWriteExecute is left off: onnxruntime and libffi may need
+# writable-executable pages, and the failure would only show at run time.
+
+[Install]
+WantedBy=multi-user.target

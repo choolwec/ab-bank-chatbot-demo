@@ -1,0 +1,15 @@
+# AB Bank Zambia chatbot: scheduled jobs (ticket P7).
+# Install: install -m 644 -o root -g root deploy/crontab.example /etc/cron.d/abz-chatbot
+# Times follow the VM's clock; set it to Lusaka time first:
+#   timedatectl set-timezone Africa/Lusaka
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+MAILTO=""
+
+# Nightly backup at 01:30 (settings: /etc/abz-chatbot/backup.conf). A failure
+# is also written to syslog with the tag abz-backup.
+30 1 * * * root /opt/abz-chatbot/current/deploy/backup.sh >>/var/log/abz-chatbot/backup.log 2>&1
+
+# R1: health alerts every minute. Uncomment once admin/alerts.py has landed
+# and ALERT_WEBHOOK_URL is set in /etc/abz-chatbot/env.
+# * * * * * root /opt/abz-chatbot/current/deploy/admin.sh alerts >>/var/log/abz-chatbot/alerts.log 2>&1

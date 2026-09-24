@@ -82,6 +82,22 @@ fraud | there is an unusual charge on my account
 complaint | i want to dispute a payment on my account
 fraud | there is a payment even though i haven't used my card
 
+# --- vishing and account takeover (the common Zambian scams) ---
+fraud | a man on the phone said he was from the bank and now my etumba is empty
+fraud | someone called claiming they were from ab bank and asked for my pin
+fraud | i was tricked into giving my pin to a caller
+fraud | i gave my otp to someone who said he was customer care
+fraud | a lady pretending to be etumba staff took my money
+fraud | my card was used in a shop i have never been to
+fraud | somebody has been taking money from my etumba wallet bit by bit
+fraud | my wallet balance went to zero overnight
+fraud | money keeps leaving my account
+fraud | there are payments on my statement that i cannot explain
+fraud | somebody got hold of my bank details
+fraud | i suspect foul play on my account
+fraud | i see my money going to a number i do not know
+fraud | money was sent from my wallet to a number i have never seen
+
 # --- lost / stolen card (card wording) ---
 fraud | i lost my card
 fraud | my card was stolen at the market

@@ -274,6 +274,11 @@ def handle_comment(message: InboundMessage) -> dict:
         return {"action": "comment_too_old"}
     masked, _ = guards.mask(guards.clean(message.text or ""))
     signal = guards.urgent_scan(masked)
+    if signal is None and not guards.urgent_negated(masked):
+        from .. import urgent_model
+
+        if urgent_model.flags(masked):  # N7's second net, as a soft signal
+            signal = guards.UrgentSignal("fraud", guards._fraud_sub(masked), "soft")
     who = user_hash(f"{NAME}:{message.user_key}")
     if not signal:
         audit.log_event("-", "system", "comment (not urgent)", action="comment_ignored",

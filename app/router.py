@@ -10,7 +10,7 @@ import re
 
 from rapidfuzz import fuzz
 
-from . import audit, config, guards, shadow
+from . import audit, config, guards, shadow, urgent_model
 from .messages import button, has, msg
 from .flows import FLOWS
 from .flows.locator import CITY_PREFIX, branches_mentioned
@@ -359,6 +359,9 @@ def _route(session, text, payload):
     # 1b. Urgent topics bypass everything, from any flow (§1 rule 3)
     if text:
         urgent = guards.urgent_scan(text)
+        if urgent is None and not guards.urgent_negated(text) and urgent_model.flags(text):
+            # N7: the model's second net -- it can only ASK, never start a flow.
+            urgent = guards.UrgentSignal("fraud", guards._fraud_sub(text), "soft")
         if urgent and session.active_flow not in ("fraud", "complaint"):
             if urgent.is_hard:
                 return _start_urgent(session, urgent.kind, urgent.sub, trigger=text)

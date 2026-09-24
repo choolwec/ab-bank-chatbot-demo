@@ -1,0 +1,93 @@
+# N7: exemplar fraud / lost-card reports for the model-based urgent check.
+# A message whose embedding is close enough to one of these (config.EMB_URGENT,
+# calibrated by `python -m admin.calibrate_urgent`) gets the soft-urgent
+# confirmation question even if the keyword rules missed it. It can only ever
+# ASK; it never suppresses a rule-based signal. Our own wording (from the S1
+# corpus), never evaluation-set text. Add real reports the rules missed.
+
+exemplars:
+- someone stole money from my etumba
+- they stole my money
+- someone took money from my account
+- my money was taken without my permission
+- my money has been stolen
+- somebody is stealing from my account
+- someone steals money from my wallet every week
+- money was stolen from my savings
+- they have stolen all my savings
+- i was robbed, the thief used my phone to send money
+- there has been theft on my account
+- thieves took my phone and my etumba
+- sombody stoled my money
+- my money was stollen
+- some one is steeling my money
+- i have been skammed
+- i was scamed by a guy on facebook
+- fraudulant transaction on my account
+- i think i was hackd
+- i think i've been scammed
+- this is a scam call pretending to be ab bank
+- i want to report fraud
+- there is fraud on my account
+- i was defrauded by someone claiming to be from the bank
+- someone conned me out of K500
+- i was cheated by an agent
+- i got a phishing sms asking for my pin
+- someone is impersonating the bank on whatsapp
+- my account was hacked
+- someone hacked my myabz
+- my etumba has been hacked
+- someone cloned my card
+- i think my card was skimmed at the atm
+- i was duped into sending money
+- there is an unauthorised transaction on my account
+- unauthorized withdrawal from my account
+- money was withdrawn without my consent
+- someone withdrew without my knowledge
+- i did not authorise this payment
+- i didn't authorize that transfer
+- i never authorised this debit
+- this is not my transaction
+- there is a transaction i did not make
+- i see transactions i did not make on my statement
+- my account was debited without my permission
+- someone accessed my account
+- someone is using my account
+- someone logged into my account from another phone
+- money taken from my account last night
+- somebody took K2000 from my etumba
+- they took K500 from my etumba wallet yesterday at the kitwe branch
+- he withdrew K2000 from my account without telling me
+- a man deducted money from my wallet at the agent
+- someone has withdrawn all my savings
+- i don't recognise this etumba payment
+- there is a withdrawal on my statement that is not mine
+- a debit that i did not set up is on my account
+- somebody made a purchase with my card
+- my card is being used by someone else
+- i think someone may be using my etumba
+- my card details were leaked
+- please freeze my card now
+- block my account there are strange transactions
+- the app says i withdrew K800 but i did not
+- i didn't withdraw that money but it shows on my statement
+- there is an unusual charge on my account
+- there is a payment even though i haven't used my card
+- i lost my card
+- my card was stolen at the market
+- stolen card
+- i cant find my card
+- please block my card
+- my card is missing
+- someone has my card
+- cancel my card
+- i cannot find my debit card anywhere
+- i lost my purse today with my bank cards inside
+- my money is gone
+- money missing from my account
+- my money has disappeared from etumba
+- my balance is wrong
+- there is less money in my account than yesterday
+- i did not make this transaction
+- i didnt make that withdrawal
+- i never made those payments

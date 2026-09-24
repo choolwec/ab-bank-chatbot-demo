@@ -194,3 +194,56 @@ def test_shadow_mode_without_a_model_is_silent(bot, monkeypatch):
     b.say("what is etumba")
     assert "shadow" not in audit.JSONL_FILE.read_text(encoding="utf-8")
     assert b.action == "answer"
+
+
+
+# --- N7: the model-based urgent check --------------------------------------------
+
+
+def test_model_catches_a_report_the_rules_miss_and_only_asks(bot):
+    from app import guards, urgent_model
+
+    text = "my account does not look right, money is less than yesterday by a lot"
+    assert guards.urgent_scan(text) is None  # the keyword rules miss it
+    assert urgent_model.flags(text)
+    b = bot()
+    b.say(text)
+    assert b.action == "urgent_confirm:fraud"  # asks; never starts the flow by itself
+    assert b.session.active_flow is None
+
+
+def test_model_never_suppresses_a_rule(bot):
+    from app import urgent_model
+
+    b = bot()
+    b.say("someone stole money from my etumba")
+    assert b.action == "urgent:fraud"
+
+
+def test_model_respects_negation_and_the_kill_switch(bot, monkeypatch):
+    from app import urgent_model
+
+    b = bot()
+    b.say("nothing was stolen and my account is fine, i just want to know the charges")
+    assert not b.action.startswith("urgent")  # a negated message never asks
+    text = "my account does not look right, money is less than yesterday by a lot"
+    assert urgent_model.flags(text)
+    monkeypatch.setenv("URGENT_MODEL_ENABLED", "0")
+    assert not urgent_model.flags(text)
+
+
+def test_model_false_confirmations_on_our_negatives_stay_under_two_percent():
+    """N7 acceptance: the negative sets trigger at most 2% confirmations."""
+    from pathlib import Path
+
+    from app import guards, urgent_model
+    from admin.eval_report import load_heldout, load_oos
+
+    neg = [l.strip() for l in (Path(__file__).parent / "data" / "urgent_negative.txt").read_text(
+        encoding="utf-8").splitlines() if l.strip() and not l.startswith("#")]
+    neg += [c["text"] for c in load_heldout()["in_scope"]
+            if c["intent"] not in ("fraud_scam", "lost_stolen_card", "complaint")]
+    neg += [c["text"] for c in load_oos()]
+    quiet = [t for t in neg if guards.urgent_scan(t) is None]
+    flagged = [t for t in quiet if urgent_model.flags(t)]
+    assert len(flagged) / len(quiet) <= 0.02, flagged

@@ -88,7 +88,16 @@ def _banking77_metrics(matcher, b77: dict) -> dict:
         oos_direct += top not in ABSTAIN_INTENTS and score >= high
     urgent = [c for c in ins if c["intent"] in URGENT_INTENTS]
     caught = sum(1 for c in urgent if (s := guards.urgent_scan(c["text"])) and s.kind == "fraud")
-    return {
+    extra = {}
+    if getattr(matcher, "mode", "char") == "hybrid":
+        from app import urgent_model
+
+        # N7: the rules OR the model (the model only asks, never starts a flow)
+        both = sum(1 for c in urgent
+                   if ((s := guards.urgent_scan(c["text"])) and s.kind == "fraud")
+                   or (not guards.urgent_negated(c["text"]) and urgent_model.flags(c["text"])))
+        extra["b77_urgent_recall_with_model"] = round(both / len(urgent), 3) if urgent else 0.0
+    return {**extra,
         "b77_right_direct": round(right / len(ins), 3),
         "b77_wrong_direct": round(wrong / len(ins), 3),
         "b77_oos_direct": round(oos_direct / len(oos), 3) if oos else 0.0,

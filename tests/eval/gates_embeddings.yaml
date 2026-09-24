@@ -14,4 +14,6 @@ gates:
   b77_right_direct_min: 0.231
   b77_wrong_direct_max: 0.031
   b77_oos_direct_max: 0.003
-  b77_urgent_recall_min: 0.749
+  b77_urgent_recall_min: 0.754
+  # N7: rules OR model
+  b77_urgent_recall_with_model_min: 0.794

@@ -85,7 +85,8 @@ FRAUD_HARD_RE = re.compile(
     r"stole|stolen|stollen|stoled|steal|steals|stealing|steeling|"
     r"theft|thief|thieves|thieved|"
     r"hack\w*|unauthori[sz]\w*|conned|cheated|"
-    r"phish\w*|skimm\w*|cloned|impersonat\w*|swindl\w*|duped|compromis\w*)\b"
+    r"phish\w*|skimm\w*|cloned|impersonat\w*|swindl\w*|duped|compromis\w*|"
+    r"tricked|deceived|conned|lured|fooled\s+me|misled)\b"
 )
 
 # Multi-word hard signals. These are the S1 misses: none of them contain a
@@ -113,7 +114,8 @@ FRAUD_HARD_PHRASES = [
 # phrase list above only knew "they took MY".
 THEFT_RE = re.compile(
     r"(?i)\b(?:someone|somebody|some\s+one|they|he|she|people|a\s+(?:man|woman|guy|person))\s+"
-    r"(?:took|has\s+taken|have\s+taken|withdrew|has\s+withdrawn|have\s+withdrawn|deducted|drained|emptied)\b"
+    r"(?:took|taking|has\s+been\s+taking|has\s+taken|have\s+taken|withdrew|has\s+withdrawn|have\s+withdrawn|"
+    r"deducted|deducting|drained|draining|emptied|emptying)\b"
     # the money word within five words of the verb: "they took my documents
     # at the branch, when will my account be ready" is not a theft
     r"(?:\W+\w+){0,5}?\W+(?:all\s+)?(?:money|k\s?\d[\d,]*|zmw|kwacha|savings|balance|wallet|e-?tumba|funds|cash)\b"
@@ -176,14 +178,41 @@ FREEZE_RE = re.compile(
 SOMEONE_USED_RE = re.compile(
     r"(?i)\b(?:someone|somebody|some\s+one|a\s+stranger|another\s+person|people|they)\s+(?:else\s+)?"
     r"(?:(?:may|might|could|must)\s+)?(?:has\s+|have\s+|had\s+|is\s+|are\s+|was\s+|be\s+|been\s+|just\s+)*"
-    r"(?:used|using|accessed|accessing|access\s+to|gained\s+access\s+to|got\s+into|entered|made|making)\s+"
-    r"(?:\w+\s+){0,3}(?:cards?|accounts?|wallet|e-?tumba|app|payments?|purchases?|withdrawals?|transactions?)\b"
+    r"(?:used|using|accessed|accessing|access\s+to|gained\s+access\s+to|got\s+into|got\s+hold\s+of|entered|made|making)\s+"
+    r"(?:\w+\s+){0,3}(?:cards?|accounts?|wallet|e-?tumba|app|payments?|purchases?|withdrawals?|transactions?|"
+    r"details|pin|password)\b"
     # "my card is being used by someone else", "has been used by somebody"
     r"|\b(?:cards?|accounts?|wallet|e-?tumba)\s+(?:\w+\s+){0,2}(?:is\s+being|has\s+been|was|being)\s+used\s+by\s+"
     r"(?:someone|somebody|some\s+one|another|a\s+stranger)\b"
     # "my card data has been exposed", "a security breach"
     r"|\b(?:card|account|pin|details|data|info\w*)\s+(?:\w+\s+){0,3}(?:exposed|leaked|breached)\b"
     r"|\bsecurity\s+breach\b|\bdata\s+breach\b"
+)
+
+# Vishing -- a caller posing as the bank -- is the most common mobile-money
+# fraud in Zambia, and none of these were caught before: "a man said he was
+# from the bank", "i gave my pin to a caller", "my card was used in a shop i
+# have never been to".
+SCAM_CALL_RE = re.compile(
+    r"(?i)\b(?:said|says|claimed|claiming|told\s+me)\s+(?:that\s+)?(?:he|she|they|it)\s+(?:was|were|is|are)\s+"
+    r"(?:from|with|calling\s+from)\s+(?:the\s+|ab\s+)?(?:bank|etumba|ab\s+bank|head\s+office|customer\s+care)\b"
+    r"|\b(?:pretend\w*|posing|posed)\s+(?:to\s+be|as)\s+(?:\w+\s+){0,3}(?:bank|etumba|staff|agent|customer\s+care)\b"
+    r"|\b(?:gave|give|giving|shared|sharing|told|sent|send)\s+(?:him|her|them|someone|somebody|a\s+caller|the\s+caller|"
+    r"a\s+man|a\s+woman|an\s+agent)?\s*(?:my\s+|the\s+)?(?:pin|password|otp|one\s+time\s+pin|verification\s+code|code)\s+"
+    r"(?:to|with)\b"
+    r"|\b(?:cards?|accounts?|e-?tumba|wallet)\s+(?:was|were|has\s+been|got|is\s+being)\s+used\s+"
+    r"(?:\w+\s+){0,6}(?:never|not\s+me|without\s+me|without\s+my)\b"
+)
+# Consistent with theft, but innocent readings exist -> ask.
+SOFT_EMPTIED_RE = re.compile(
+    r"(?i)\b(?:wallet|account|e-?tumba|balance|savings)\s+(?:\w+\s+){0,2}(?:is|was|went\s+to|is\s+now|now)\s+"
+    r"(?:empty|zero|nil|k\s?0)\b"
+    r"|\bmoney\s+(?:keeps\s+|is\s+)?(?:leaving|disappearing|going\s+out\s+of)\s+my\b"
+    r"|\b(?:payments?|transactions?|charges?|withdrawals?|debits?)\s+(?:\w+\s+){0,5}(?:can\s*n'?t|cannot|can\s+not)\s+explain\b"
+    r"|\bfoul\s+play\b|\bsuspicious\s+activity\b"
+    # "money sent to a number i don't know / have never seen"
+    r"|\bmoney\s+(?:\w+\s+){0,5}(?:to|into)\s+(?:a|an|some)\s+(?:strange\s+|unknown\s+)?(?:number|person|account|phone)\s+"
+    r"(?:that\s+)?i\s+(?:do\s*n'?t|dont|do\s+not|did\s*n'?t|never|have\s+never)\s+(?:know|recogni[sz]e|seen|sent)\b"
 )
 
 # Consistent with fraud, but with a plausible innocent reading -> confirm.
@@ -358,7 +387,7 @@ def urgent_scan(text: str) -> UrgentSignal | None:
         if FREEZE_RE.search(t) and not UNFREEZE_RE.search(t):
             strength = "soft" if EDUCATION_RE.search(t) else "hard"
             return UrgentSignal("fraud", _fraud_sub(t), strength)
-        if UNRECOGNISED_TX_RE.search(t) or SOMEONE_USED_RE.search(t):
+        if UNRECOGNISED_TX_RE.search(t) or SOMEONE_USED_RE.search(t) or SCAM_CALL_RE.search(t):
             strength = "soft" if EDUCATION_RE.search(t) else "hard"
             return UrgentSignal("fraud", _fraud_sub(t), strength)
         if FRAUD_HARD_RE.search(t) or THEFT_RE.search(t) or _has_phrase(t, FRAUD_HARD_PHRASES):
@@ -376,7 +405,7 @@ def urgent_scan(text: str) -> UrgentSignal | None:
     # 3. Soft money signals -> confirmation question.
     if not NO_PROBLEM_RE.search(t):
         if (_has_phrase(t, SOFT_MONEY_PHRASES) or SOFT_DID_NOT_MAKE_RE.search(t)
-                or SOFT_TX_NOT_MADE_RE.search(t) or SOFT_ODD_TX_RE.search(t)):
+                or SOFT_TX_NOT_MADE_RE.search(t) or SOFT_ODD_TX_RE.search(t) or SOFT_EMPTIED_RE.search(t)):
             return UrgentSignal("fraud", _fraud_sub(t), "soft")
 
     # 4. Soft complaint vocabulary -> confirmation question.

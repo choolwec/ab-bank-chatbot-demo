@@ -152,6 +152,11 @@ EMB_HIGH = float(os.environ.get("EMB_HIGH", "0.715"))  # N5: seed 7, OOS <= 3% o
 EMB_MEDIUM = float(os.environ.get("EMB_MEDIUM", "0.41"))  # N5: OOS suggestions <= 45%, so gibberish falls back
 
 
+# N7: similarity to an exemplar fraud report that triggers the soft-urgent
+# question when no rule fired. Set by `python -m admin.calibrate_urgent`.
+EMB_URGENT = float(os.environ.get("EMB_URGENT", "0.73"))  # false confirmations <= 2% when tuned
+
+
 def embeddings_enabled() -> bool:
     """Kill switch (N3). Off, or model missing/unverified -> exactly the
     pre-N3 character matcher."""

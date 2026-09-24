@@ -21,6 +21,7 @@
 #   2026-09-24  S1 follow-up: b77_urgent_recall 0.352 -> 0.749 (patterns tuned on
 #               the BANKING77 TRAIN split: 0.746 there, so no overfit gap);
 #               false fraud triggers on our own data unchanged.
+#   2026-09-24  vishing / account-takeover rules (N7 work): 0.749 -> 0.754
 gates:
   right_direct_min: 0.527
   wrong_direct_max: 0.044
@@ -33,4 +34,4 @@ gates:
   b77_wrong_direct_max: 0.008
   b77_oos_direct_max: 0.003
   # the share of BANKING77 fraud / lost-card reports the S1 scan routes
-  b77_urgent_recall_min: 0.749
+  b77_urgent_recall_min: 0.754

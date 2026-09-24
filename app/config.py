@@ -181,6 +181,26 @@ def public_holidays() -> set[str]:
     return {d.strip() for d in raw.split(",") if d.strip()}
 
 
+# --- Sampled one-tap CSAT (H5) ----------------------------------------------
+# Share of customers asked "how did I do?" after a resolved conversation. The
+# sample is deterministic per customer (from user_hash). On WhatsApp the
+# question is merged into the resolving reply, so it costs no extra message,
+# but the tap's reply does: Ops can lower this, or set 0 to stop asking, with
+# no restart (env var > flags.json > default, like the kill switches).
+CSAT_SAMPLE_RATE_DEFAULT = 0.2
+
+
+def csat_sample_rate() -> float:
+    raw = os.environ.get("CSAT_SAMPLE_RATE")
+    if raw is None:
+        raw = _flags_from_file().get("CSAT_SAMPLE_RATE", CSAT_SAMPLE_RATE_DEFAULT)
+    try:
+        rate = float(raw)
+    except (TypeError, ValueError):
+        return CSAT_SAMPLE_RATE_DEFAULT
+    return min(max(rate, 0.0), 1.0)
+
+
 def _flags_from_file() -> dict:
     try:
         return json.loads(FLAGS_FILE.read_text(encoding="utf-8"))

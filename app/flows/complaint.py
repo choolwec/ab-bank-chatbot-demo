@@ -41,4 +41,5 @@ class ComplaintFlow(FormFlow):
         text = msg("complaint.finish", ref=ref)
         if not hours.is_open():
             text += "\n" + msg("out_of_hours_pickup", when=hours.when_phrase())
-        return [{"text": text, "buttons": [HUMAN_BUTTON, MENU_BUTTON]}]
+        # H5: a resolved conversation; the router may ask for feedback.
+        return [{"text": text, "buttons": [HUMAN_BUTTON, MENU_BUTTON], "resolved": "complaint"}]

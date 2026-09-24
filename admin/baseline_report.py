@@ -13,6 +13,7 @@ Runs everything against a temporary data dir; never touches data/.
 
 import argparse
 import datetime as dt
+import os
 import re
 import subprocess
 import sys
@@ -77,6 +78,9 @@ PATHS = {
 
 
 def _isolate():
+    # H5's sampled feedback question depends on each random session id; the
+    # snapshot measures the happy path itself, so it is off here.
+    os.environ["CSAT_SAMPLE_RATE"] = "0"
     tmp = Path(tempfile.mkdtemp(prefix="abz-baseline-"))
     config.DATA_DIR = tmp
     audit.DB_FILE = tmp / "audit.db"

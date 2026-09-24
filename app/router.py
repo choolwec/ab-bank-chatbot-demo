@@ -210,6 +210,7 @@ def handle(session, text=None, payload=None, merge=None, prior_findings=None,
     if first_contact and meta.get("intent") != "greeting":
         replies.insert(0, {"text": msg("disclosure"), "buttons": []})
     replies.extend(routed)
+    replies = _maybe_ask_csat(session, replies, meta)
     return respond(session, replies, meta, merge)
 
 
@@ -339,6 +340,10 @@ def _route(session, text, payload):
         if done:
             session.active_flow = None
         return replies, {"intent": "human_handoff", "action": "flow_start"}
+    # H5: a feedback tap. Before flows and intents, so a stale thumbs-up
+    # (WhatsApp keeps old buttons tappable) is never stored as a flow answer.
+    if payload in (CSAT_UP, CSAT_DOWN):
+        return _csat_answer(session, payload)
 
     # 1a. Answer to that confirmation question
     if payload in (URGENT_YES, URGENT_NO):
@@ -569,6 +574,97 @@ def _two_questions(session, text):
         [{"text": text1 + "\n\n" + msg("and_also") + "\n" + text2, "buttons": buttons}],
         {"action": "answer", "intent": first, "intents": [first, second]},
     )
+
+
+# --- H5: sampled one-tap CSAT --------------------------------------------------
+# After a RESOLVED conversation -- thanks_goodbye answered, or a callback or
+# complaint finished with a ticket (its reply carries an internal "resolved"
+# marker) -- a sample of customers get one extra reply with thumbs-up/down
+# buttons. Never in a session that started a fraud report, and at most once
+# per session. On WhatsApp and Messenger P5 merges it into the resolving
+# bubble, so asking costs no extra billable message.
+CSAT_UP = "csat:up"
+CSAT_DOWN = "csat:down"
+_CSAT_BUCKETS = 10_000
+
+
+def csat_sampled(session) -> bool:
+    """Deterministic per customer (config.csat_sample_rate()): the same
+    user_hash is always in or always out, so it is stable and testable."""
+    try:
+        bucket = int(session.user_hash[:8], 16) % _CSAT_BUCKETS
+    except (TypeError, ValueError):
+        return False  # nothing stable to sample on: don't ask
+    return bucket < round(config.csat_sample_rate() * _CSAT_BUCKETS)
+
+
+def _resolved(session, replies, meta):
+    """What resolved the conversation this turn, or None. Always pops the
+    flows' "resolved" marker, so it never reaches a channel."""
+    marked = [r.pop("resolved") for r in replies if "resolved" in r]
+    if marked:
+        return marked[-1]
+    if meta.get("action") == "answer" and meta.get("intent") == "thanks_goodbye":
+        # "thanks" as the very first message hasn't resolved anything.
+        if sum(t["role"] == "user" for t in session.transcript) > 1:
+            return "thanks_goodbye"
+    return None
+
+
+def _maybe_ask_csat(session, replies, meta):
+    resolved = _resolved(session, replies, meta)
+    if (
+        not resolved
+        or session.slots.get("csat_asked")
+        or session.slots.get("csat_skip")
+        or not csat_sampled(session)
+    ):
+        return replies
+    session.slots["csat_asked"] = resolved
+    meta["csat"] = "asked"
+    _log(session, "system", f"csat asked after {resolved}", action="csat_asked")
+    last = replies[-1]
+    ask = {
+        "text": msg("csat.ask"),
+        # Three buttons stay one tap on WhatsApp (a fourth makes it a list).
+        # Main menu is the way on for anyone who'd rather not answer; a
+        # thumbs-down then offers a person directly.
+        "buttons": [
+            button("csat_up", CSAT_UP),
+            button("csat_down", CSAT_DOWN),
+            button("main_menu", "menu"),
+        ],
+        # A typed yes/no still answers the resolving reply ("anything else?").
+        "yes": last.get("yes"),
+        "no": last.get("no"),
+    }
+    return replies + [ask]
+
+
+def _csat_answer(session, payload):
+    """A thumbs-up/down tap. Only the first tap after the question counts
+    (action=csat:up|down, logged with the channel by respond()); a repeat or
+    unasked tap gets the same thanks, logged as csat_ignored."""
+    counted = bool(session.slots.get("csat_asked")) and not session.slots.get("csat_answered")
+    if counted:
+        session.slots["csat_answered"] = payload
+    down = payload == CSAT_DOWN
+    meta = {"action": payload if counted else "csat_ignored"}
+    thanks = msg("csat.thanks_down" if down else "csat.thanks")
+    human = button("talk_to_a_person", "human_handoff")
+
+    def person_first(buttons):
+        if not down:
+            return list(buttons)
+        return [human] + [b for b in buttons if b["payload"] != "human_handoff"]
+
+    if session.active_flow:
+        # A stale tap mid-flow: thank them, then re-ask the current step.
+        flow = FLOWS[session.active_flow]
+        prompt = flow.resume(session)[-1]
+        back = msg("back_to_flow", flow=flow.topic_label, prompt=prompt["text"])
+        return [dict(prompt, text=thanks + "\n\n" + back, buttons=person_first(prompt["buttons"]))], meta
+    return [{"text": thanks, "buttons": person_first(MENU_BUTTONS)}], meta
 
 
 def _did_you_mean_text(suggested):

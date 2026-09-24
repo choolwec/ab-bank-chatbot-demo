@@ -360,6 +360,21 @@ messages:
     fills: [cities]
     text: "I couldn't find a listed branch there. We currently list branches in: {cities}. Our team can help you find the nearest service point."
 
+  # --- Sampled one-tap feedback (H5) ------------------------------------------
+  # Sent to about 1 in 5 customers after a resolved conversation (a goodbye,
+  # or a finished callback or complaint), never after a fraud report. On
+  # WhatsApp and Messenger it joins the previous bubble, so it is written as
+  # an invitation, not a second question.
+  csat.ask:
+    status: draft
+    text: If you have a moment, please tap below to tell us how I did today.
+  csat.thanks:
+    status: draft
+    text: Thank you for your feedback. It helps us improve.
+  csat.thanks_down:
+    status: draft
+    text: Thank you for telling us, and I'm sorry I didn't help more. A person from our team can help you directly — tap "Talk to a person", or choose another option below.
+
   # --- Button labels (C11). 20 characters or fewer: WhatsApp's limit. --------
   button.a_branch: {status: draft, text: "A branch"}
   button.about_etumba: {status: draft, text: "About eTumba"}
@@ -391,3 +406,5 @@ messages:
   button.choose_an_option: {status: draft, text: "Choose an option"}
   button.options: {status: draft, text: "Options"}
   button.use_this_number: {status: draft, text: "Use this number"}
+  button.csat_up: {status: draft, text: "👍 Good"}
+  button.csat_down: {status: draft, text: "👎 Not good"}

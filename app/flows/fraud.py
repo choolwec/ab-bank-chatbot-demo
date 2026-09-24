@@ -58,6 +58,9 @@ class FraudFlow(FormFlow):
     # --- C8 pre-fill -------------------------------------------------------
 
     def start(self, session, kind=None, trigger=None):
+        # H5: "how did I do?" reads badly to someone reporting fraud, so a
+        # session that ever started a report is never asked for feedback.
+        session.slots["csat_skip"] = self.name
         replies, done = super().start(session, kind)
         words = (trigger or "").split()
         if len(words) < PREFILL_MIN_WORDS:

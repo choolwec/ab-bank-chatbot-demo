@@ -23,8 +23,13 @@ HIGH_CONFIDENCE = 0.70    # answer directly
 MEDIUM_CONFIDENCE = 0.45  # "Did you mean…?" candidate buttons
 SUGGESTION_COUNT = 3
 
-# --- Session (§3.1D) ---
-SESSION_TIMEOUT_MINUTES = 30
+# --- Session (§3.1D, ticket P1) ---
+# Idle this long: greet again, but keep any half-finished flow.
+IDLE_REGREET_MINUTES = int(os.environ.get("IDLE_REGREET_MINUTES", "30"))
+SESSION_TIMEOUT_MINUTES = IDLE_REGREET_MINUTES  # pre-P1 name, kept for scripts
+# A flow left this long is dropped; fraud reports and complaints get longer.
+FLOW_EXPIRY_HOURS = int(os.environ.get("FLOW_EXPIRY_HOURS", "24"))
+FLOW_EXPIRY_HOURS_URGENT = int(os.environ.get("FLOW_EXPIRY_HOURS_URGENT", "72"))
 
 # --- Input hygiene (§3.3) ---
 MAX_MESSAGE_CHARS = 500

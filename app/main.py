@@ -27,6 +27,7 @@ WIDGET_DIR = config.BASE_DIR / "widget"
 async def lifespan(app):
     audit.init_db()
     audit.purge_expired()
+    store.purge_expired()  # same retention schedule as the audit log (P1)
     yield
 
 
@@ -97,26 +98,28 @@ def chat(body: ChatIn, request: Request):
     if _rate_limited(_client_ip(request)):
         raise HTTPException(status_code=429, detail="Too many messages — please slow down.")
 
-    session, created = store.get_or_create(body.session_id)
-    if not body.message and not body.payload:
-        # Empty post = the widget opening. Only a genuinely new session gets
-        # the welcome (which starts fresh); a returning page load resumes —
-        # it must never wipe an in-progress fraud/complaint/callback flow.
-        if created or not session.greeted:
-            replies = router.welcome(session)
-            meta = {"action": "welcome"}
-            history = []
-        else:
-            history = _history(session)
-            replies, meta = router.resume(session)
-        return {
-            "session_id": session.id,
-            "replies": replies,
-            "meta": meta,
-            "history": history,
-        }
-    replies, meta = router.handle(session, text=body.message, payload=body.payload)
-    return {"session_id": session.id, "replies": replies, "meta": meta}
+    with store.web_session(body.session_id) as (session, created):
+        if not body.message and not body.payload:
+            # Empty post = the widget opening. A new session, or one idle past
+            # IDLE_REGREET_MINUTES with nothing in progress, gets the welcome.
+            # Otherwise it resumes: a page load must never wipe an in-progress
+            # fraud/complaint/callback flow.
+            fresh = created or not session.greeted or (session.returning and not session.active_flow)
+            if fresh:
+                replies = router.welcome(session)
+                meta = {"action": "welcome"}
+                history = []
+            else:
+                history = _history(session)
+                replies, meta = router.resume(session)
+            return {
+                "session_id": session.id,
+                "replies": replies,
+                "meta": meta,
+                "history": history,
+            }
+        replies, meta = router.handle(session, text=body.message, payload=body.payload)
+        return {"session_id": session.id, "replies": replies, "meta": meta}
 
 
 def _history(session) -> list[dict]:

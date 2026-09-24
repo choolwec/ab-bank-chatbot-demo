@@ -198,13 +198,27 @@ corrected this way. Phone numbers are stored in one canonical form
 ("0977123456") in every flow.
 
 ### Session store (`app/session.py`)
-In-memory, single-process by design (`SessionStore` behind a lock, 30-minute
-idle timeout). This is why `app/main.py`'s deployment notes insist on
-exactly **one** uvicorn worker/process: sessions here and the per-IP
-rate-limit buckets in `app/main.py` both live in process memory, so extra
-workers or instances silently fragment conversations and rate limits across
-processes. Scaling past one process means moving sessions to SQLite/Redis —
-a real code change, not a config flag.
+Persistent since P1: `SqliteSessionStore` (`data/sessions.db`, one row per
+`channel:user_key`, state as JSON) survives restarts. `SessionStore` keeps the
+same rules in memory for tests (`SESSION_STORE=memory` selects it at run
+time). `Session.id` is always an opaque random id: it is what the audit log
+sees, never a phone number or platform id. There are two timeouts, kept
+separate on purpose:
+- `IDLE_REGREET_MINUTES` (30): the widget greets again, but a half-finished
+  flow is **kept** and resumed.
+- `FLOW_EXPIRY_HOURS` (24, or **72** for fraud/complaint): the flow is
+  dropped.
+
+Sessions are purged on the `TRANSCRIPT_RETENTION_DAYS` schedule. Always go
+through `with store.session(key) as (session, created):` (or
+`web_session(id)`). It holds a per-key lock and saves on exit, so two
+requests for one customer never interleave.
+
+This is why `app/main.py`'s deployment notes still insist on exactly **one**
+uvicorn worker/process: the per-key locks and the per-IP rate-limit buckets
+live in process memory, so extra workers would race on the same session row
+and fragment rate limits. Scaling out means moving locks and sessions to
+Redis, a real code change, not a config flag.
 
 ### Audit trail (`app/audit.py`)
 SQLite (`data/audit.db`) + append-only JSONL, written only after guards have

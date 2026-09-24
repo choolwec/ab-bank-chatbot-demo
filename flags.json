@@ -3,5 +3,6 @@
   "WIDGET_ENABLED": true,
   "JIRA_ENABLED": true,
   "MARKETING_CONSENT_ENABLED": true,
-  "WA_LINK_ENABLED": false
+  "WA_LINK_ENABLED": false,
+  "COEXISTENCE_ENABLED": false
 }

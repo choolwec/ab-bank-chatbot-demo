@@ -21,6 +21,12 @@ a hashed recipient, so demos and tests need no Meta account.
 Free-form sends outside the customer's 24-h window are refused (W8); staff use
 an approved template instead (W7).
 
+Coexistence (W11): staff keep the WhatsApp Business app on the same number.
+An echo of a message a person sent from the app (the smb_message_echoes
+field) passes the same signature check and durable inbox as any other event,
+as an InboundMessage with kind "echo"; the worker then pauses the bot for
+that customer (app/channels/coexistence.py).
+
 Handoff (H2): with the agent desk (Chatwoot) configured, "Talk to a person"
 puts the conversation on the desk (pass_to_desk) and pauses the bot; agents'
 replies come back through send_free_form(). See app/desk/bridge.py.
@@ -125,6 +131,10 @@ def parse(body: dict) -> tuple[list[InboundMessage], list[dict]]:
                 else:  # contacts, unsupported, ...
                     inbound.media_type = kind or "unsupported"
                 messages.append(inbound)
+            for echo in value.get("message_echoes", []):
+                inbound = parse_echo(echo, contacts)
+                if inbound is not None:
+                    messages.append(inbound)
             for st in value.get("statuses", []):
                 statuses.append({
                     "status": st.get("status"),
@@ -133,6 +143,31 @@ def parse(body: dict) -> tuple[list[InboundMessage], list[dict]]:
                     "errors": [e.get("code") for e in st.get("errors", [])],
                 })
     return messages, statuses
+
+
+def parse_echo(echo: dict, contacts: list[dict] | None = None) -> InboundMessage | None:
+    """W11: one smb_message_echoes item, i.e. a message a PERSON sent from the
+    WhatsApp Business app on our number (coexistence). [VERIFY] the exact
+    shape against Meta's current coexistence docs. Modelled as
+      {"from": <our number>, "to": <customer wa_id>, "to_user_id": <BSUID>?,
+       "id": "wamid...", "timestamp": "...", "type": "text", "text": {...}}
+    Only WHO it went to matters (the same user key as the customer's own
+    messages: the BSUID when present, else the wa_id), plus its id and time
+    for de-duplication. The staff member's text is never read or stored."""
+    customer = echo.get("to_user_id") or echo.get("recipient_user_id")
+    for contact in contacts or []:
+        if not customer and contact.get("user_id") and contact.get("wa_id") == echo.get("to"):
+            customer = contact["user_id"]
+    customer = customer or echo.get("to")
+    if not customer:
+        return None
+    return InboundMessage(
+        channel=NAME,
+        user_key=str(customer),
+        msg_id=f"echo:{echo['id']}" if echo.get("id") else None,
+        ts=float(echo["timestamp"]) if echo.get("timestamp") else None,
+        kind="echo",
+    )
 
 
 def log_statuses(statuses: list[dict]) -> None:

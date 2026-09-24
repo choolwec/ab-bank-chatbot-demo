@@ -113,6 +113,13 @@ messages:
     status: draft
     fills: [ref]
     text: I've passed our conversation to our team, with everything you've told me so far — a person will reply to you right here. Your reference is {ref}. If your card is lost or money was taken, please also call {emergency_phone} now.
+  # W11: sent at most once per coexistence pause, only when a customer whom
+  # staff are answering from the WhatsApp Business app reports fraud or a
+  # lost card. Ops/Risk to review with the emergency number.
+  coexistence.urgent_safety:
+    status: draft
+    fills: [ref]
+    text: This is the AB Bank automated assistant. I've logged your message as urgent for our team — your reference is {ref}. If your card is lost or money was taken without your permission, call {emergency_phone} now to block it. Never share your PIN.
   comment_private.fraud:
     status: draft
     text: Hello, this is AB Bank. We saw your comment and want to help privately. If your card is lost or money was taken without your permission, please call {emergency_phone} straight away. You can also reply here to report it — never share your PIN or full card number.

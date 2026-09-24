@@ -896,7 +896,7 @@ def _answer(session, intent, score, text=None, keep_context=False):
     session.slots["topic"] = intent.get("category")
     if not keep_context:
         session.slots["context"] = {"intent": intent["intent"], "age": 0}
-    answer = intent.get("answer")
+    answer = (intent.get("answer_by_channel") or {}).get(session.channel) or intent.get("answer")
     if not answer:
         return [{"text": msg("fallback"), "buttons": list(MENU_BUTTONS)}], meta
     buttons = [dict(b) for b in intent.get("buttons", [])]

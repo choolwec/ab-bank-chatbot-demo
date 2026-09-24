@@ -17,7 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import audit, config, jira_export
+from . import admin_cases, audit, config, jira_export
 from .adminauth import require_admin
 from .channels import messenger, web, whatsapp
 from .ratelimit import client_ip as _client_ip  # noqa: F401  (tests, docs)
@@ -50,6 +50,7 @@ app.mount("/widget", StaticFiles(directory=WIDGET_DIR), name="widget")
 app.include_router(web.api)
 app.include_router(whatsapp.api)
 app.include_router(messenger.api)
+app.include_router(admin_cases.api)
 
 
 @app.get("/health")

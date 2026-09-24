@@ -137,15 +137,15 @@ def create_ticket(kind: str, fields: dict, transcript: list, channel: str = "web
     con.commit()
     con.close()
     log_event("-", "system", f"ticket created: {ref}", action=f"ticket:{kind}", channel=channel)
-    _push_to_jira(kind, ref, fields, transcript)
+    _push_to_jira(kind, ref, fields, transcript, channel, reply_to)
     return ref
 
 
-def _push_to_jira(kind: str, ref: str, fields: dict, transcript: list) -> None:
+def _push_to_jira(kind: str, ref: str, fields: dict, transcript: list, channel="web", reply_to=None) -> None:
     """Best-effort: a Jira outage or bad credentials must never block the
     customer-facing ticket flow (§1 rule 1 — no dead ends, extended to us)."""
     try:
-        result = jira_export.push_ticket(kind, ref, fields, transcript)
+        result = jira_export.push_ticket(kind, ref, fields, transcript, channel=channel, reply_to=reply_to)
     except Exception:
         result = None
     if result:

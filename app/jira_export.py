@@ -37,8 +37,19 @@ def _summary(kind: str, ref: str, fields: dict) -> str:
     return f"[Chatbot] {_TITLE.get(kind, kind.title())} {ref} — {topic}"[:250]
 
 
-def _description(ref: str, fields: dict, transcript: list) -> str:
-    lines = [f"Reference: {ref}", "", "Details:"]
+_REPLY_HOW = {
+    "web": "Website visitor: call back on the number in the details (no chat channel to reply on).",
+    "whatsapp": ("WhatsApp: reply in the agent inbox until {until}; after that WhatsApp only "
+                 "allows the approved template 'case_update' (/admin/cases)."),
+    "messenger": ("Messenger: reply in the Page Inbox until {until}; a person (not the bot) may "
+                  "reply for up to 7 days with the HUMAN_AGENT tag, then only a template."),
+}
+
+
+def _description(ref: str, fields: dict, transcript: list, channel="web", reply_to=None) -> str:
+    until = (reply_to or {}).get("window_open_until", "24 h after the customer's last message")
+    lines = [f"Reference: {ref}", f"Channel: {channel}", "How to reply: " + _REPLY_HOW.get(
+        channel, _REPLY_HOW["web"]).format(until=until), "", "Details:"]
     for k, v in fields.items():
         lines.append(f"- {k}: {v}")
     lines += ["", "Conversation transcript (PII already masked before storage):"]
@@ -47,14 +58,14 @@ def _description(ref: str, fields: dict, transcript: list) -> str:
     return "\n".join(lines)
 
 
-def push_ticket(kind: str, ref: str, fields: dict, transcript: list) -> dict | None:
+def push_ticket(kind: str, ref: str, fields: dict, transcript: list, channel="web", reply_to=None) -> dict | None:
     """Best-effort. Returns {"key","url","mode"} on success, or None if the
     integration is off entirely. A failed real push also returns None."""
     if not config.jira_enabled():
         return None
 
     summary = _summary(kind, ref, fields)
-    description = _description(ref, fields, transcript)
+    description = _description(ref, fields, transcript, channel, reply_to)
     priority = _PRIORITY.get(kind, "Medium")
     labels = _LABELS.get(kind, ["chatbot"])
 

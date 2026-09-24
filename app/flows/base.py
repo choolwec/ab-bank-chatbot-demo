@@ -97,6 +97,24 @@ def store_contact(value: str) -> str:
     return clean_phone(value) if is_valid_zambian_phone(value) else value.strip()
 
 
+def reply_to(session) -> dict:
+    """H1: how staff can reach this customer back, minimised. `sealed` is the
+    ENCRYPTED platform id (never the raw one); `window_open_until` is when
+    free-form replies stop and a template is needed (WhatsApp/Messenger)."""
+    import datetime as dt
+
+    info = {"channel": session.channel, "user_hash": session.user_hash}
+    if session.slots.get("reply_ref"):
+        info["sealed"] = session.slots["reply_ref"]
+    if session.channel in ("whatsapp", "messenger"):
+        from .. import config
+
+        last = session.last_inbound_at or session.last_active
+        until = dt.datetime.fromtimestamp(last + config.CUSTOMER_WINDOW_HOURS * 3600, dt.timezone.utc)
+        info["window_open_until"] = until.isoformat(timespec="seconds")
+    return info
+
+
 USE_HINT = "use_hint"
 SEND_BUTTON = button("send_it", "confirm_yes")
 CHANGE_BUTTON = button("change_something", "confirm_change")
@@ -345,7 +363,7 @@ class FormFlow:
         return audit.create_ticket(
             kind, data, session.transcript,
             channel=session.channel,
-            reply_to={"channel": session.channel, "user_hash": session.user_hash},
+            reply_to=reply_to(session),
         )
 
     def finish(self, session):

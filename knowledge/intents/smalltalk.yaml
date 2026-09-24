@@ -15,6 +15,8 @@
 #   follow_ups: (optional) {generic intent: specific intent} -- after this
 #              answer, a short follow-up ("how much does it cost?") that
 #              matches the generic intent gets the specific one (C9)
+#   answer_by_channel: (optional) {whatsapp|messenger|web: text} -- a channel
+#              variant of the answer, same facts (W9)
 #   on_yes / on_no: (optional) the payload a typed "yes" / "no" means, when
 #              the answer ends in a yes/no question ("anything else?")
 #

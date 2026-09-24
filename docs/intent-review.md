@@ -748,6 +748,15 @@ Customer-facing answer:
 > Or ask me for a callback and our team will phone you within one
 > working day.
 
+On whatsapp this answer reads instead:
+
+> You're already chatting with AB Bank on WhatsApp. You can also reach us on:
+> Contact Centre: {contact_phone}
+> Email: {contact_email}
+> Website: {website_url}
+> Or ask me for a callback and our team will phone you within one
+> working day.
+
 Follow-up buttons: Request a callback · Find a branch · Opening hours
 
 
@@ -894,7 +903,30 @@ Customer-facing answer:
 Follow-up buttons: Contact details · Find a branch · Talk to a person
 
 
-## System messages (110 texts)
+## WhatsApp utility templates (3)
+
+Submitted to Meta under these names; `{{1}}` is the case reference.
+
+### `case_received` (UTILITY)
+
+- Status: **draft**
+
+> Hello, this is AB Bank. We have received your case {{1}}. A member of our team will contact you. You can reply to this message to add anything.
+
+### `case_update` (UTILITY)
+
+- Status: **draft**
+
+> Hello, this is AB Bank about your case {{1}}. Please reply to this message to continue.
+
+### `callback_scheduled` (UTILITY)
+
+- Status: **draft**
+
+> Hello, this is AB Bank. Your callback request {{1}} is booked, and our team will call you within one working day.
+
+
+## System messages (125 texts)
 
 Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts, retries, confirmations. Source: `knowledge/system_messages.yaml`. `{placeholders}` are filled in by the bot (contact details from `app/config.py`, or the values listed).
 
@@ -903,6 +935,12 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Status: **draft**
 
 > Hello! I'm the AB Bank assistant — an automated helper, not a person. I can help with branches and agents, opening an account, eTumba, and loans, or connect you to our team. What can I help with?
+
+### `disclosure`
+
+- Status: **draft**
+
+> I'm the AB Bank assistant — an automated helper, not a person.
 
 ### `resume`
 
@@ -1051,6 +1089,61 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 
 > Here are the other options.
 
+### `media_not_accepted`
+
+- Status: **draft**
+
+> For your safety I can't accept photos or files here — please never send pictures of your card, NRC or statements. Tell me in words what the problem is, or talk to a person.
+
+### `voice_not_supported`
+
+- Status: **draft**
+
+> I can't listen to voice notes yet. Please type your question, or talk to a person.
+
+### `sorry_delay`
+
+- Status: **draft**
+
+> Sorry for the slow reply — we had a delay receiving your messages. What can I help with now?
+
+### `channel_off`
+
+- Status: **draft**
+
+> Our automated assistant is not available on this channel right now. Please call our Contact Centre on {contact_phone} (Monday to Friday 08:00–17:00), or visit any branch. If your card is lost or money was taken without your permission, call {emergency_phone} straight away.
+
+### `window_closed`
+
+- Status: **draft**
+
+> This customer last wrote more than 24 hours ago, so WhatsApp only allows an approved template. Send the case_update template instead.
+
+### `handoff_inbox`
+
+- Status: **draft**
+- Filled in by the bot: `{ref}`
+
+> I've passed our conversation to our team, with everything you've told me so far — a person will reply to you right here. Your reference is {ref}. If your card is lost or money was taken, please also call {emergency_phone} now.
+
+### `comment_private.fraud`
+
+- Status: **draft**
+
+> Hello, this is AB Bank. We saw your comment and want to help privately. If your card is lost or money was taken without your permission, please call {emergency_phone} straight away. You can also reply here to report it — never share your PIN or full card number.
+
+### `comment_private.complaint`
+
+- Status: **draft**
+
+> Hello, this is AB Bank. We saw your comment and we're sorry about your experience. Please reply here and we'll log a formal complaint for you and give you a reference number.
+
+### `comment_public`
+
+- Status: **draft**
+
+> We've sent you a private message so we can help.
+
 ### `pii_warning`
 
 - Status: **draft**
@@ -1116,6 +1209,13 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Filled in by the bot: `{name}`
 
 > Thanks, {name}.
+
+### `use_this_number`
+
+- Status: **draft**
+- Filled in by the bot: `{last3}`
+
+> Or tap below to use the number you're messaging from (ending {last3}).
 
 ### `read_back`
 
@@ -1404,6 +1504,27 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 
 > - {name} — {address}, {city}. Phone: {phone}. Hours: {hours}
 
+### `locator.nearest`
+
+- Status: **draft**
+- Filled in by the bot: `{lines}`
+
+> These branches are closest to where you are:
+> {lines}
+
+### `locator.nearest_line`
+
+- Status: **draft**
+- Filled in by the bot: `{name}`, `{address}`, `{km}`, `{phone}`, `{hours}`
+
+> - {name} (about {km} km) — {address}. Phone: {phone}. Hours: {hours}
+
+### `locator.share_location`
+
+- Status: **draft**
+
+> Share your location and I'll find the branches closest to you, or pick your town below.
+
 ### `locator.not_found`
 
 - Status: **draft**
@@ -1591,4 +1712,10 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Status: **draft**
 
 > Options
+
+### `button.use_this_number`
+
+- Status: **draft**
+
+> Use this number
 

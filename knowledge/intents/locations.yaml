@@ -92,6 +92,15 @@ intents:
       a written note in any branch's suggestion box.
       Or ask me for a callback and our team will phone you within one
       working day.
+    # W9: someone already on WhatsApp shouldn't be told to "WhatsApp us".
+    answer_by_channel:
+      whatsapp: |
+        You're already chatting with AB Bank on WhatsApp. You can also reach us on:
+        Contact Centre: {contact_phone}
+        Email: {contact_email}
+        Website: {website_url}
+        Or ask me for a callback and our team will phone you within one
+        working day.
     buttons:
       - {label: "Request a callback", payload: "human_handoff"}
       - {label: "Find a branch", payload: "branch_locator"}

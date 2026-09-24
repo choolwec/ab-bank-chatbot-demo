@@ -48,6 +48,9 @@ def build_doc() -> str:
                     confirms.append((item["intent"], hit))
                 sections.append("\nCustomer-facing answer:\n")
                 sections.append("> " + answer.replace("\n", "\n> "))
+            for ch, variant in (item.get("answer_by_channel") or {}).items():
+                sections.append(f'\nOn {ch} this answer reads instead:\n')
+                sections.append("> " + str(variant).strip().replace("\n", "\n> "))
             simple = (item.get("answer_simple") or "").strip()
             if simple:
                 sections.append('\nPlainer version (sent for "what do you mean?"):\n')
@@ -59,6 +62,14 @@ def build_doc() -> str:
                 )
             sections.append("")
 
+    templates = yaml.safe_load((config.KNOWLEDGE_DIR / "templates.yaml").read_text(encoding="utf-8"))["templates"]
+    sections.append(f"\n## WhatsApp utility templates ({len(templates)})\n")
+    sections.append("Submitted to Meta under these names; `{{1}}` is the case reference.")
+    for name, tpl in templates.items():
+        sections.append(f"\n### `{name}` ({tpl.get('category', 'UTILITY')})\n")
+        sections.append(f"- Status: **{tpl.get('status', 'draft')}**")
+        sections.append("\n> " + str(tpl["body"]).strip())
+    sections.append("")
     sections.append(f"\n## System messages ({len(MESSAGES)} texts)\n")
     sections.append(
         "Built-in wording that is not an intent answer: welcome, fallbacks, "

@@ -1,0 +1,33 @@
+# ============================================================================
+# WhatsApp utility templates (ticket W7). Outside the customer's 24-hour
+# window WhatsApp only allows a pre-approved template. These are submitted to
+# Meta under the SAME names, and need Legal's approval of the wording (L6).
+#
+# Rules (research §5.1): neutral utility wording so Meta doesn't re-categorise
+# them as marketing; NO links (scammers imitate exactly these messages); always
+# quote the reference the customer already has; never ask for details.
+#   {{1}} is the case reference, filled in when staff send the template.
+# ============================================================================
+
+templates:
+  case_received:
+    status: draft
+    category: UTILITY
+    language: en
+    body: >-
+      Hello, this is AB Bank. We have received your case {{1}}. A member of our
+      team will contact you. You can reply to this message to add anything.
+  case_update:
+    status: draft
+    category: UTILITY
+    language: en
+    body: >-
+      Hello, this is AB Bank about your case {{1}}. Please reply to this message
+      to continue.
+  callback_scheduled:
+    status: draft
+    category: UTILITY
+    language: en
+    body: >-
+      Hello, this is AB Bank. Your callback request {{1}} is booked, and our team
+      will call you within one working day.

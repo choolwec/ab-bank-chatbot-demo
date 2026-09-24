@@ -20,6 +20,10 @@ a hashed recipient, so demos and tests need no Meta account.
 
 Free-form sends outside the customer's 24-h window are refused (W8); staff use
 an approved template instead (W7).
+
+Handoff (H2): with the agent desk (Chatwoot) configured, "Talk to a person"
+puts the conversation on the desk (pass_to_desk) and pauses the bot; agents'
+replies come back through send_free_form(). See app/desk/bridge.py.
 """
 
 import datetime as dt
@@ -237,6 +241,8 @@ class WhatsAppSender:
         for body in render.whatsapp_all(replies):
             ok &= self._post(dict({"messaging_product": "whatsapp", "recipient_type": "individual",
                                    "to": user_key}, **body), user_key)
+        if session is not None and session.slots.get("handoff_requested"):
+            ok &= self.pass_to_desk(user_key, session)
         return ok
 
     def send_free_form(self, user_key: str, replies: list[dict], session) -> bool:
@@ -244,7 +250,17 @@ class WhatsAppSender:
         inside the customer's 24-h window."""
         if not window_open(session):
             raise WindowClosed()
-        return self.send(user_key, replies, session=session)
+        return self.send(user_key, replies)
+
+    def pass_to_desk(self, user_key: str, session) -> bool:
+        """H2: put the conversation on the agent desk (Chatwoot) and pause the
+        bot, like Messenger's pass_to_inbox(). `user_key` only derives the
+        hashed session key an agent's reply comes back to; Chatwoot never sees
+        it."""
+        from ..desk import bridge
+
+        ref = session.slots.pop("handoff_requested", None)
+        return bridge.open_conversation(session, f"{NAME}:{user_hash(f'{NAME}:{user_key}')}", ref)
 
     def send_template(self, user_key: str, name: str, **params) -> bool:
         """W7: an approved utility template, allowed outside the window."""

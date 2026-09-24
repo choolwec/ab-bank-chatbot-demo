@@ -107,7 +107,7 @@ messages:
     text: Our automated assistant is not available on this channel right now. Please call our Contact Centre on {contact_phone} (Monday to Friday 08:00–17:00), or visit any branch. If your card is lost or money was taken without your permission, call {emergency_phone} straight away.
   window_closed:
     status: draft
-    text: This customer last wrote more than 24 hours ago, so WhatsApp only allows an approved template. Send the case_update template instead.
+    text: Not sent. This customer last wrote more than 24 hours ago, so WhatsApp only allows an approved template. Send the case_update template from /admin/cases instead.
 
   handoff_inbox:
     status: draft
@@ -136,6 +136,30 @@ messages:
     status: draft
     fills: [when]
     text: Our team is away right now and will pick this up {when}.
+
+  # Agent desk (H2): STAFF-facing private notes in Chatwoot. Customers never
+  # see these; window_closed above is posted there too. The contact centre
+  # lead reviews the wording.
+  desk.note.handoff:
+    status: draft
+    fills: [channel, ref, jira, until]
+    text: "Handed over by the assistant on {channel}. Case {ref}, Jira {jira}. You can reply here until {until} (Lusaka time); after that WhatsApp only allows the case_update template from /admin/cases. Resolve this conversation when you have finished, and the assistant takes over again. The conversation so far, with personal details masked:"
+  desk.jira_pending:
+    status: draft
+    text: not created yet
+  desk.note.bot_resumed_idle:
+    status: draft
+    fills: [hours]
+    text: No agent reply for {hours} hours, so the assistant is answering this customer again. Reply here to take the conversation back (possible only while the customer's 24-hour window is open).
+  desk.note.send_failed:
+    status: draft
+    text: Not sent. The message could not be delivered to the customer. Try again in a few minutes; if it keeps failing, follow up through the Jira ticket.
+  desk.note.attachment_not_sent:
+    status: draft
+    text: Attachments are not sent to customers from the desk. Please type your reply as text.
+  desk.note.unlinked:
+    status: draft
+    text: Not sent. This conversation is no longer linked to a customer chat (it may be older than the retention period). Follow up through the Jira ticket.
 
   # --- Guards -------------------------------------------------------------------
   pii_warning:

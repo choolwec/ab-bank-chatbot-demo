@@ -237,9 +237,42 @@ def handoff_mode(channel: str) -> str:
     same conversation: the Messenger Page Inbox, or the agent desk, H2).
     Override with HANDOFF_MODE_<CHANNEL>."""
     default = {"messenger": "inbox"}.get(channel, "callback")
-    if channel == "whatsapp" and os.environ.get("CHATWOOT_URL"):
+    if channel == "whatsapp" and chatwoot_enabled():
         default = "inbox"
     return os.environ.get(f"HANDOFF_MODE_{channel.upper()}", default).strip().lower()
+
+
+# --- Agent desk: self-hosted Chatwoot (H2) --------------------------------------
+# An API-channel inbox on a second VM. Secrets come from the environment ONLY.
+# With any of URL / account / inbox / token unset the desk is OFF and nothing
+# changes: WhatsApp's "Talk to a person" stays the callback flow. Messenger
+# keeps the Page Inbox (M4) and the website keeps tickets and callbacks.
+# Without an agent reply for DESK_IDLE_HOURS the bot answers again.
+DESK_IDLE_HOURS = int(os.environ.get("DESK_IDLE_HOURS", "24"))
+# The webhook secret sits in the URL path, so it must be long enough not to guess.
+CHATWOOT_WEBHOOK_SECRET_MIN = 24
+
+
+def chatwoot_settings() -> dict:
+    return {
+        "url": os.environ.get("CHATWOOT_URL", "").strip().rstrip("/"),
+        "account_id": os.environ.get("CHATWOOT_ACCOUNT_ID", "").strip(),
+        "inbox_id": os.environ.get("CHATWOOT_INBOX_ID", "").strip(),
+        "token": os.environ.get("CHATWOOT_API_TOKEN", "").strip(),
+        "webhook_secret": os.environ.get("CHATWOOT_WEBHOOK_SECRET", "").strip(),
+    }
+
+
+def chatwoot_configured() -> bool:
+    s = chatwoot_settings()
+    return bool(s["url"] and s["account_id"] and s["inbox_id"] and s["token"])
+
+
+def chatwoot_enabled() -> bool:
+    """Kill switch (H2) for NEW desk handoffs: CHATWOOT_ENABLED=false sends
+    WhatsApp's "Talk to a person" back to the callback flow at once (e.g.
+    during a Chatwoot outage). Conversations already on the desk carry on."""
+    return chatwoot_configured() and flag("CHATWOOT_ENABLED", True)
 
 
 def channel_enabled(channel: str) -> bool:

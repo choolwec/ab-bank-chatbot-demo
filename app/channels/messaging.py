@@ -5,7 +5,8 @@ P4, research §7.4). The worker calls process() for each inbox row:
      phone number or PSID) and keep a SEALED reply address on it
   2. channel kill switch (P4): one static, approved reply -- never silence
   3. per-user rate limit (P4): every webhook arrives from Meta's IPs
-  4. paused because a person took over (M4/H2): log only, don't reply
+  4. paused because a person took over (M4/H2): log only, don't reply; on
+     the agent desk also forward it to the agent (H2)
   5. stale after a Meta retry (W8): apologise + menu, never silently resume
   6. media (W5): nothing downloaded or stored; a safety reply
   7. a shared location (W6): the nearest branches
@@ -17,6 +18,7 @@ import math
 import time
 
 from .. import audit, config, router
+from ..desk import bridge
 from ..flows.locator import _load as load_branches
 from ..identity import seal, user_hash
 from ..messages import button, msg
@@ -87,11 +89,16 @@ def _respond(session, message, findings, created, now, adapter):
                         channel=session.channel, user_hash=session.user_hash)
         return [], {"action": "rate_limited"}
 
-    # 4. A person has taken over this conversation: log, don't answer.
+    # 4. A person has taken over this conversation: log, don't answer. On the
+    # agent desk (H2) the message is forwarded to the agent too, and with no
+    # agent reply for DESK_IDLE_HOURS the bot answers again.
+    bridge.expire_idle(session, now)
     if session.bot_paused_until > now or message.kind == "standby":
-        router.log_inbound(session, _inbound_text(message))
+        text = _inbound_text(message)
+        router.log_inbound(session, text)
         audit.log_event(session.id, "system", "bot paused: a person has this conversation",
                         action="paused", channel=session.channel, user_hash=session.user_hash)
+        bridge.forward(session, text)
         return [], {"action": "paused"}
 
     adapter.mark_read(message)

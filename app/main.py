@@ -20,6 +20,8 @@ from fastapi.staticfiles import StaticFiles
 from . import admin_cases, audit, config, jira_export
 from .adminauth import require_admin
 from .channels import messenger, web, whatsapp
+from .desk import bridge
+from .desk.links import links as desk_links
 from .ratelimit import client_ip as _client_ip  # noqa: F401  (tests, docs)
 from .ratelimit import ip_limiter
 from .session import store
@@ -34,6 +36,7 @@ async def lifespan(app):
     audit.init_db()
     audit.purge_expired()
     store.purge_expired()  # same retention schedule as the audit log (P1)
+    desk_links.purge(config.TRANSCRIPT_RETENTION_DAYS)  # H2; a no-op with the desk off
     worker.start()  # webhook channels: processes the durable inbox (W2)
     yield
     await worker.stop()
@@ -50,6 +53,7 @@ app.mount("/widget", StaticFiles(directory=WIDGET_DIR), name="widget")
 app.include_router(web.api)
 app.include_router(whatsapp.api)
 app.include_router(messenger.api)
+app.include_router(bridge.api)  # the agent desk's webhook (H2)
 app.include_router(admin_cases.api)
 
 

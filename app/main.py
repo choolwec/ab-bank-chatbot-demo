@@ -23,7 +23,7 @@ from . import health as health_checks
 from . import inbox as inbox_mod
 from .adminauth import require_admin
 from .channels import messenger, web, whatsapp
-from .housekeeping import housekeeper, purge_all
+from .housekeeping import housekeeper, purge_at_startup
 from .desk import bridge
 from .ratelimit import client_ip as _client_ip  # noqa: F401  (tests, docs)
 from .ratelimit import ip_limiter
@@ -38,7 +38,9 @@ _hits = ip_limiter.hits  # the per-IP buckets for /chat (tests clear them)
 @asynccontextmanager
 async def lifespan(app):
     audit.init_db()
-    purge_all()  # audit, sessions and the webhook inbox (R1); then nightly
+    # audit, sessions and the webhook inbox (R1); then nightly. Never blocks
+    # start-up: a locked or corrupt DB is logged and the app still serves.
+    purge_at_startup()
     worker.start()  # webhook channels: processes the durable inbox (W2)
     housekeeper.start()
     yield

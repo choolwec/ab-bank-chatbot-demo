@@ -12,6 +12,10 @@ from ..messages import button, msg
 from .base import CANCEL_BUTTON, HUMAN_BUTTON, MENU_BUTTON
 
 
+# Self-describing button ids (P3): an old "Lusaka" button tapped long after
+# the locator ended still means "branches in Lusaka".
+CITY_PREFIX = "loc_city:"
+
 AGENT_WORDS = frozenset({
     "agent", "agents", "an agent", "etumba agent", "etumba agents", "an etumba agent",
 })
@@ -111,6 +115,8 @@ class LocatorFlow:
             if payload == "loc_branch" or not (text or "").strip():
                 return [self._city_prompt("")], False
         city = (payload or text or "").strip()
+        if city.startswith(CITY_PREFIX):
+            city = city[len(CITY_PREFIX):]
         if not city:
             return [self._city_prompt("")], False
         if " ".join(city.lower().split()) in AGENT_WORDS:
@@ -122,7 +128,7 @@ class LocatorFlow:
     def _city_prompt(self, prefix):
         cities = sorted({b["city"] for b in _load()["branches"]})
         text = (prefix + " " if prefix else "") + msg("locator.city")
-        buttons = [{"label": c, "payload": c} for c in cities] + [CANCEL_BUTTON]
+        buttons = [{"label": c, "payload": CITY_PREFIX + c} for c in cities] + [CANCEL_BUTTON]
         return {"text": text, "buttons": buttons}
 
     def _agents(self):
@@ -149,6 +155,17 @@ class LocatorFlow:
             ],
         }
 
+    def lookup(self, session, city):
+        """A one-off lookup outside the flow (stale city button)."""
+        matches = find_branches(city)
+        if matches:
+            return [self.found_reply(session, matches)]
+        cities = sorted({b["city"] for b in _load()["branches"]})
+        return [{
+            "text": msg("locator.not_found_final", cities=", ".join(cities)),
+            "buttons": [HUMAN_BUTTON, MENU_BUTTON],
+        }]
+
     def _branch_lookup(self, session, city):
         matches = find_branches(city)
         if matches:
@@ -159,7 +176,7 @@ class LocatorFlow:
         if state["misses"] >= 2:
             text = msg("locator.not_found_final", cities=", ".join(cities))
             return [{"text": text, "buttons": [HUMAN_BUTTON, MENU_BUTTON]}], True
-        buttons = [{"label": c, "payload": c} for c in cities] + [
+        buttons = [{"label": c, "payload": CITY_PREFIX + c} for c in cities] + [
             HUMAN_BUTTON,
             CANCEL_BUTTON,
         ]

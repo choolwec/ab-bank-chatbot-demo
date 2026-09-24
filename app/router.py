@@ -13,7 +13,8 @@ from rapidfuzz import fuzz
 from . import audit, config, guards
 from .messages import button, has, msg
 from .flows import FLOWS
-from .flows.locator import branches_mentioned
+from .flows.locator import CITY_PREFIX, branches_mentioned
+from .render import MORE_PAYLOAD
 from .matcher import Matcher
 
 matcher = Matcher()
@@ -392,6 +393,12 @@ def _route(session, text, payload):
         return replies, {"action": f"flow:{flow.name}"}
 
     # 3. Quick-reply payload → direct intent
+    if payload == MORE_PAYLOAD:
+        return _more_options(session)
+    if payload and payload.startswith(CITY_PREFIX):
+        # A city button tapped after the locator ended (WhatsApp keeps old
+        # buttons tappable): look it up anyway rather than a fallback.
+        return FLOWS["locator"].lookup(session, payload[len(CITY_PREFIX):]), {"action": "branch_lookup"}
     if payload:
         intent = matcher.get(payload)
         if intent:
@@ -580,7 +587,11 @@ def _free_text(session, text, urgent_flows=True):
             if score >= config.MEDIUM_CONFIDENCE
         ]
         buttons = [
-            {"label": matcher.get(name).get("label", name), "payload": name}
+            {
+                "label": matcher.get(name).get("label", name),
+                "short_label": matcher.get(name).get("short_label", ""),
+                "payload": name,
+            }
             for name, score in ranked[: config.SUGGESTION_COUNT]
             if score >= config.MEDIUM_CONFIDENCE
         ]
@@ -664,6 +675,21 @@ def _digression(flow, session, text):
     reply = dict(prompt, text=intent["answer"].strip() + "\n\n" + back)
     return [reply], {"action": f"digression:{flow.name}", "intent": intent["intent"],
                      "confidence": round(top_score, 3)}
+
+
+# P3: a list shows at most this many options before "More…" (per channel).
+_SHOWN_BEFORE_MORE = {"whatsapp": 9, "messenger": 12}
+
+
+def _more_options(session):
+    """ "More…" in a WhatsApp list / Messenger quick replies: the options
+    that didn't fit, from the last reply (which "repeat" also uses)."""
+    last = (session.last_replies or [{}])[-1]
+    shown = _SHOWN_BEFORE_MORE.get(session.channel, 0)
+    rest = [dict(b) for b in last.get("buttons", [])[shown:]]
+    if not rest:
+        return [{"text": msg("menu"), "buttons": list(MENU_BUTTONS)}], {"action": "more_options"}
+    return [{"text": msg("more_options"), "buttons": rest}], {"action": "more_options"}
 
 
 def _typed_command(session, text):

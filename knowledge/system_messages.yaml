@@ -82,6 +82,13 @@ messages:
     fills: [flow, prompt]
     text: "Now, back to your {flow} — {prompt}"
 
+  choose_below:
+    status: draft
+    text: Please choose an option below.
+  more_options:
+    status: draft
+    text: Here are the other options.
+
   # --- Guards -------------------------------------------------------------------
   pii_warning:
     status: draft
@@ -309,3 +316,6 @@ messages:
   button.yes_report_it: {status: draft, text: "Yes, report it"}
   button.yes_stop: {status: draft, text: "Yes, stop"}
   button.yes_that_s_right: {status: draft, text: "Yes, that's right"}
+  button.more: {status: draft, text: "More…"}
+  button.choose_an_option: {status: draft, text: "Choose an option"}
+  button.options: {status: draft, text: "Options"}

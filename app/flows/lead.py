@@ -45,8 +45,8 @@ class LeadFlow(FormFlow):
         prompt = super()._prompt(i)
         if self.steps[i] == "time":
             prompt["buttons"] = [
-                button("morning", "Morning"),
-                button("afternoon", "Afternoon"),
+                button("morning", "time:Morning"),
+                button("afternoon", "time:Afternoon"),
                 CANCEL_BUTTON,
             ]
         return prompt

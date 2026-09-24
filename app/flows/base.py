@@ -287,6 +287,8 @@ class FormFlow:
 
         i = state.get("step", 0)
         field = self.steps[i]
+        if payload and payload.startswith(field + ":"):
+            payload = payload[len(field) + 1:]  # self-describing button id (P3)
         ok, value = self._validated(field, (text or payload or "").strip())
         if not ok:
             return self._retry(field)

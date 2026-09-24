@@ -113,7 +113,14 @@ Every channel turns its traffic into `channels.base.InboundMessage` and goes
 through the same unchanged `router.handle()`, so the invariants hold per
 channel by construction. `web.py` is the widget's synchronous `POST /chat`,
 with the per-IP limiter (`app/ratelimit.py`). `whatsapp.py` and
-`messenger.py` are webhook adapters (see their sections). `main.py` is only
+`messenger.py` are webhook adapters (see their sections). `app/render.py` (P3) turns
+replies into native payloads: WhatsApp reply buttons (<=3) or a list
+(4-10, `short_label` as the row title), Messenger quick replies (<=13). It
+may re-shape buttons but never drops "Talk to a person".
+`tests/test_render_limits.py` renders every intent on every channel, so a
+label or body that breaks a platform limit fails CI. Button ids are
+self-describing (`loc_city:Lusaka`, `time:Morning`) because WhatsApp keeps
+old buttons tappable. `main.py` is only
 the app shell: CORS, `/health`, the demo page, admin routes (all behind
 `adminauth.require_admin`), and mounting the channel routers.
 

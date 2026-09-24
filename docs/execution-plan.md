@@ -1412,7 +1412,7 @@ that finishes the ticket.
 | N8 | Code-mixed phrases and multilingual test | 2 | W09 | 1 | N1 | Dev | ☐ |
 | P1 | Persistent session store | 3a | W07 | 3 | — | Dev 2 | ☑ |
 | P2 | Channel interface; move `/chat` | 3a | W10 | 2 | P1 | Dev 2 | ☑ |
-| P3 | Renderer and per-channel limit tests | 3a | W10–11 | 4 | P2, K1 | Dev 2 | ☐ |
+| P3 | Renderer and per-channel limit tests | 3a | W10–11 | 4 | P2, K1 | Dev 2 | ☑ |
 | P4 | Per-channel kill switches, per-user limits | 3a | W11 | 1.5 | P2 | Dev 2 | ☐ |
 | P5 | Fewer message bubbles | 3a | W11 | 1 | — | Dev 2 | ☑ |
 | P6 | Audit channel column and HMAC identities | 3a | W08 | 2 | P1 | Dev 2 | ☑ |

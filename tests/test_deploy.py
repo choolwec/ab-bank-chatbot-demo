@@ -315,6 +315,18 @@ def test_rollback_returns_to_the_previous_release_and_back_again(tmp_path):
 
 
 @needs_bash
+def test_rollback_takes_a_release_name_never_a_path(tmp_path):
+    tree = Tree(tmp_path)
+    tree.run("deploy.sh", "v0.0.2")
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+    (elsewhere / ".abz-release-ok").touch()  # looks tested, but is not under releases/
+    done = tree.run("rollback.sh", "../../elsewhere")
+    assert done.returncode != 0 and "not a release tag" in done.stderr
+    assert tree.link("current") == "v0.0.2"
+
+
+@needs_bash
 @pytest.mark.parametrize("problem, message", [
     ("blank", "blank lines for: WA_APP_SECRET"),
     ("missing", "missing: REPLY_KEY"),

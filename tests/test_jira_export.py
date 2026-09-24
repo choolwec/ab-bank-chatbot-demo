@@ -94,6 +94,31 @@ def test_a_real_jira_push_never_holds_up_the_reply(monkeypatch, isolated_data):
     assert pushed == [ref]
 
 
+def test_the_background_push_sends_the_transcript_as_stored(monkeypatch, isolated_data):
+    """The session keeps growing after the ticket is created (the finish reply
+    is appended next); the Jira issue must carry the ticket's own snapshot."""
+    import threading
+
+    monkeypatch.setattr(config, "jira_enabled", lambda: True)
+    monkeypatch.setattr(config, "jira_configured", lambda: True)
+    release, seen = threading.Event(), []
+
+    def slow_push(kind, ref, fields, transcript, **kwargs):
+        release.wait(5)
+        seen.append((dict(fields), list(transcript)))
+        return None
+
+    monkeypatch.setattr(jira_export, "push_ticket", slow_push)
+    transcript = [{"role": "user", "text": "someone took money"}]
+    fields = {"what_happened": "someone took money"}
+    ref = audit.create_ticket("fraud", fields, transcript)
+    transcript.append({"role": "bot", "text": "later message"})
+    fields["extra"] = "later"
+    release.set()
+    _join_push(ref)
+    assert seen == [({"what_happened": "someone took money"}, [{"role": "user", "text": "someone took money"}])]
+
+
 def test_a_failing_background_push_is_still_harmless(monkeypatch, isolated_data):
     monkeypatch.setattr(config, "jira_enabled", lambda: True)
     monkeypatch.setattr(config, "jira_configured", lambda: True)

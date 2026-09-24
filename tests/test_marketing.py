@@ -84,6 +84,26 @@ def test_consent_can_be_typed(bot, typed, stored):
     assert "shall i send it" in b.text.lower()
 
 
+@pytest.mark.parametrize("typed", [
+    "sure", "ok", "yeah", "Yes please!", "yes please, send them", "sure go ahead", "absolutely",
+    "sounds good", "agreed", "👍", "👍🏾", "inde",
+])
+def test_anything_that_means_yes_is_consent(bot, typed):
+    # D16 (PO, 24/09/2026): any yes is a yes.
+    b = bot()
+    _to_summary(b)
+    b.say(typed)
+    assert b.session.flow_state["data"]["marketing_consent"] == "yes"
+
+
+@pytest.mark.parametrize("typed", ["maybe", "ok but no offers", "yes but not by sms", "not now", "sure, later"])
+def test_a_qualified_yes_is_asked_again_never_stored_as_consent(bot, typed):
+    b = bot()
+    _to_summary(b)
+    b.say(typed)
+    assert b.session.flow_state["data"].get("marketing_consent") != "yes"
+
+
 def test_an_unclear_consent_answer_is_asked_again(bot):
     b = bot()
     _to_summary(b)

@@ -29,19 +29,48 @@ CONSENT = "marketing_consent"
 CONSENT_AT = "marketing_consent_at"
 NOT_ASKED = "not_asked"
 OPT_OUT_SLOT = "marketing_opt_out"
-# Consent needs a clear answer: anything else re-asks with the buttons.
-_CONSENT_YES = frozenset({"i agree", "agree", "i consent", "yes i agree", "yes send them"})
+# D16 (PO, 24/09/2026): any reply that means yes is consent: "sure", "ok",
+# "yes please send them", a thumbs-up. Anything unclear or qualified ("maybe",
+# "ok but no offers") re-asks with the buttons; a no is never read as a yes.
+# [VERIFY: Legal, concern #21, that this meets the ECT Act 2021 opt-in.]
+_CONSENT_YES = frozenset({
+    "i agree", "agree", "agreed", "i consent", "yes i agree", "yes send them", "yes send offers",
+    "send them", "send offers", "send me offers", "i do", "yes i do", "absolutely", "definitely",
+    "alright", "all right", "sounds good", "why not", "go on", "sure thing",
+})
 _CONSENT_NO = frozenset({"i don't agree", "i dont agree", "dont", "don't", "no offers"})
+# A reply that STARTS with one of these, with none of _NOT after it, is a yes:
+# "yes please, that's fine", "sure go ahead". "inde" (Nyanja) and "ee"
+# (Bemba) are yes [VERIFY: the N8 native-speaker check].
+_YES_START = frozenset({
+    "yes", "y", "yeah", "yea", "yep", "yup", "ya", "sure", "ok", "okay", "agreed", "absolutely",
+    "definitely", "true", "ehe", "eya", "inde", "ee",
+})
+_NOT = frozenset({
+    "no", "not", "don't", "dont", "never", "stop", "but", "nope", "without", "unsubscribe", "maybe",
+    "later", "nothing",
+})
+_THUMBS = frozenset("👍👌✅✔☑")
+_EMOJI_MODIFIERS = frozenset("\ufe0f\U0001f3fb\U0001f3fc\U0001f3fd\U0001f3fe\U0001f3ff")  # skin tones
 
 
 def consent_answer(text):
-    """True / False for a clear yes or no to the consent question, else None."""
+    """True / False for a yes or no to the consent question, else None."""
+    chars = set("".join((text or "").split()))
+    if chars & _THUMBS and chars <= _THUMBS | _EMOJI_MODIFIERS:  # a thumbs-up alone
+        return True
     t = guards.normalise(text)
     if t in _CONSENT_YES:
         return True
     if t in _CONSENT_NO:
         return False
-    return guards.yes_no(text)
+    answer = guards.yes_no(text)
+    if answer is not None:
+        return answer
+    words = t.split()
+    if words and words[0] in _YES_START and not _NOT & set(words[1:]):
+        return True
+    return None
 
 
 def _now_iso():

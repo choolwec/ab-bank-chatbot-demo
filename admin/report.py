@@ -29,6 +29,7 @@ from pathlib import Path
 
 from admin.export_utterances import looks_personal
 from app import audit, config
+from app.flows.lead import NOT_ASKED, consent_answer
 
 CHANNELS = ("web", "whatsapp", "messenger")
 MESSAGING = ("whatsapp", "messenger")
@@ -496,14 +497,20 @@ def topic_group(text: str) -> str:
     return TOPIC_GROUPS.get(matcher.get(top).get("category"), OTHER_TOPIC)
 
 
-# The only values the callback flow writes (flows/lead.py). Anything else,
-# True or "true" included, is not a recorded consent and counts as unknown.
-CONSENT_VALUES = {"yes": "yes", "no": "no", "not_asked": "not asked"}
+CONSENT_ROWS = ("yes", "no", "not asked")
 
 
 def _consent(fields: dict) -> str:
+    """D16: anything that means yes counts as consent, read the same way as
+    the callback flow reads the customer's reply (lead.consent_answer)."""
     value = fields.get("marketing_consent")
-    return CONSENT_VALUES.get(value, "unknown") if isinstance(value, str) else "unknown"
+    if isinstance(value, bool):
+        return "yes" if value else "no"
+    if not isinstance(value, str):
+        return "unknown"
+    if value == NOT_ASKED:
+        return "not asked"
+    return {True: "yes", False: "no"}.get(consent_answer(value), "unknown")
 
 
 def _clean_value(value) -> str | None:
@@ -560,7 +567,7 @@ def _lead_lines(tickets, channels) -> list[str]:
         return out + ["Not recorded on any callback in this window."]
     consent = collections.Counter(_consent(fields) for _, fields in callbacks)
     out += _table(["Consent", "Callbacks"],
-                  [[k, str(consent[k])] for k in (*CONSENT_VALUES.values(), "unknown")])
+                  [[k, str(consent[k])] for k in (*CONSENT_ROWS, "unknown")])
     out.append(f"\nShare of callbacks with marketing consent: "
                f"{_fmt(_ratio(consent['yes'], len(callbacks)), 'pct')} (yes ÷ all callbacks).")
     return out

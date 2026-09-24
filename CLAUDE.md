@@ -284,9 +284,12 @@ you" while collecting no way to reach the customer.
 leaves it out when the flag is off or the customer opted out this session:
 a skipped field is not asked, summarised or offered under "Change
 something", and `resume()` moves past a step that stops applying midway.
-Consent needs a clear answer (the buttons, a typed yes/no or a small set
-like "I agree"); anything else re-asks with the buttons, and it is never
-changed through the C6 correction path. The ticket always carries
+Any reply that means yes is consent (D16, `lead.consent_answer`): the
+buttons, "sure", "ok", "yes please send them", a thumbs-up, "inde". A reply
+that is unclear or qualified ("maybe", "ok but no offers": a yes followed by
+no/not/but/later...) re-asks with the buttons, a no is never a yes, and
+consent is never changed through the C6 correction path. The weekly report
+reads stored values with the same function. The ticket always carries
 `marketing_consent` (`yes`/`no` with `marketing_consent_at`, or
 `not_asked`) and `source`; Jira adds the label `marketing-consent` on yes
 only. An opt-out during a callback turns that callback's consent to `no`.

@@ -352,12 +352,18 @@ def test_lead_section(seeded):
     assert "Share of callbacks with marketing consent: 25.0%" in consent
 
 
-@pytest.mark.parametrize("value", [True, "true", "True", "YES", " yes", 1, "agree"])
-def test_consent_counts_only_the_values_the_flow_writes(value):
-    # Concern #12: a loose value is not a recorded consent.
-    assert report._consent({"marketing_consent": value}) == "unknown"
-    assert report._consent({"marketing_consent": "yes"}) == "yes"
-    assert report._consent({"marketing_consent": "not_asked"}) == "not asked"
+@pytest.mark.parametrize("value", [True, "true", "yes", "YES", " yes", "sure", "ok", "yes please", "👍"])
+def test_anything_that_means_yes_counts_as_consent(value):
+    # D16: the report reads a stored value the way the flow reads a reply.
+    assert report._consent({"marketing_consent": value}) == "yes"
+
+
+@pytest.mark.parametrize("value, expected", [
+    (False, "no"), ("no", "no"), ("not_asked", "not asked"), ("maybe", "unknown"),
+    ("ok but no offers", "unknown"), (1, "unknown"), (None, "unknown"),
+])
+def test_everything_else_is_counted_as_it_reads(value, expected):
+    assert report._consent({"marketing_consent": value}) == expected
 
 
 def test_lead_section_without_source_or_consent_fields(isolated_data):

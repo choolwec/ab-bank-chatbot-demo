@@ -53,19 +53,25 @@ def user_hash(key: str) -> str:
 # including later (an agent's reply, a case_update template). It is stored
 # only ENCRYPTED ("sealed"), never in the audit log. REPLY_KEY is a Fernet key
 # from the environment in production; otherwise one is generated into data/.
+#
+# P7: REPLY_KEY may hold several keys, comma-separated. The FIRST seals; every
+# one unseals (MultiFernet), so the key can be rotated without losing a stored
+# value: put the new key first, restart, run `python -m admin.rotate_reply_key`
+# to re-seal what is stored, then drop the old key (runbook-production.md).
 _REPLY_KEY_FILE = "reply_key"
-_fernet = None
+_file_keys: str | None = None
+_ciphers = None  # (key source, MultiFernet, primary Fernet)
 
 
-def _cipher():
-    global _fernet
-    from cryptography.fernet import Fernet
-
+def _key_source() -> str:
+    global _file_keys
     env = os.environ.get("REPLY_KEY")
     if env:
-        return Fernet(env.encode())
+        return env
+    from cryptography.fernet import Fernet
+
     with _lock:
-        if _fernet is None:
+        if _file_keys is None:
             path = config.DATA_DIR / _REPLY_KEY_FILE
             if not path.exists():
                 path.write_bytes(Fernet.generate_key())
@@ -73,8 +79,34 @@ def _cipher():
                     os.chmod(path, 0o600)
                 except OSError:
                     pass
-            _fernet = Fernet(path.read_bytes().strip())
-        return _fernet
+            _file_keys = path.read_text(encoding="utf-8")
+        return _file_keys
+
+
+def reply_keys(source: str | None = None) -> list[bytes]:
+    """The configured keys, primary first (commas or newlines separate them)."""
+    source = _key_source() if source is None else source
+    return [k.strip().encode() for k in source.replace("\n", ",").split(",") if k.strip()]
+
+
+def _cipher_pair():
+    global _ciphers
+    from cryptography.fernet import Fernet, MultiFernet
+
+    source = _key_source()
+    cached = _ciphers
+    if cached is None or cached[0] != source:
+        keys = reply_keys(source)
+        if not keys:
+            raise ValueError("REPLY_KEY is set but holds no key")
+        fernets = [Fernet(k) for k in keys]
+        cached = (source, MultiFernet(fernets), fernets[0])
+        _ciphers = cached
+    return cached[1], cached[2]
+
+
+def _cipher():
+    return _cipher_pair()[0]
 
 
 def seal(value: str) -> str:
@@ -83,3 +115,19 @@ def seal(value: str) -> str:
 
 def unseal(token: str) -> str:
     return _cipher().decrypt(token.encode()).decode()
+
+
+def reseal(token: str) -> str:
+    """The same value, sealed again with the primary key (rotation). Raises
+    cryptography.fernet.InvalidToken if no configured key opens it."""
+    return _cipher().rotate(token.encode()).decode()
+
+
+def sealed_with_primary(token: str) -> bool:
+    from cryptography.fernet import InvalidToken
+
+    try:
+        _cipher_pair()[1].decrypt(token.encode())
+    except (InvalidToken, ValueError, TypeError):
+        return False
+    return True

@@ -61,3 +61,52 @@ def test_preview_renders_without_crashing_when_empty(monkeypatch, tmp_path):
     html = jira_export.render_jira_preview()
     assert "Jira" in html
     assert "No tickets yet" in html
+
+
+def _join_push(ref):
+    import threading
+
+    for thread in threading.enumerate():
+        if thread.name == f"jira-push-{ref}":
+            thread.join(5)
+
+
+def test_a_real_jira_push_never_holds_up_the_reply(monkeypatch, isolated_data):
+    """P9: with real credentials the push runs beside the reply, not in it."""
+    import threading
+    import time
+
+    monkeypatch.setattr(config, "jira_enabled", lambda: True)
+    monkeypatch.setattr(config, "jira_configured", lambda: True)
+    release, pushed = threading.Event(), []
+
+    def slow_push(kind, ref, *args, **kwargs):
+        release.wait(5)
+        pushed.append(ref)
+        return {"key": "CC-9", "url": None, "mode": "real"}
+
+    monkeypatch.setattr(jira_export, "push_ticket", slow_push)
+    start = time.perf_counter()
+    ref = audit.create_ticket("callback", {"name": "Test"}, [])
+    assert time.perf_counter() - start < 1 and pushed == []
+    release.set()
+    _join_push(ref)
+    assert pushed == [ref]
+
+
+def test_a_failing_background_push_is_still_harmless(monkeypatch, isolated_data):
+    monkeypatch.setattr(config, "jira_enabled", lambda: True)
+    monkeypatch.setattr(config, "jira_configured", lambda: True)
+    monkeypatch.setattr(
+        jira_export, "push_ticket", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("boom"))
+    )
+    ref = audit.create_ticket("fraud", {"what_happened": "x"}, [])
+    _join_push(ref)
+    assert ref.startswith("FRD-")
+
+
+def test_mock_mode_still_writes_before_the_reply(monkeypatch, isolated_data):
+    monkeypatch.setattr(config, "jira_enabled", lambda: True)
+    monkeypatch.setattr(config, "jira_configured", lambda: False)
+    ref = audit.create_ticket("callback", {"name": "Test"}, [])
+    assert jira_export.read_mock_issues()[0]["ref"] == ref

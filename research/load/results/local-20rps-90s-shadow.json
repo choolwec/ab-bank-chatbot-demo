@@ -1,0 +1,117 @@
+{
+  "config": {
+    "rate": 20.0,
+    "minutes": 1.5,
+    "seed": 7,
+    "fake_latency_ms": 0,
+    "shadow": true,
+    "target": "spawned uvicorn, one worker"
+  },
+  "achieved_rate": 20.0,
+  "client": {
+    "chat": {
+      "count": 1270,
+      "p50_ms": 9.0,
+      "p95_ms": 29.3,
+      "p99_ms": 37.3,
+      "max_ms": 563.2
+    },
+    "webhook": {
+      "count": 530,
+      "p50_ms": 4.4,
+      "p95_ms": 7.0,
+      "p99_ms": 27.4,
+      "max_ms": 237.7
+    }
+  },
+  "status": {
+    "chat:200": 1270,
+    "webhook:200": 530
+  },
+  "errors": {},
+  "flows": {
+    "callback:started": 64,
+    "callback:ticket": 63,
+    "faq:started": 162,
+    "fraud:started": 45,
+    "fraud:ticket": 45
+  },
+  "wa_sent": {
+    "wa:location": 31,
+    "wa:text": 317,
+    "wa:status": 56,
+    "wa:list_reply": 50,
+    "wa:button_reply": 56,
+    "wa:image": 20
+  },
+  "server": {
+    "/admin": {
+      "count": 20,
+      "window": 20,
+      "p50_ms": 1.8,
+      "p95_ms": 2.8,
+      "p99_ms": 2.9,
+      "max_ms": 2.9
+    },
+    "/chat": {
+      "count": 1270,
+      "window": 1270,
+      "p50_ms": 6.6,
+      "p95_ms": 26.6,
+      "p99_ms": 32.4,
+      "max_ms": 560.7
+    },
+    "/webhooks/whatsapp": {
+      "count": 530,
+      "window": 530,
+      "p50_ms": 2.1,
+      "p95_ms": 4.5,
+      "p99_ms": 14.2,
+      "max_ms": 217.4
+    },
+    "worker:whatsapp": {
+      "count": 474,
+      "window": 474,
+      "p50_ms": 20.6,
+      "p95_ms": 29.7,
+      "p99_ms": 53.7,
+      "max_ms": 790.5
+    }
+  },
+  "inbox_final": {
+    "oldest_pending_age_s": 0.0,
+    "counts": {
+      "done": 474
+    }
+  },
+  "process_final": {
+    "rss_mb": 344.8,
+    "session_locks": 448,
+    "rate_limit_buckets": 178
+  },
+  "queue_age_max_s": 0.014,
+  "queue_depth_max": 1,
+  "drain_seconds": 0.0,
+  "rss_series": [
+    [
+      0.0,
+      149.4,
+      0
+    ],
+    [
+      30.0,
+      343.7,
+      196
+    ],
+    [
+      60.1,
+      344.3,
+      332
+    ]
+  ],
+  "rss_first_last_mb": [
+    149.4,
+    344.3
+  ],
+  "rss_trend_mb_per_min_after_warmup": null
+}

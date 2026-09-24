@@ -10,8 +10,10 @@ sessions.
 
 import asyncio
 import logging
+import time
 
 from .inbox import inbox
+from .timing import timings
 
 log = logging.getLogger("abz.worker")
 
@@ -25,7 +27,11 @@ def adapters():
 def dispatch(message, findings):
     from .channels import messaging
 
-    messaging.process(message, findings, adapters()[message.channel])
+    start = time.perf_counter()
+    try:
+        messaging.process(message, findings, adapters()[message.channel])
+    finally:  # P9: per-message processing time, read at /admin/timing
+        timings.record(f"worker:{message.channel}", (time.perf_counter() - start) * 1000)
 
 
 def process_now() -> int:

@@ -20,11 +20,14 @@ from fastapi.staticfiles import StaticFiles
 
 from . import admin_cases, audit, config, jira_export, metrics
 from . import health as health_checks
+from . import inbox as inbox_mod
 from .adminauth import require_admin
 from .channels import messenger, web, whatsapp
 from .housekeeping import housekeeper, purge_all
 from .ratelimit import client_ip as _client_ip  # noqa: F401  (tests, docs)
 from .ratelimit import ip_limiter
+from .session import store
+from .timing import TimingMiddleware, rss_mb, timings
 from .worker import worker
 
 WIDGET_DIR = config.BASE_DIR / "widget"
@@ -50,6 +53,7 @@ app.add_middleware(
     allow_headers=["Content-Type"],
 )
 app.add_middleware(metrics.WebhookStatusMiddleware)  # /health counts (R1)
+app.add_middleware(TimingMiddleware)  # P9: server-side latency, /admin/timing
 app.mount("/widget", StaticFiles(directory=WIDGET_DIR), name="widget")
 app.include_router(web.api)
 app.include_router(whatsapp.api)
@@ -91,3 +95,30 @@ def jira_preview():
     for why this exists and jira_export.py for the mock/real split. It shows
     names, phone numbers and transcripts, hence require_admin."""
     return jira_export.render_jira_preview()
+
+
+@app.get("/admin/timing", dependencies=[Depends(require_admin)])
+def admin_timing():
+    """P9: the server's own latency per route group and per worker message,
+    the inbox queue, and memory -- what the load and soak test records."""
+    from .ratelimit import ip_limiter, user_limiter
+
+    return {
+        "since": timings.since,
+        "timings": timings.summary(),
+        "inbox": {
+            "oldest_pending_age_s": round(inbox_mod.inbox.oldest_pending_age(), 3),
+            "counts": inbox_mod.inbox.counts(),
+        },
+        "process": {
+            "rss_mb": rss_mb(),
+            "session_locks": len(store._locks),
+            "rate_limit_buckets": len(ip_limiter.hits) + len(user_limiter.hits),
+        },
+    }
+
+
+@app.post("/admin/timing/reset", dependencies=[Depends(require_admin)])
+def admin_timing_reset():
+    timings.reset()
+    return {"reset": True}

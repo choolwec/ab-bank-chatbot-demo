@@ -22,15 +22,20 @@
 #               the BANKING77 TRAIN split: 0.746 there, so no overfit gap);
 #               false fraud triggers on our own data unchanged.
 #   2026-09-24  vishing / account-takeover rules (N7 work): 0.749 -> 0.754
+#   2026-09-24  hybrid switch-over prep (negated clauses dropped; 300 new
+#               intent phrases and 34 out_of_scope phrases, none taken from
+#               tests/eval/): right_direct 0.527 -> 0.670, oos_direct 0.100 ->
+#               0.067, one_tap 0.923 -> 0.945, oos_large_direct 0.155 -> 0.138,
+#               b77_right_direct 0.053 -> 0.078, all tightened; the rest equal.
 gates:
-  right_direct_min: 0.527
+  right_direct_min: 0.670
   wrong_direct_max: 0.044
-  oos_direct_max: 0.100
-  one_tap_min: 0.923
+  oos_direct_max: 0.067
+  one_tap_min: 0.945
   # N2: the >= 300 out-of-scope set (tests/eval/oos.yaml)
-  oos_large_direct_max: 0.155
+  oos_large_direct_max: 0.138
   # N1: BANKING77 (CC BY 4.0) mapped onto our intents (tests/eval/banking77.yaml)
-  b77_right_direct_min: 0.053
+  b77_right_direct_min: 0.078
   b77_wrong_direct_max: 0.008
   b77_oos_direct_max: 0.003
   # the share of BANKING77 fraud / lost-card reports the S1 scan routes

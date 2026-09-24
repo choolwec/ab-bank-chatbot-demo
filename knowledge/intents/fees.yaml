@@ -11,6 +11,9 @@ intents:
       - "tamanga charges"
       - "how much does tamanga cost"
       - "tamanga account maintenance fee"
+      - "tamanga fee"
+      - "monthly charge on tamanga"
+      - "how much is the tamanga account"
     answer: |
       The Tamanga account's monthly maintenance fee is ZMW 36. Opening
       the account is free, cash and cheque deposits are free, and
@@ -40,6 +43,13 @@ intents:
       - "tariff guide"
       - "how much does it cost"
       - "ledger fees"
+      - "atm withdrawal charges"
+      - "how much do you charge"
+      - "bank fees"
+      - "what are the charges"
+      - "cash withdrawal fee"
+      - "transfer charges"
+      - "service fees"
     answer: |
       Monthly maintenance fees: Tamanga ZMW 36, Tamanga Plus ZMW 135,
       Mukula Plus (business) ZMW 200. Cash deposits and withdrawals are

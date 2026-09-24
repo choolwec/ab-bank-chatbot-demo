@@ -141,3 +141,62 @@ def test_other_organisations_services_get_the_out_of_scope_answer(query):
     """N6: hard lookalikes get "that's not something I can help with"."""
     ranked = matcher.match(query)
     assert ranked[0][0] == "out_of_scope", (query, ranked[:3])
+
+
+# --- Negation (hybrid switch-over prep, 2026-09-24) -----------------------------
+
+
+@pytest.mark.parametrize(
+    "text,kept",
+    [
+        ("I don't want a loan, I want to open an account", "I want to open an account"),
+        ("I want to open an account instead of a loan", "I want to open an account"),
+        ("i dont need a new card but where is the kitwe branch", "where is the kitwe branch"),
+        ("no, i want a business loan", "i want a business loan"),
+        ("im not interested in etumba, tell me about tamanga", "tell me about tamanga"),
+        ("I don't want a loan and I want to open an account", "I want to open an account"),
+        ("not a savings account, a current account please", "a current account please"),
+    ],
+)
+def test_negated_clause_is_dropped_before_scoring(text, kept):
+    from app.matcher import drop_negated_clauses
+
+    assert drop_negated_clauses(text) == kept
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "my card is not working, what do i do",   # a problem report, not a negated request
+        "i don't have an nrc",                     # one clause: nothing to fall back on
+        "i dont want a loan",                      # everything negated: score as it is
+        "i don't want it, cancel",                 # what is left is under 3 words
+        "i need a loan but i don't have collateral",
+        "why don't you want to give me a loan, my business is good",
+        # past tense describes what happened: the topic must stay
+        "i didn't want insurance but they charged me, how do i cancel it",
+        "I didn't mean to send money to the wrong number, how do I reverse it",
+        "i did not need this debit order, please reverse it",
+        # "not sure" is a question, not a ruled-out topic
+        "not sure which account to open, can you help me choose",
+    ],
+)
+def test_text_without_a_droppable_negated_clause_is_unchanged(text):
+    from app.matcher import drop_negated_clauses
+
+    assert drop_negated_clauses(text) == text
+
+
+def test_negated_topic_no_longer_steers_the_character_matcher():
+    ranked = matcher.match("I don't want a loan, I want to open an account")
+    assert ranked[0] == ("account_opening_how", 1.0)
+    ranked = matcher.match("not a business loan, i need a personal loan")
+    assert ranked[0][0] == "personal_loan", ranked[:3]
+
+
+def test_negated_and_clause_is_one_question_not_two(bot):
+    b = bot()
+    b.say("I don't want a loan and I want to open an account")
+    assert b.action == "answer"
+    assert b.last[1]["intent"] == "account_opening_how"
+    assert "intents" not in b.last[1]  # not a C10 double answer with the loan

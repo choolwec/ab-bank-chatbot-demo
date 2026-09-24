@@ -15,6 +15,11 @@ intents:
       - "what is e-tumba"
       - "explain etumba"
       - "etumba meaning"
+      - "what is etumba all about"
+      - "is etumba mobile money"
+      - "ab bank mobile money"
+      - "what can i do with etumba"
+      - "tell me about the etumba wallet"
     answer: |
       eTumba is AB Bank Zambia's mobile wallet. It lets you send and
       receive money, buy airtime on MTN, Airtel and Zamtel, pay ZESCO and
@@ -51,6 +56,11 @@ intents:
       - "how to get etumba wallet"
       - "open etumba account"
       - "etumba sign up"
+      - "how to register etumba"
+      - "register on etumba"
+      - "create etumba account"
+      - "download etumba app"
+      - "can i register etumba without a bank account"
     answer: |
       Two ways to register: download the eTumba app from the Google Play
       Store or App Store, or dial {ussd_code} and follow the prompts.
@@ -80,6 +90,10 @@ intents:
       - "etumba menu"
       - "how to check etumba balance"
       - "send money on etumba"
+      - "ussd code for etumba"
+      - "star 888"
+      - "etumba shortcode"
+      - "how to use etumba without internet"
     answer: |
       Dial {ussd_code} on your phone to open the eTumba menu. From there
       you can register, check your balance, send money, buy airtime, pay
@@ -114,6 +128,12 @@ intents:
       - "etumba tariffs"
       - "what does etumba charge"
       - "etumba transaction fees"
+      - "etumba transfer charges"
+      - "how much to send money on etumba"
+      - "etumba levy"
+      - "mobile money levy"
+      - "etumba cost"
+      - "etumba withdrawal fee"
     answer: |
       A mobile levy applies to wallet-to-wallet transfers and
       wallet-to-other-AB-Bank-account transfers — this is Zambia's
@@ -143,6 +163,11 @@ intents:
       - "cardless withdrawal"
       - "deposit cash at kazang"
       - "withdraw cash at agent"
+      - "how do i deposit money on etumba"
+      - "how to withdraw from etumba"
+      - "load money on etumba"
+      - "atm withdrawal without a card"
+      - "withdraw etumba money at the bank"
     answer: |
       Deposit or withdraw at any AB Bank branch, at Kazang / 543 Konse
       Konse / Zoona agents, or (withdraw only) cardless at supporting
@@ -172,6 +197,11 @@ intents:
       - "send etumba balance to my account"
       - "pull funds"
       - "push funds"
+      - "move money from etumba to bank"
+      - "transfer money from my account to etumba"
+      - "send money from bank to wallet"
+      - "pull from ab bank account"
+      - "move funds from etumba to my tamanga account"
     answer: |
       Pull funds (bank → eTumba): dial {ussd_code} → option 2 (Get money)
       → option 1 (Pull from AB Bank account) → enter amount → confirm →
@@ -203,6 +233,12 @@ intents:
       - "how do i send etumba to mobile money"
       - "receive money from airtel money"
       - "transfer between etumba and mobile money"
+      - "send money to airtel money"
+      - "etumba to mtn"
+      - "etumba to airtel"
+      - "send to zamtel money"
+      - "receive money from mtn into etumba"
+      - "mobile money to etumba"
     answer: |
       eTumba → Airtel Money: dial {ussd_code} → 1 (Send money) → 3 (send
       to mobile money) → 2 (Airtel Money) → enter number, amount, and a
@@ -234,6 +270,11 @@ intents:
       - "yaka savings account"
       - "save with etumba"
       - "yaka pa tumba"
+      - "yaka account"
+      - "how does yaka work"
+      - "open yaka"
+      - "yaka interest"
+      - "savings on etumba"
     answer: |
       Yaka is a savings pocket inside eTumba — move funds between your
       eTumba main balance and Yaka Savings, earning 5% interest per annum,
@@ -261,6 +302,11 @@ intents:
       - "lost my zesco token"
       - "view my zesco transaction"
       - "zesco token etumba"
+      - "zesco units token"
+      - "i paid zesco but no token"
+      - "token not received"
+      - "i bought units but did not get the token"
+      - "resend zesco token"
     answer: |
       Via USSD: dial {ussd_code} → select 8 → View Accounts/Transactions
       (1) → View eTumba transactions (2) → Outgoing Transactions → enter
@@ -287,6 +333,11 @@ intents:
       - "cancel pending etumba transaction"
       - "reversal of etumba payment"
       - "recall etumba money"
+      - "i sent money to a wrong number"
+      - "wrong transfer on etumba"
+      - "how do i reverse money sent by mistake"
+      - "i made a mistake sending money"
+      - "money sent to the wrong number"
     answer: |
       If the money was sent to a number that isn't registered on eTumba:
       dial {ussd_code} → 1 (send money) → 5 (view pending) → select 3,
@@ -314,6 +365,9 @@ intents:
       - "balance enquiry etumba"
       - "check my wallet balance"
       - "how much money do i have on etumba"
+      - "etumba bal"
+      - "check my etumba bal"
+      - "balance inquiry"
     answer: |
       Check your own balance directly on your phone — dial {ussd_code} and
       follow the balance-enquiry option, or open the eTumba app. For your

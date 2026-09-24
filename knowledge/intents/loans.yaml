@@ -16,6 +16,14 @@ intents:
       - "borrow money for business"
       - "do you give business loans"
       - "capital for my business"
+      - "loan for my small business"
+      - "sme loans"
+      - "micro loan for business"
+      - "loan to grow my business"
+      - "business loan interest rate"
+      - "how much can i borrow for my business"
+      - "loan to buy stock for my shop"
+      - "small business loan"
     answer: |
       Business (Micro & SME) loans are available if your business:
       - Has been operating for at least 12 months
@@ -55,6 +63,13 @@ intents:
       - "loan for seeds"
       - "do you have loans for farmers"
       - "livestock loan"
+      - "loan for farmers"
+      - "farm loan"
+      - "agricultural loan"
+      - "loan to buy fertilizer"
+      - "loan for my poultry"
+      - "loan for crops"
+      - "loan for cattle"
     answer: |
       We don't have a separate agriculture-specific loan product — a
       farming business applies under our general Business (Micro & SME)
@@ -86,6 +101,13 @@ intents:
       - "personal loan requirements"
       - "loan for public service worker"
       - "government worker loan"
+      - "loan for civil servants"
+      - "i am a teacher can i get a loan"
+      - "government employee loan"
+      - "payslip loan"
+      - "loan against my salary"
+      - "personal loans"
+      - "personal loan without collateral"
     answer: |
       Personal loans are available to government employees only:
       - Amount: ZMW 1,000 - ZMW 500,000
@@ -116,6 +138,11 @@ intents:
       - "does ab bank offer overdrafts"
       - "overdraft collateral"
       - "overdraft on my business account"
+      - "overdraft"
+      - "overdraft facility"
+      - "can i get an overdraft"
+      - "overdraft for my company"
+      - "overdraft limit"
     answer: |
       SME overdraft requirements:
       - Valid business registration and operating licences
@@ -147,6 +174,12 @@ intents:
       - "loan qualification"
       - "who qualifies for a loan"
       - "can i get a loan without collateral"
+      - "requirements for a business loan"
+      - "loan documents"
+      - "what are the loan requirements"
+      - "how do i qualify for a loan"
+      - "am i eligible for a loan"
+      - "loan eligibility"
     answer: |
       For a business loan you'll typically need:
       - Age 21-65, valid & original ID (NRC, Driving Licence, or Passport)
@@ -179,6 +212,10 @@ intents:
       - "what does a guarantor do"
       - "explain guarantor"
       - "guarantor meaning"
+      - "who is a guarantor"
+      - "guarantor"
+      - "can my wife be my guarantor"
+      - "what is guarantor"
     answer: |
       A guarantor gives a guarantee for loan repayment. They must be
       either in formal employment or have a running business of their own.
@@ -203,6 +240,9 @@ intents:
       - "collateral assessment"
       - "explain collateral"
       - "collateral meaning"
+      - "collateral"
+      - "can i use land as collateral"
+      - "can i use household goods as collateral"
     answer: |
       Collateral can include household goods, fixed assets, and/or a
       mortgage (building, land, or motor vehicle). It's assessed at your
@@ -230,6 +270,14 @@ intents:
       - "how can i borrow money"
       - "i need a loan"
       - "how long does a loan take"
+      - "how to apply for a loan"
+      - "i want to borrow money"
+      - "how can i get a loan"
+      - "loan process"
+      - "steps to get a loan"
+      - "i would like a loan"
+      - "ndifuna loan"
+      - "ndefwaya loan"
     answer: |
       Applying is straightforward:
       1. Visit your nearest branch, or request a callback and we'll contact you

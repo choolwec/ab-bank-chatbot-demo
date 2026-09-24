@@ -12,7 +12,7 @@ from rapidfuzz import fuzz
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from . import config
+from . import config, guards
 
 
 # Punctuation carries no meaning for matching but costs score: "what are your
@@ -22,6 +22,32 @@ _PUNCT_RE = re.compile(r"[^\w\s']+")
 
 def normalise(text: str) -> str:
     return " ".join(_PUNCT_RE.sub(" ", (text or "").lower()).split())
+
+
+# C10's clause splitter (router._two_questions uses it too).
+CLAUSE_SPLIT_RE = re.compile(r"\?|\band\b|\balso\b", re.IGNORECASE)
+CLAUSE_MIN_WORDS = 3
+# For negation, commas and "but" end a clause as well, and "instead of X" /
+# "rather than X" mean "not X".
+_NEG_SPLIT_RE = re.compile(CLAUSE_SPLIT_RE.pattern + r"|[,;.!]|\bbut\b", re.IGNORECASE)
+_NOT_MARKER_RE = re.compile(r"\b(?:instead\s+of|rather\s+than)\b", re.IGNORECASE)
+
+
+def drop_negated_clauses(text: str) -> str:
+    """ "I don't want a loan, I want to open an account" -> "I want to open an
+    account". A clause matching guards.NEGATED_REQUEST_RE is dropped, but only
+    when what is left still has CLAUSE_MIN_WORDS words; otherwise (a single
+    clause, or everything negated) the text is scored unchanged. Deterministic,
+    and applied in both matcher modes: the embedding reads the negated clause
+    as a second topic, and the character scorer as extra matching words."""
+    marked = _NOT_MARKER_RE.sub(", not", text or "")
+    clauses = [c.strip() for c in _NEG_SPLIT_RE.split(marked) if c and c.strip()]
+    if len(clauses) < 2:
+        return text
+    kept = [c for c in clauses if not guards.NEGATED_REQUEST_RE.search(c)]
+    if len(kept) == len(clauses) or len(" ".join(kept).split()) < CLAUSE_MIN_WORDS:
+        return text
+    return " ".join(kept)
 
 
 def calibrated(emb: float) -> float:
@@ -149,13 +175,13 @@ class Matcher:
 
     def detail(self, text: str) -> dict:
         """Both scorers for every intent (shadow mode, N4; calibration, N5)."""
-        q = normalise(text)
+        q = normalise(drop_negated_clauses(text))
         if not q:
             return {"char": {}, "emb": {}}
         return {"char": self._char_scores(q), "emb": self._emb_scores(q) if self.mode == "hybrid" else {}}
 
     def match(self, text: str, top_n: int = 5) -> list[tuple[str, float]]:
-        q = normalise(text)
+        q = normalise(drop_negated_clauses(text))
         if not q:
             return []
         char = self._char_scores(q)

@@ -42,6 +42,12 @@ intents:
       - "muli bwanji"
       - "how are you"
       - "hi there"
+      - "good morning ba"
+      - "hi good afternoon"
+      - "morning"
+      - "hello ab bank"
+      - "mwabuka shani"
+      - "mulishani"
     answer: |
       Hello! I'm the AB Bank assistant — an automated helper, not a person.
       I can help with branches and agents, opening an account, eTumba, and
@@ -85,6 +91,11 @@ intents:
       - "all good thanks"
       - "no more questions"
       - "nothing more"
+      - "thanks a lot"
+      - "okay thank you"
+      - "have a nice day"
+      - "noted thanks"
+      - "thanks for the help"
     answer: |
       You're welcome. Is there anything else I can help with? If not, thank
       you for chatting with AB Bank — goodbye for now.
@@ -111,6 +122,12 @@ intents:
       - "menu"
       - "options"
       - "start over"
+      - "what can i ask you"
+      - "how can you help me"
+      - "am i chatting with a bot"
+      - "is this an automated chat"
+      - "show me the menu"
+      - "what services can you help with"
     answer: |
       I'm an automated assistant (not a person). I can:
       - find branches and eTumba agents
@@ -142,6 +159,10 @@ intents:
       - "what services does ab bank offer"
       - "is ab bank a real bank"
       - "about your bank"
+      - "is ab bank safe"
+      - "is ab bank registered with bank of zambia"
+      - "what does ab bank do"
+      - "tell me more about your bank"
     answer: |
       AB Bank is a licensed local commercial bank operating in Zambia,
       regulated by the Bank of Zambia. We provide banking and credit
@@ -173,3 +194,12 @@ intents:
       - "operator"
       - "real person please"
       - "talk to staff"
+      - "i want to speak to a real person"
+      - "connect me to someone at the bank"
+      - "i need to speak to customer care"
+      - "transfer me to a human"
+      - "please call me back"
+      - "request a callback"
+      - "i want a callback"
+      - "talk to a bank officer"
+      - "can i chat with a person"

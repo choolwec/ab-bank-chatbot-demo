@@ -5,6 +5,9 @@
 # banking topic ("where is the zra branch" -> our branch finder). They were
 # written from categories, NOT copied from tests/eval/*.yaml (a test enforces
 # that), so the E3 gates stay a fair measure. Grow this from real traffic.
+# Short topical sentences ("changing the password on my social media app")
+# suit the embedding matcher; bare platform names ("facebook account") hold
+# off the character matcher's word overlap with our account intents.
 #
 # The E3 gates count a match here as a CORRECT abstention.
 
@@ -54,6 +57,40 @@ intents:
       - "church or school savings group rules"
       - "government bursaries and student loans"
       - "birth marriage or death certificates"
+      - "creating a new facebook or tiktok profile"
+      - "getting back into my whatsapp or instagram"
+      - "changing the password on my social media app"
+      - "twitter or snapchat account settings"
+      - "youtube channel or google account login"
+      - "whatsapp verification code for a new phone"
+      - "my account at a different bank"
+      - "customer service for another bank"
+      - "indo zambia bank or access bank branches"
+      - "airtel money pin and wallet support"
+      - "mtn mobile money customer care"
+      - "zamtel mobile money line problem"
+      - "social cash transfer payments from government"
+      - "applying for a visa at an embassy"
+      - "land title deeds and plots from the council"
+      - "voters card registration"
+      - "police clearance certificate"
+      - "buying or renting a house"
+      - "taxi or yango ride"
+      - "write my cv or cover letter"
+      - "translate something into english"
+      - "betting and lotto results"
+      - "music and movie downloads"
+      - "medical advice about my symptoms"
+      - "general knowledge quiz questions"
+      - "shoprite or pick n pay specials"
+      - "facebook account"
+      - "facebook password"
+      - "instagram account"
+      - "tiktok account"
+      - "whatsapp account"
+      - "gmail account password"
+      - "sign up on facebook"
+      - "social media login problem"
     answer: |
       That's not something I can help with here. I can help with accounts,
       eTumba, loans and branches, or connect you to our team.

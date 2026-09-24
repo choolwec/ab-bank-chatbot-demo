@@ -341,6 +341,32 @@ def test_desk_text_redacts_phone_numbers_but_not_references_or_amounts():
         assert bridge.desk_text(kept) == kept
 
 
+def test_desk_text_redacts_email_addresses():
+    for written in ("mary.banda@example.com", "M.Banda+bank@mail.example.co.zm", "x_y-z@abc-bank.zm"):
+        assert bridge.desk_text(f"email me at {written} please") == f"email me at {bridge.EMAIL_MASK} please"
+    for kept in ("FRD-20260924-1234", "support at the branch", "@abbank on Facebook", "a@b"):
+        assert bridge.desk_text(kept) == kept
+
+
+def test_a_fraud_contact_email_reaches_the_ticket_but_never_chatwoot(meta_env, desk):
+    email = "mary.banda@example.com"
+    wa(meta_env, "i think i was scammed")
+    wa(meta_env, "they called pretending to be the bank")
+    wa(meta_env, "yesterday")
+    wa(meta_env, "eTumba")
+    wa(meta_env, email)  # the fraud report's contact step
+    wa(meta_env, button="human_handoff")
+    wa(meta_env, f"or write to {email.upper()}")  # forwarded while paused
+    wire = desk.wire()
+    assert desk.posted(7, private=True) and desk.posted(7, message_type="incoming")
+    assert email not in wire.lower() and "example.com" not in wire.lower()
+    assert bridge.EMAIL_MASK in wire
+    # Staff keep the customer's chosen contact channel on the ticket (and Jira).
+    (fields,) = sqlite3.connect(audit.DB_FILE).execute(
+        "SELECT fields FROM tickets WHERE type = 'fraud'").fetchone()
+    assert json.loads(fields)["contact"] == email
+
+
 def test_links_follow_retention_and_never_create_a_file_to_purge(tmp_path):
     from app.desk.links import Links
 

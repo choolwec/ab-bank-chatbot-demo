@@ -28,9 +28,11 @@ With no agent reply for DESK_IDLE_HOURS, the next customer message resumes
 the bot and a private note tells the desk. Jira stays the system of record.
 
 Everything posted to Chatwoot goes through desk_text(): guards.mask() again,
-then phone numbers are redacted as well, so the customer's WhatsApp number
-can't reach the desk in any format. Agents reply inside the conversation and
-never need it; Jira keeps the contact fields of callbacks and reports.
+then phone numbers and email addresses are redacted as well, so the
+customer's WhatsApp number or email (e.g. the fraud report's contact step,
+its read-back and summary) can't reach the desk in any format. Agents reply
+inside the conversation and never need them; the ticket and its Jira issue
+keep the contact fields of callbacks and reports (/admin/cases).
 """
 
 import datetime as dt
@@ -53,6 +55,10 @@ api = APIRouter()
 CONVERSATION_SLOT = "chatwoot_conversation_id"
 TRANSCRIPT_TURNS = 40  # the same window as the Jira description
 PHONE_MASK = "[PHONE REDACTED]"
+EMAIL_MASK = "[EMAIL REDACTED]"
+# Anything shaped like an address: local@domain.tld. Deliberately loose (a
+# false positive only hides a few characters from an agent).
+EMAIL_RE = re.compile(r"[\w.+%\-]+@[\w\-]+(?:\.[\w\-]+)*\.[a-z]{2,}", re.IGNORECASE)
 # 9-15 digits, single spaces or dashes allowed between them. Not preceded by a
 # letter, digit or dash, so a reference like FRD-20260924-1234 is left alone.
 PHONE_RE = re.compile(r"(?<![\w\-+])\+?\d(?:[ \-]?\d){8,14}(?!\d)")
@@ -63,8 +69,10 @@ ZM_PHONE_RE = re.compile(r"(?<![\w\-+.,/])(?:\+?\(?260\)?|\(?0)(?:[ .\-/()]{0,2}
 
 
 def desk_text(text: str) -> str:
-    """Text bound for Chatwoot: masked by guards (again), phone numbers too."""
+    """Text bound for Chatwoot: masked by guards (again), phone numbers and
+    email addresses too."""
     masked, _ = guards.mask(guards.clean(text or ""))
+    masked = EMAIL_RE.sub(EMAIL_MASK, masked)
     return ZM_PHONE_RE.sub(PHONE_MASK, PHONE_RE.sub(PHONE_MASK, masked))
 
 

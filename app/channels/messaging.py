@@ -5,8 +5,10 @@ P4, research §7.4). The worker calls process() for each inbox row:
      phone number or PSID) and keep a SEALED reply address on it
   2. channel kill switch (P4): one static, approved reply -- never silence
   3. per-user rate limit (P4): every webhook arrives from Meta's IPs
-  4. paused because a person took over (M4/H2): log only, don't reply; on
-     the agent desk also forward it to the agent (H2)
+  4. paused because a person took over (M4/H2/W11): log only, don't reply;
+     on the agent desk also forward it to the agent (H2). A WhatsApp
+     coexistence pause (W11, coexistence.py) ends on "menu" or its timeout,
+     and a hard fraud / lost-card message during it is still ticketed
   5. stale after a Meta retry (W8): apologise + menu, never silently resume
   6. media (W5): nothing downloaded or stored; a safety reply
   7. a shared location (W6): the nearest branches
@@ -29,6 +31,7 @@ from ..identity import seal, user_hash
 from ..messages import button, msg
 from ..ratelimit import user_limiter
 from ..session import store as default_store
+from . import coexistence
 from .base import InboundMessage
 
 HUMAN = {"payload": "human_handoff"}
@@ -51,6 +54,11 @@ def process(message: InboundMessage, findings, adapter, store=None):
         from .messenger import handle_comment
 
         return [], handle_comment(message)
+    if message.kind == "echo":
+        # W11: a person replied from the WhatsApp Business app. Not a customer
+        # turn: no reply address, no 24-h window, nothing sent.
+        with store.session(session_key(message), message.channel) as (session, created):
+            return [], coexistence.handle_echo(session, message)
     with store.session(session_key(message), message.channel) as (session, created):
         now = time.time()
         session.slots["reply_ref"] = seal(message.user_key)
@@ -116,13 +124,21 @@ def _respond(session, message, findings, created, now, adapter):
     # 4. A person has taken over this conversation: log, don't answer. On the
     # agent desk (H2) the message is forwarded to the agent too, and with no
     # agent reply for DESK_IDLE_HOURS the bot answers again.
+    # W11: staff replying from the WhatsApp Business app pause the bot the
+    # same way; the timeout or "menu" lifts it, and a hard fraud / lost-card
+    # message still gets a ticket and one safety reply.
     bridge.expire_idle(session, now)
+    coexistence.expire(session, now)
+    coexistence.resume_on_menu(session, message)
     if session.bot_paused_until > now or message.kind == "standby":
         text = _inbound_text(message)
         router.log_inbound(session, text)
         audit.log_event(session.id, "system", "bot paused: a person has this conversation",
                         action="paused", channel=session.channel, user_hash=session.user_hash)
         bridge.forward(session, text)
+        safety = coexistence.urgent_while_paused(session, message)
+        if safety:
+            return router.respond(session, safety, {"action": "coexistence_urgent"})
         return [], {"action": "paused"}
 
     adapter.mark_read(message)

@@ -25,7 +25,9 @@ class InboundMessage:
     # prefill the customer confirms; never logged raw.
     phone_hint: str | None = None
     # "message" (a conversation turn), "comment" (a public Page comment, M5)
-    # or "standby" (arrived while a person has the Messenger thread, M4).
+    # "standby" (arrived while a person has the Messenger thread, M4) or
+    # "echo" (a person replied from the WhatsApp Business app, W11; user_key
+    # is the CUSTOMER it went to, and no text is kept).
     kind: str = "message"
     ref: str | None = None  # e.g. the comment id to reply to privately
 

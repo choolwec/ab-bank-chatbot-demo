@@ -287,6 +287,29 @@ DESK_IDLE_HOURS = int(os.environ.get("DESK_IDLE_HOURS", "24"))
 CHATWOOT_WEBHOOK_SECRET_MIN = 24
 
 
+# --- WhatsApp coexistence (W11, decision D5 option B) ---------------------------
+# Staff keep the WhatsApp Business app on the same number as the bot. When a
+# person replies from the app (Meta's smb_message_echoes webhook), the bot goes
+# quiet for that customer for COEXISTENCE_PAUSE_HOURS, restarted by each new
+# echo, or until the customer types or taps "menu". OFF by default until the
+# number decision is confirmed: off, echoes are logged and ignored.
+COEXISTENCE_PAUSE_HOURS_DEFAULT = 12.0
+
+
+def coexistence_enabled() -> bool:
+    return flag("COEXISTENCE_ENABLED", False)
+
+
+def coexistence_pause_hours() -> float:
+    """Read per call, so a change needs no code edit. A bad value falls back
+    to the default rather than crashing the worker."""
+    try:
+        hours = float(os.environ.get("COEXISTENCE_PAUSE_HOURS", COEXISTENCE_PAUSE_HOURS_DEFAULT))
+    except ValueError:
+        return COEXISTENCE_PAUSE_HOURS_DEFAULT
+    return hours if hours > 0 else COEXISTENCE_PAUSE_HOURS_DEFAULT
+
+
 def chatwoot_settings() -> dict:
     return {
         "url": os.environ.get("CHATWOOT_URL", "").strip().rstrip("/"),

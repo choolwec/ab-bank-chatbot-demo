@@ -25,6 +25,12 @@ intents:
       - "i was conned"
       - "report fraud"
       - "my money is gone"
+      - "unknown transaction on my account"
+      - "someone withdrew money from my account"
+      - "money deducted without my permission"
+      - "strange transaction on my card"
+      - "fraudulent transaction"
+      - "suspicious transaction"
 
   - intent: lost_stolen_card
     label: "Lost or stolen card"
@@ -43,6 +49,12 @@ intents:
       - "i cant find my card"
       - "my card is gone"
       - "cancel my card"
+      - "i misplaced my card"
+      - "my atm card is lost"
+      - "lost debit card"
+      - "my card got stolen"
+      - "i left my card at the atm"
+      - "lost my visa card"
 
   - intent: complaint
     label: "Make a complaint"
@@ -62,6 +74,11 @@ intents:
       - "i want to report bad service"
       - "dispute a charge"
       - "raise a dispute"
+      - "i want to lodge a complaint"
+      - "i am not satisfied"
+      - "bad customer service"
+      - "i want to report a staff member"
+      - "i was overcharged"
 
   - intent: emergency_line
     label: "Emergency number"
@@ -78,6 +95,10 @@ intents:
       - "who do i call in an emergency"
       - "urgent number to call"
       - "number to report fraud"
+      - "emergency phone number"
+      - "fraud number"
+      - "after hours number"
+      - "24/7 number"
     answer: |
       For anything urgent — a lost or stolen card, or money taken without
       your permission — call {emergency_phone} straight away.
@@ -107,6 +128,12 @@ intents:
       - "reset my etumba pin"
       - "cant log in to myabz"
       - "i forgot my internet banking password"
+      - "change my pin"
+      - "how do i change my pin"
+      - "i forgot my passcode"
+      - "wrong pin too many times"
+      - "forgot etumba password"
+      - "change password"
     answer: |
       For your security, I never handle PINs or passwords in chat — and no
       genuine member of staff will ever ask you for them.

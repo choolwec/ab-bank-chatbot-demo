@@ -148,8 +148,8 @@ EMBED_MODEL_SHA256 = {
 
 # Embedding-similarity thresholds for the decision in hybrid mode. Set by
 # calibration (N5, `python -m admin.calibrate`), never tuned on the test split.
-EMB_HIGH = float(os.environ.get("EMB_HIGH", "0.715"))  # N5: seed 7, OOS <= 3% on calibration
-EMB_MEDIUM = float(os.environ.get("EMB_MEDIUM", "0.41"))  # N5: OOS suggestions <= 45%, so gibberish falls back
+EMB_HIGH = float(os.environ.get("EMB_HIGH", "0.715"))  # N5: seed 7, OOS <= 3% on calibration (re-run 2026-09-24: same)
+EMB_MEDIUM = float(os.environ.get("EMB_MEDIUM", "0.435"))  # OOS suggestions <= 45%, so gibberish falls back (0.41 until 2026-09-24)
 
 
 # N7: similarity to an exemplar fraud report that triggers the soft-urgent

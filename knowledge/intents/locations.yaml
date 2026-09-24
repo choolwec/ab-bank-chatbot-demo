@@ -10,13 +10,21 @@ intents:
       - "nearest branch"
       - "branch in lusaka"
       - "branch in kitwe"
-      - "where are you located"
+      - "where are you located in zambia"
       - "your address"
       - "find a branch"
       - "branches"
       - "where is ab bank"
       - "ab bank location"
       - "which towns are you in"
+      - "branch near me"
+      - "where is your branch"
+      - "branch in ndola"
+      - "branch in chipata"
+      - "branch in solwezi"
+      - "where is your head office"
+      - "ab bank branches"
+      - "where can i find ab bank"
 
   - intent: agent_locator
     label: "Find an eTumba agent"
@@ -36,6 +44,11 @@ intents:
       - "cash out etumba"
       - "where to withdraw etumba money"
       - "agents"
+      - "nearest agent"
+      - "agent near me"
+      - "etumba agents in lusaka"
+      - "where are your agents"
+      - "find an agent"
 
   - intent: opening_hours
     label: "Opening hours"
@@ -52,6 +65,8 @@ intents:
       - "business hours"
       - "opening times"
       - "are you open now"
+      - "are you open on public holidays"
+      - "working hours on saturday"
     answer: |
       Branches: Monday-Friday 08:00-15:00, Saturday 09:00-12:30. Closed
       Sundays and public holidays.
@@ -82,6 +97,11 @@ intents:
       - "how can i reach you"
       - "contact number"
       - "your contacts"
+      - "your phone number"
+      - "contact centre number"
+      - "what is your email"
+      - "whatsapp contact"
+      - "telephone number"
     answer: |
       You can reach AB Bank Zambia on:
       Contact Centre: {contact_phone}

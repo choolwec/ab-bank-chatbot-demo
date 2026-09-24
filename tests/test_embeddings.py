@@ -29,9 +29,8 @@ KNOWN_HYBRID_DIFFERENCES = {
     # dropped before scoring, matcher.drop_negated_clauses.)
     # "loan" alone is answered directly (MSME loans) instead of "did you mean".
     "n6-out-of-scope-answer",
-    # Answered with savings_account (which states its fees) rather than
-    # offering fees_charges in the top 3.
-    "how much do you charge for a savings account",
+    # ("how much do you charge for a savings account" was here until
+    # 2026-09-24: fees_charges is now in the top 3.)
 }
 
 
@@ -244,3 +243,25 @@ def test_model_false_confirmations_on_our_negatives_stay_under_two_percent():
     quiet = [t for t in neg if guards.urgent_scan(t) is None]
     flagged = [t for t in quiet if urgent_model.flags(t)]
     assert len(flagged) / len(quiet) <= 0.02, flagged
+
+
+
+# --- Hybrid switch-over prep (2026-09-24) ----------------------------------------
+
+
+@pytest.mark.parametrize(
+    "query",
+    ["how can i make a new instagram page", "i forgot the password for my tiktok",
+     "how do i contact mtn mobile money", "i have an account with a different bank, can you help"],
+)
+def test_other_platforms_are_out_of_scope_in_hybrid_mode(hybrid, query):
+    """Embedding-style out_of_scope phrases: other platforms and providers
+    must not get a confident banking answer."""
+    ranked = hybrid.match(query)
+    top, score = ranked[0]
+    assert top == "out_of_scope" or score < config.HIGH_CONFIDENCE, (query, ranked[:3])
+
+
+def test_negation_is_fixed_in_hybrid_mode(hybrid):
+    ranked = hybrid.match("i dont need a loan, how do i open a savings account")
+    assert ranked[0][0] == "savings_account" and ranked[0][1] >= config.HIGH_CONFIDENCE, ranked[:3]

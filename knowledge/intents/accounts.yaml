@@ -15,6 +15,13 @@ intents:
       - "compare your accounts"
       - "account options"
       - "banking accounts you offer"
+      - "what accounts do you have"
+      - "which account is best for me"
+      - "list of your accounts"
+      - "types of bank accounts"
+      - "which account should i open"
+      - "account types"
+      - "what kind of accounts are there"
     answer: |
       We offer these main account types:
       - Tamanga — everyday current account (ZMW 36/month)
@@ -49,6 +56,13 @@ intents:
       - "how does the savings account work"
       - "open a savings account"
       - "is my money safe in savings"
+      - "savings acc"
+      - "how much interest do i get on savings"
+      - "minimum balance for savings account"
+      - "savings account interest rate"
+      - "i want to start saving"
+      - "account to keep my money and earn interest"
+      - "can i withdraw anytime from savings"
     answer: |
       Our Savings account lets you deposit and withdraw at any time:
       - Minimum balance: ZMW 100
@@ -86,6 +100,15 @@ intents:
       - "account for salary"
       - "tamanga"
       - "what is tamanga"
+      - "tamanga account"
+      - "tamanga acc"
+      - "what is a tamanga account"
+      - "current acc"
+      - "can i open a dollar account"
+      - "usd account"
+      - "euro account"
+      - "account to receive my salary"
+      - "salary account"
     answer: |
       Tamanga is our everyday current account, available in ZMW, USD, or
       EURO:
@@ -125,6 +148,12 @@ intents:
       - "account with cheque book"
       - "myabz account"
       - "which account gets online banking"
+      - "tamanga plus account"
+      - "i want a cheque book"
+      - "how do i get a cheque book"
+      - "upgrade to tamanga plus"
+      - "tamanga plus benefits"
+      - "account with internet banking"
     answer: |
       Tamanga Plus has everything Tamanga has, plus a cheque book and
       Online Banking (MyABZ) access. Monthly maintenance fee: ZMW 135.
@@ -159,6 +188,15 @@ intents:
       - "corporate account"
       - "mukula plus"
       - "what is mukula plus"
+      - "mukula plus account"
+      - "account for my company"
+      - "open a company account"
+      - "bank account for my ngo"
+      - "church bank account"
+      - "account for a sole trader"
+      - "business acc"
+      - "account for my small business"
+      - "account for a club or association"
     answer: |
       Mukula Plus is our corporate/business current account — for limited
       companies, sole traders/partnerships, and clubs/NGOs/churches/
@@ -195,6 +233,13 @@ intents:
       - "what does my club need to open an account"
       - "requirements for a corporate account"
       - "documents for opening a business account"
+      - "what documents does a company need to open an account"
+      - "pacra documents for account opening"
+      - "what do i need to open a business account"
+      - "requirements for mukula plus"
+      - "business account documents"
+      - "board resolution for opening an account"
+      - "what does a sole trader need to open an account"
     answer: |
       Requirements vary by entity type:
       - Limited company: certificate of share capital, certificate of
@@ -229,6 +274,10 @@ intents:
       - "what is a savings plan"
       - "restricted withdrawal savings"
       - "savings plan requirements"
+      - "savings plan acc"
+      - "save for a goal"
+      - "goal savings account"
+      - "savings plan minimum deposit"
     answer: |
       The Savings Plan account lets you deposit any time, but withdrawals
       are blocked — good for a savings goal you don't want to dip into:
@@ -262,6 +311,13 @@ intents:
       - "under 16 bank account"
       - "guardian savings account"
       - "child savings account requirements"
+      - "account for children"
+      - "kids account"
+      - "open an account for my baby"
+      - "child account"
+      - "bank account for my kids"
+      - "junior savings account"
+      - "kids savings interest"
     answer: |
       Kids Savings is a joint account opened for a minor (under 16) by
       their guardian:
@@ -292,6 +348,13 @@ intents:
       - "lock my money for interest"
       - "term deposit interest rate"
       - "investment account requirements"
+      - "fixed deposit account"
+      - "fixed deposit rates"
+      - "invest my money"
+      - "term deposit rates"
+      - "fix money for 90 days"
+      - "where can i invest money"
+      - "minimum amount for a fixed deposit"
     answer: |
       A Term Deposit Account (TDA) fixes your money for a chosen term to
       earn a higher interest rate:
@@ -325,6 +388,12 @@ intents:
       - "account with my wife"
       - "joint account types"
       - "open a joint account"
+      - "joint acc"
+      - "open account with my partner"
+      - "account for husband and wife"
+      - "couple account"
+      - "two people one account"
+      - "joint account requirements"
     answer: |
       We offer two types of joint account:
       - Joint AND — all signatories must be present to transact (except
@@ -357,6 +426,12 @@ intents:
       - "account for expats"
       - "im a foreigner"
       - "can i open an account without an nrc"
+      - "can foreigners open accounts"
+      - "i am a foreigner can i open an account"
+      - "account for non zambians"
+      - "expatriate account"
+      - "what does a foreigner need to open an account"
+      - "can i open an account with a passport"
     answer: |
       Yes — foreign nationals can open an account. Visit any branch with:
       - A valid passport (with visa)
@@ -384,6 +459,12 @@ intents:
       - "what should i bring to open account"
       - "papers needed to open account"
       - "requirements to open a bank account"
+      - "requirements for opening an account"
+      - "which documents are required to open an account"
+      - "account opening requirements"
+      - "reference form for account opening"
+      - "do i need a tpin to open an account"
+      - "do i need proof of residence"
     answer: |
       To open a personal account, visit any branch with:
       - Original valid ID (NRC, Passport, or Driving Licence)
@@ -419,6 +500,13 @@ intents:
       - "i want a bank account"
       - "help me open an account"
       - "how long does it take to open an account"
+      - "how can i open an account"
+      - "steps to open an account"
+      - "i would like to open an account"
+      - "open acc"
+      - "opening an account"
+      - "can i open an account on my phone"
+      - "how do i become a customer"
     answer: |
       Accounts are opened at any branch only — there's no online/remote
       account opening. Bring the right documents and it's usually done
@@ -447,6 +535,12 @@ intents:
       - "how to get statement online"
       - "statement for tamanga account"
       - "get my transaction history"
+      - "how can i get my statement"
+      - "bank statement for a visa application"
+      - "6 months bank statement"
+      - "statement of account"
+      - "i need a stamped bank statement"
+      - "get statement"
     answer: |
       - Mukula Plus & Tamanga Plus customers: get statements anytime via
         Online Banking (MyABZ) at https://ob.abbank.co.zm/landing/auth
@@ -475,6 +569,11 @@ intents:
       - "account reactivation requirements"
       - "wake up my dormant account"
       - "restart my inactive account"
+      - "my account is inactive"
+      - "my account was closed because i did not use it"
+      - "account not used for a long time"
+      - "reactivate dormant acc"
+      - "activate my dormant account"
     answer: |
       Dormant accounts must be reactivated in person at a branch — bring
       your original ID.
@@ -498,6 +597,11 @@ intents:
       - "sort code for my branch"
       - "routing code"
       - "bic code"
+      - "swift"
+      - "bank code"
+      - "branch code"
+      - "swift number"
+      - "bank details for international transfer"
     answer: |
       SWIFT code for all AB Bank Zambia branches: ABBAZMLU
       Sort codes differ by branch — tell me your branch and I'll confirm

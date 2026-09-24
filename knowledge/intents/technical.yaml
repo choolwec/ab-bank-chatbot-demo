@@ -25,6 +25,13 @@ intents:
       - "app is offline"
       - "having trouble with the app"
       - "app wont open"
+      - "app not opening"
+      - "etumba app not opening"
+      - "online banking is down"
+      - "error on the app"
+      - "the app is slow"
+      - "internet banking not working"
+      - "app failing to load"
     answer: |
       Sounds like a technical/service problem rather than a forgotten PIN —
       sorry about that.

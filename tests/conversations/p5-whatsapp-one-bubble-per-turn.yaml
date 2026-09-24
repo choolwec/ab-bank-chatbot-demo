@@ -3,7 +3,9 @@ id: p5-whatsapp-one-bubble-per-turn
 channel: whatsapp
 turns:
   - say: my card number is 4111 1111 1111 1111 what is etumba
-    expect: {replies_max: 1, text_contains: ["never need them", "did you mean"]}
+    # the PII warning and the suggestions share one bubble (the suggestion
+    # wording varies with C11's topic line, so the action is checked instead)
+    expect: {replies_max: 1, action: did_you_mean, text_contains: ["never need them"]}
   - say: i think i was scammed
     expect: {replies_max: 1, text_contains: ["treating it as urgent", "tell me briefly what happened"]}
   - say: stop

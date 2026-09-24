@@ -17,6 +17,8 @@ here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
 . "$here/lib.sh"
 
 if [[ -n ${1:-} ]]; then
+    # A release name only: never a path outside releases/.
+    [[ $1 =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-rc\.?[0-9]+)?$ ]] || die "'$1' is not a release tag (vMAJOR.MINOR.PATCH)"
     target=$RELEASES/$1
 else
     target=$(previous_release)

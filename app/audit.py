@@ -4,6 +4,7 @@ Also owns tickets (fraud / complaint / callback) with the session transcript
 attached, so a human never asks the customer to repeat themselves (§1 rule 7).
 """
 
+import copy
 import datetime as dt
 import json
 import secrets
@@ -142,8 +143,11 @@ def create_ticket(kind: str, fields: dict, transcript: list, channel: str = "web
         # P9: a real Jira round trip must not hold up the customer's reply
         # (a 250 ms Jira put /chat p95 at 322 ms). The ticket is already
         # stored above, so the push stays best-effort, as before. Mock mode
-        # is a local file write and stays inline.
-        threading.Thread(target=_push_to_jira, args=(kind, ref, fields, transcript, channel, reply_to),
+        # is a local file write and stays inline. The thread gets its own
+        # copies: the caller keeps appending to session.transcript after this
+        # returns, and the Jira issue must match the stored ticket exactly.
+        snapshot = copy.deepcopy((fields, transcript, reply_to))
+        threading.Thread(target=_push_to_jira, args=(kind, ref, snapshot[0], snapshot[1], channel, snapshot[2]),
                          name=f"jira-push-{ref}", daemon=True).start()
     else:
         _push_to_jira(kind, ref, fields, transcript, channel, reply_to)

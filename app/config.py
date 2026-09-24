@@ -258,3 +258,45 @@ def free_text_enabled() -> bool:
 
 def widget_enabled() -> bool:
     return flag("WIDGET_ENABLED", True)
+
+
+# --- Health checks, alerts and housekeeping (R1) ------------------------------
+# One set of thresholds: /health computes each check's `ok` with them, and
+# admin/alerts.py reports the value against the same threshold, so the uptime
+# checker and the Teams/Jira alerts can never disagree.
+HEALTH_WINDOW_MINUTES = 60  # the rolling window for every count in /health
+QUEUE_MAX_AGE_SECONDS = int(os.environ.get("ALERT_QUEUE_MAX_AGE_SECONDS", "120"))
+WEBHOOK_5XX_MAX_RATE = float(os.environ.get("ALERT_WEBHOOK_5XX_RATE", "0.01"))
+SEND_FAILURE_MAX_RATE = float(os.environ.get("ALERT_SEND_FAILURE_RATE", "0.02"))
+FAILED_MESSAGES_MAX = 0
+# Webhook requests that carried a Meta signature header and were still
+# refused (4xx): after a secret rotation every Meta delivery fails this way,
+# which the 5xx check never sees.
+WEBHOOK_REJECTED_MAX = int(os.environ.get("ALERT_WEBHOOK_REJECTED_MAX", "2"))
+
+# The retention purges run at start-up and then every night at this hour,
+# Lusaka time (housekeeping.py).
+PURGE_HOUR = int(os.environ.get("PURGE_HOUR", "2"))
+
+# admin/alerts.py, run by cron on the VM. The Teams URL is a secret (anyone
+# holding it can post into the chat): environment only, never flags.json or git.
+ALERT_HEALTH_URL = os.environ.get("ALERT_HEALTH_URL", "http://127.0.0.1:8000/health")
+ALERT_TEAMS_REPEAT_MINUTES = int(os.environ.get("ALERT_TEAMS_REPEAT_MINUTES", "15"))
+ALERT_JIRA_REPEAT_HOURS = int(os.environ.get("ALERT_JIRA_REPEAT_HOURS", "24"))
+
+
+def alert_teams_webhook_url() -> str:
+    return os.environ.get("ALERT_TEAMS_WEBHOOK_URL", "").strip()
+
+
+def alert_jira_project_key() -> str:
+    """Alerts can go to a dev/ops project on the same Jira site, so they stay
+    out of the contact centre's queue. Defaults to the ticket project."""
+    return os.environ.get("ALERT_JIRA_PROJECT_KEY", "").strip() or JIRA_PROJECT_KEY
+
+
+def alert_env_name() -> str:
+    """Shown on every alert, so staging and production can share one chat."""
+    import socket
+
+    return os.environ.get("ALERT_ENV_NAME", "").strip() or socket.gethostname()

@@ -10,6 +10,11 @@ will see land in their queue with zero real Jira access.
 
 Called from audit.create_ticket() as best-effort: a Jira outage or bad
 credentials must never block the customer-facing ticket flow.
+
+Operational alerts (R1, admin/alerts.py) use push_alert(): the same real/mock
+switch and the same JIRA_ENABLED kill switch, label "chatbot-alert" (not
+"chatbot", so a contact-centre filter on that label never picks them up), and
+ALERT_JIRA_PROJECT_KEY when alerts belong in a different project.
 """
 
 import datetime as dt
@@ -30,6 +35,10 @@ _TITLE = {"fraud": "Fraud / lost card report", "complaint": "Complaint", "callba
           "handoff": "Conversation handed to a person"}
 
 MOCK_FILE_NAME = "jira_mock.jsonl"
+
+# R1: alert severity -> Jira priority.
+ALERT_LABEL = "chatbot-alert"
+ALERT_PRIORITY = {1: "Highest", 2: "High", 3: "Medium"}
 
 
 def _summary(kind: str, ref: str, fields: dict) -> str:
@@ -74,11 +83,26 @@ def push_ticket(kind: str, ref: str, fields: dict, transcript: list, channel="we
     return _push_mock(kind, ref, summary, description, priority, labels)
 
 
-def _push_real(summary, description, priority, labels) -> dict | None:
+def push_alert(issue: str, severity: int, summary: str, description: str, transport=None) -> dict | None:
+    """R1: one operational alert as a Jira issue. Same contract as
+    push_ticket(): {"key","url","mode"}, or None when Jira is off or a real
+    push failed. The caller (admin/alerts.py) passes counts and hints only."""
+    if not config.jira_enabled():
+        return None
+    summary = summary[:250]
+    priority = ALERT_PRIORITY.get(severity, "High")
+    labels = [ALERT_LABEL, f"sev{severity}"]
+    if config.jira_configured():
+        return _push_real(summary, description, priority, labels,
+                          project_key=config.alert_jira_project_key(), transport=transport)
+    return _push_mock("alert", issue, summary, description, priority, labels)
+
+
+def _push_real(summary, description, priority, labels, project_key=None, transport=None) -> dict | None:
     url = f"{config.JIRA_BASE_URL.rstrip('/')}/rest/api/2/issue"
     payload = {
         "fields": {
-            "project": {"key": config.JIRA_PROJECT_KEY},
+            "project": {"key": project_key or config.JIRA_PROJECT_KEY},
             "summary": summary,
             "description": description,
             "issuetype": {"name": "Task"},
@@ -87,12 +111,8 @@ def _push_real(summary, description, priority, labels) -> dict | None:
         }
     }
     try:
-        resp = httpx.post(
-            url,
-            json=payload,
-            auth=(config.JIRA_EMAIL, config.JIRA_API_TOKEN),
-            timeout=8.0,
-        )
+        with httpx.Client(transport=transport, timeout=8.0) as client:  # tests inject a MockTransport
+            resp = client.post(url, json=payload, auth=(config.JIRA_EMAIL, config.JIRA_API_TOKEN))
         resp.raise_for_status()
         key = resp.json().get("key")
         return {"key": key, "url": f"{config.JIRA_BASE_URL.rstrip('/')}/browse/{key}", "mode": "real"}
@@ -137,7 +157,7 @@ def read_mock_issues(limit: int = 100) -> list[dict]:
     return list(reversed(records))[:limit]
 
 
-_PRIORITY_COLOR = {"Highest": "#DE350B", "Medium": "#FF991F", "Low": "#0065FF"}
+_PRIORITY_COLOR = {"Highest": "#DE350B", "High": "#FF5630", "Medium": "#FF991F", "Low": "#0065FF"}
 
 
 def _escape(text) -> str:

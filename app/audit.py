@@ -155,19 +155,21 @@ def _push_to_jira(kind: str, ref: str, fields: dict, transcript: list, channel="
         )
 
 
-def purge_expired() -> None:
-    """Retention (§3.3) — periods configurable, to be confirmed by legal."""
+def purge_expired() -> dict:
+    """Retention (§3.3) — periods configurable, to be confirmed by legal.
+    Returns how many rows went (counts only, for the housekeeping log)."""
     cutoff = (
         dt.datetime.now(dt.timezone.utc)
         - dt.timedelta(days=config.TRANSCRIPT_RETENTION_DAYS)
     ).isoformat(timespec="seconds")
     con = _connect()
-    con.execute("DELETE FROM events WHERE ts < ?", (cutoff,))
+    purged = {"events": con.execute("DELETE FROM events WHERE ts < ?", (cutoff,)).rowcount, "tickets": 0}
     if config.TICKET_RETENTION_DAYS > 0:
         tcut = (
             dt.datetime.now(dt.timezone.utc)
             - dt.timedelta(days=config.TICKET_RETENTION_DAYS)
         ).isoformat(timespec="seconds")
-        con.execute("DELETE FROM tickets WHERE created < ?", (tcut,))
+        purged["tickets"] = con.execute("DELETE FROM tickets WHERE created < ?", (tcut,)).rowcount
     con.commit()
     con.close()
+    return purged

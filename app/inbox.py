@@ -12,8 +12,10 @@ messages in order.
   findings  what guards.mask() found, so the PII warning is still shown
   user_ref  the raw platform user id, SEALED (identity.seal) -- needed to
             reply; cleared as soon as the row is processed
-A row that keeps failing is retried up to MAX_ATTEMPTS, then marked failed;
-a crash mid-row leaves it 'new', so it is picked up again after a restart.
+A row that keeps failing is retried up to MAX_ATTEMPTS, then marked failed
+(with failed_at, for the R1 alert); a crash mid-row leaves it 'new', so it is
+picked up again after a restart. Processed and failed rows are purged on the
+transcript retention schedule (housekeeping.py).
 """
 
 import dataclasses
@@ -51,6 +53,9 @@ class Inbox:
                 )"""
             )
             con.execute("CREATE INDEX IF NOT EXISTS inbound_status ON inbound(status, received)")
+            # R1: added after W2; an existing inbox.db gains it in place.
+            if "failed_at" not in {row[1] for row in con.execute("PRAGMA table_info(inbound)")}:
+                con.execute("ALTER TABLE inbound ADD COLUMN failed_at REAL")
 
     def _connect(self):
         con = sqlite3.connect(self.path, timeout=10)
@@ -88,8 +93,8 @@ class Inbox:
             if status == "done":
                 con.execute("UPDATE inbound SET status='done', user_ref=NULL, error=NULL WHERE id=?", (row_id,))
             elif status == "failed":
-                con.execute("UPDATE inbound SET status='failed', user_ref=NULL, error=?, attempts=? WHERE id=?",
-                            (error, attempts, row_id))
+                con.execute("UPDATE inbound SET status='failed', user_ref=NULL, error=?, attempts=?,"
+                            " failed_at=? WHERE id=?", (error, attempts, time.time(), row_id))
             else:
                 con.execute("UPDATE inbound SET attempts=?, error=? WHERE id=?", (attempts, error, row_id))
 
@@ -122,6 +127,18 @@ class Inbox:
         with self._db_lock, self._connect() as con:
             row = con.execute("SELECT MIN(received) FROM inbound WHERE status='new'").fetchone()
         return time.time() - row[0] if row and row[0] else 0.0
+
+    def failed_since(self, seconds: float) -> list[str]:
+        """The (already masked) text of each message that failed in the last
+        `seconds`, for the R1 check to count and scan. Never returned to a
+        caller outside the app: /health reports counts only."""
+        cutoff = time.time() - seconds
+        with self._db_lock, self._connect() as con:
+            rows = con.execute(
+                "SELECT message FROM inbound WHERE status='failed' AND COALESCE(failed_at, received) >= ?",
+                (cutoff,),
+            ).fetchall()
+        return [json.loads(raw).get("text") or "" for (raw,) in rows]
 
     def counts(self) -> dict:
         with self._db_lock, self._connect() as con:

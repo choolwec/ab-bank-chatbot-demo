@@ -33,7 +33,7 @@ import httpx
 from fastapi import APIRouter, HTTPException, Query, Request, Response
 from fastapi.responses import PlainTextResponse
 
-from .. import audit, config, render
+from .. import audit, config, metrics, render
 from ..identity import user_hash
 from ..inbox import inbox
 from .base import InboundMessage
@@ -205,12 +205,14 @@ class WhatsAppSender:
                     last_error = f"{type(exc).__name__}"
                 else:
                     if response.status_code < 300:
+                        metrics.record_send(NAME, True)
                         return True
                     last_error = f"HTTP {response.status_code}"
                     if response.status_code != 429 and response.status_code < 500:
                         break  # a permanent error: retrying won't help
                 if attempt < MAX_ATTEMPTS - 1:
                     self._sleep(0.5 * 2 ** attempt)
+        metrics.record_send(NAME, False)
         audit.log_event("-", "system", f"send failed: {last_error}", action="send_failed",
                         channel=NAME, user_hash=user_hash(f"{NAME}:{recipient}"))
         return False

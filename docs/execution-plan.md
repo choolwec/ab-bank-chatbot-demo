@@ -1474,8 +1474,7 @@ rest needs infrastructure or people. Details, owners and open decisions:
   stays off until the shadow reviews.
 - **R2, W10, W1, L1, N1, N8:** drafts (`go-no-go.md`,
   `pilot-runbook-whatsapp.md`, `meta-onboarding-guide.md`, `dpia-draft.md`,
-  `phrase-workshop-kit.md`) are on branch `wip/launch-docs-review` and not
-  yet merged into this branch; they await PO sign-off. W10's widget link is
+  `phrase-workshop-kit.md`) are in `docs/`; they await PO sign-off. W10's widget link is
   built (MK3).
 - **MK2 / MK3:** built; also every product answer now reaches the callback
   flow in one tap, and `docs/marketing-launch-kit.md` is a draft for

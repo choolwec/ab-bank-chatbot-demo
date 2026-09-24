@@ -50,7 +50,7 @@ data outside Zambia; and staff tickets holding names and contact numbers.
 |---|---|---|
 | Fraud / lost card (`fraud.py`) | What happened (free text), when, which service (card, eTumba, …), a contact (phone, email, or an explicit "skip"). Extracted hints: date, branch, amount | Ticket `FRD-…`, urgent; never closed by the bot |
 | Complaint (`complaint.py`) | Topic, details (free text), contact (phone, email or skip); confirmed by the customer before sending | Ticket `CMP-…` to the complaints team |
-| Callback / "talk to a person" (`lead.py`) | Name, phone, topic, preferred time (morning/afternoon); confirmed before sending. **Being added this week:** a yes/no marketing-consent answer, with time and channel | Ticket `CBK-…`; a person calls within a working day |
+| Callback / "talk to a person" (`lead.py`) | Name, phone, topic, preferred time (morning/afternoon); confirmed before sending. Plus a yes/no marketing-consent answer with its timestamp (MK2; `MARKETING_CONSENT_ENABLED`) and the campaign source (MK3) | Ticket `CBK-…`; a person calls within a working day |
 | Handoff to an inbox (Messenger, and WhatsApp once Chatwoot exists) | No extra fields; the conversation so far | Ticket `HND-…`; the thread passes to staff |
 | Branch / agent locator (`locator.py`) | Town chosen from buttons; on WhatsApp, optionally a **shared location** | The location is used once to find the nearest branches and is **never logged** (`[location shared]` is stored instead) |
 | One-tap satisfaction (H5, this week's build) | Thumbs up or down, sampled on about 20% of resolved conversations, never after fraud | Audit event |
@@ -141,7 +141,7 @@ Current values are **placeholders pending Legal (L5)**, from `app/config.py`:
 | Audit events | 90 days (`TRANSCRIPT_RETENTION_DAYS`) | `audit.purge_expired()` |
 | Sessions | 90 days since last activity (same setting) | `store.purge_expired()` |
 | Tickets | **Never auto-deleted** (`TICKET_RETENTION_DAYS = 0`) | Follows the complaints unit's policy **[DPO]** |
-| Inbox rows (WhatsApp/Messenger) | Purge exists; scheduling being added (R1) | `inbox.purge()` |
+| Inbox rows (WhatsApp/Messenger) | Purged at start-up and nightly (R1, `app/housekeeping.py`) | `inbox.purge()` |
 | Backups | 14 days (plan, P7) | `deploy/backup.sh` |
 | Jira copies | Jira's own settings **[CONFIRM]** | Outside the app |
 | Meta | Up to 30 days (research) [VERIFY] | Outside the bank's control |

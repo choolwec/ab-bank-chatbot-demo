@@ -27,7 +27,7 @@ for WhatsApp. Several decisions below need the product owner's yes or no.
 | Better understanding | The bot now handles "I don't want X, I want Y", recognises more off-topic questions, and was recalibrated. See the numbers below. | Built; the better (hybrid) mode stays off until shadow reviews |
 | Marketing consent and opt-out (MK2) | The callback request ends with an optional "may we send you news and offers?" question. Customers can type "unsubscribe" at any time. Jira tickets are labelled when the customer said yes. | Built; wording needs Legal |
 | Campaign tracking (MK3) | Records which campaign or QR code brought a conversation, and can show a "Continue on WhatsApp" link on the website. | Built; link off until the WhatsApp number is confirmed |
-| Launch documents | Go/no-go checklist, WhatsApp pilot runbook, IT hosting request, Meta onboarding guide, legal pack, draft DPIA, phrase-workshop kit, decisions log. | Drafted; not yet merged into this branch (see below) |
+| Launch documents | Go/no-go checklist, WhatsApp pilot runbook, IT hosting request, Meta onboarding guide, legal pack, draft DPIA, phrase-workshop kit, decisions log. | Drafted, in `docs/`; awaiting PO review |
 
 **Understanding, measured on the held-out test set** (share of test
 questions; detail in [metrics-matcher-2026-09-24.md](metrics-matcher-2026-09-24.md)):
@@ -79,9 +79,8 @@ real phrasings collected in the staff workshop.
    to the agent; they do not start the fraud flow. Acceptable?
 5. **Marketing consent:** is a typed "sure" a valid yes, and should "No" be
    the first button?
-6. **Server settings file** permissions: recorded as readable by the bot's
-   own user (mode 640) so the alert job can run; the deploy script still
-   expects 600, so one of the two must change before the first install.
+6. **Server settings file** permissions: settled as root-only (mode 600);
+   the alert job reads it through `deploy/admin.sh`. No action needed.
 7. **Background Jira sending** can lose an issue if the server restarts at
    that moment (the ticket itself is safe). Add a retry queue before real
    Jira goes live?
@@ -104,9 +103,12 @@ decisions log.
 - **Unverified outside facts** marked [VERIFY] or [CONFIRM] in the code and
   documents: Meta prices and screens, the Chatwoot version's behaviour,
   Jira endpoints, contact numbers, retention periods.
-- **Some fixes are still in progress** in parallel (feedback question
-  keeping "Talk to a person", a separate callback button, masking emails
-  sent to Chatwoot, start-up resilience, server configuration).
+- **Reviewer fixes done since:** the feedback question keeps "Talk to a
+  person", "Request a callback" always opens the callback form (so consent
+  and campaign are captured on every channel), emails are masked before
+  anything reaches Chatwoot, failed-message records keep no customer text,
+  a bad database or setting can't stop start-up, the alert and weekly jobs
+  are in the server schedule, and the env file stays root-only (mode 600).
 
 ## Where to read more
 
@@ -117,11 +119,11 @@ decisions log.
 - Agent desk: [chatwoot-setup.md](chatwoot-setup.md)
 - Load test: [load-test-results.md](load-test-results.md)
 - Marketing: [marketing-launch-kit.md](marketing-launch-kit.md)
-- The launch documents (`go-no-go.md`, `pilot-runbook-whatsapp.md`,
-  `hosting-requirements-it.md`, `meta-onboarding-guide.md`,
-  `legal-compliance-pack.md`, `dpia-draft.md`, `phrase-workshop-kit.md`,
-  `decisions-log.md`) are on branch `wip/launch-docs-review` and will
-  appear in `docs/` once that branch is merged.
+- Launch: [go-no-go.md](go-no-go.md), [pilot-runbook-whatsapp.md](pilot-runbook-whatsapp.md),
+  [hosting-requirements-it.md](hosting-requirements-it.md), [meta-onboarding-guide.md](meta-onboarding-guide.md)
+- Legal and Compliance: [legal-compliance-pack.md](legal-compliance-pack.md), [dpia-draft.md](dpia-draft.md)
+- Workshop: [phrase-workshop-kit.md](phrase-workshop-kit.md)
+- Every decision to approve or reverse: [decisions-log.md](decisions-log.md)
 
 ## Appendix: decisions made by the build streams
 
@@ -136,7 +138,7 @@ Every row is **Proposed** until the product owner approves or reverses it.
 | B4 | New `flags_file` check: `flags.json` must parse and hold only `true`/`false`. | A quoted "false" silently leaves a kill switch on. | Remove the check from `app/health.py`. |
 | B5 | `/health` stays public and HTTP 200 when a check fails (503 only if a store is unreadable); it shows counts only. | Outside uptime checkers need it. | Limit `/health` detail to internal addresses in nginx. |
 | B6 | Retention purges run in the app at start-up and nightly at 02:00 Lusaka, and now include the webhook inbox. | There was no scheduled purge and the inbox was never purged. | Set `PURGE_HOUR`; retention days are env settings. |
-| B7 | Env file `/etc/abz-chatbot/env` is `root:abz`, mode 640. | The alert cron job runs as the service user and must read it; the app already holds these secrets. | Keep 600 and run alerts as root through `deploy/admin.sh` (deploy/lib.sh currently expects 600). |
+| B7 | Env file `/etc/abz-chatbot/env` stays root-only, mode 600; the alert cron runs as root through `deploy/admin.sh`, which runs the script as the service user. | Keeps secrets root-only; matches `deploy/lib.sh`. | Change `check_env` in `deploy/lib.sh` and the runbooks. |
 | B8 | Deploys accept only `vX.Y.Z` tags, test each release in its own environment on scratch data before switching, and switch back if `/health` fails. Rollback takes a release name, never a path. | Only a reviewed release can go live; a broken one never serves traffic. | Edit `deploy/deploy.sh` / `rollback.sh`. |
 | B9 | Data and kill switches live outside the release (`ABZ_DATA_DIR`, `ABZ_FLAGS_FILE`). | They must survive a deploy or rollback. | Unset both: the repo's `data/` and `flags.json` are used. |
 | B10 | `REPLY_KEY` can hold several keys (first is primary); `admin.rotate_reply_key` re-encrypts. | Rotation with no downtime. | Use a single key. |

@@ -36,7 +36,7 @@ they differ; the ticket plans in section 3 are kept as the design record.
 | Matcher | Negation handled in both modes, `out_of_scope` phrases, broader phrases, recalibration (`EMB_MEDIUM` 0.435), gates tightened. Character: right 0.670 / wrong 0.044 / OOS 0.067. Hybrid: right 0.835 / wrong 0.022 / OOS 0.067 (targets 0.85 / 0.02 / 0.03) | `metrics-matcher-2026-09-24.md` |
 | MK2 | Marketing-consent step in the callback flow (`MARKETING_CONSENT_ENABLED`), opt-out commands, Jira label `marketing-consent` | `marketing-launch-kit.md` |
 | MK3 | Campaign source (widget `data-campaign`/utm, WhatsApp `ref:`), "Continue on WhatsApp" link (`WA_LINK_ENABLED`, off), a callback button on every product answer | `marketing-launch-kit.md` |
-| Launch docs | `go-no-go.md` (R2), `pilot-runbook-whatsapp.md` (W10), `hosting-requirements-it.md`, `meta-onboarding-guide.md` (W1), `legal-compliance-pack.md`, `dpia-draft.md`, `phrase-workshop-kit.md`, `decisions-log.md` | branch `wip/launch-docs-review`, **not yet merged** into this branch |
+| Launch docs | `go-no-go.md` (R2), `pilot-runbook-whatsapp.md` (W10), `hosting-requirements-it.md`, `meta-onboarding-guide.md` (W1), `legal-compliance-pack.md`, `dpia-draft.md`, `phrase-workshop-kit.md`, `decisions-log.md` | in `docs/`; drafts awaiting PO review |
 
 Section 4 loose ends now closed: the inbox purge is scheduled (R1); backups
 cover `user_key_secret` and `reply_key`, and `REPLY_KEY` can be rotated (P7);
@@ -61,24 +61,17 @@ and nginx changes, and the WhatsApp coexistence pause (W11,
 | Contact-centre lead | Review the `desk.*` staff notes; Chatwoot agent training (W19); pilot roles and testers |
 | Marketing | MK1 launch communications; name an owner for opt-out suppression (opt-outs exist only as `marketing_opt_out` audit events keyed by `user_hash`); campaign codes |
 | Content owner + staff | N1 phrase workshop and two-person labelling; N8 native-speaker check of the draft Bemba/Nyanja phrases (`mwabuka shani`, `mulishani`, `ndifuna loan`, `ndefwaya loan`) |
-| Dev | P7 acceptance on the VM (two deploys, two rollbacks, one restore; a dry run of `deploy.sh` as the non-root user); P9 30-minute staging and VM runs; switch on the alerts cron line; W11; the [VERIFY] checks against a live Chatwoot, Meta and the bank's Jira; the parallel fixes above; a decision on the serial WhatsApp send worker (about 1.6 messages/s at 250 ms per Graph call) before volume grows |
+| Dev | P7 acceptance on the VM (two deploys, two rollbacks, one restore; a dry run of `deploy.sh` as the non-root user); P9 30-minute staging and VM runs; W11; the [VERIFY] checks against a live Chatwoot, Meta and the bank's Jira; the parallel fixes above; a decision on the serial WhatsApp send worker (about 1.6 messages/s at 250 ms per Graph call) before volume grows |
 
-### Decision recorded: env file mode 640
+### Decision recorded: env file mode 600 (root-only)
 
-`/etc/abz-chatbot/env` is `root:abz`, mode `640`, with single-quoted values.
-Reason: the alert cron job in `runbook-incidents.md` section 6 runs as the
-service user `abz` and sources the env file, and the files it writes in
-`data/` must stay writable by the app. The extra exposure is small, because
-the app process, running as `abz`, already holds these secrets in its
-environment.
-
-**Not yet reconciled in code:** `deploy/lib.sh` `check_env` still refuses
-any mode but `600`, and `deploy/env.example`, `deploy/abz-chatbot.service`
-and `runbook-production.md` still say `600`. `deploy/crontab.example`
-instead runs alerts as root through `admin.sh`, which works with `600`.
-Either change `check_env` and those files to `640`, or keep `600` with the
-`admin.sh` cron line (or a systemd timer). Settle this before the first
-deploy, or `deploy.sh` will refuse a `640` file.
+`/etc/abz-chatbot/env` stays `root:root`, mode `600`, as P7 planned and as
+`deploy/lib.sh` `check_env` enforces. The alert cron job runs as root through
+`deploy/admin.sh`, which reads the env file and then runs the script as the
+service user `abz`, so its files in `data/` stay writable by the app.
+`runbook-incidents.md` section 6 and `deploy/crontab.example` agree. (An
+earlier draft of this update recorded `640`; that is withdrawn because it
+needed a weaker file mode for no benefit.)
 
 ### Reviewer concerns that need a human decision
 
@@ -109,7 +102,7 @@ deploy, or `deploy.sh` will refuse a `640` file.
 | 23 | The WhatsApp coexistence pause (bot stops when staff reply from the Business app) was not built; needed before the staff pilot if decision D5 (coexistence) stands | Dev | In progress (W11) |
 | 24 | Tickets with names and phone numbers go to Jira; if Jira is Atlassian Cloud this is likely a cross-border transfer. Real Jira stays in mock mode until Legal rules | Legal | Open |
 | 25 | The single WhatsApp send worker is serial (about 1.6 messages/s) | PO + Dev | Open |
-| 26 | Env file mode 600 or 640 (see above) | Dev | Decided 640; code not yet aligned |
+| 26 | Env file mode 600 or 640 (see above) | Dev | Decided 600; runbook, crontab and `lib.sh` aligned |
 
 ---
 
@@ -262,9 +255,8 @@ failures; alert thresholds and rate-limiting with a mocked transport.
 
 **Build now, in `deploy/`:**
 - `abz-chatbot.service`: systemd, **one** uvicorn worker, `Restart=always`,
-  `EnvironmentFile=/etc/abz-chatbot/env`, and a non-root user. (This plan
-  first said root-only `chmod 600`; the decision is now `root:abz` mode
-  `640`, see "Update 24/09/2026" below.)
+  `EnvironmentFile=/etc/abz-chatbot/env`, and a non-root user. Root-only
+  `chmod 600` (confirmed, see "Update 24/09/2026" below.)
 - `nginx.conf`: TLS (Let's Encrypt or the bank certificate), and
   `proxy_set_header X-Forwarded-For`, with `PROXY_HOPS=1` in the env file.
   Pass `/webhooks/*` through with the **raw body untouched**, since the

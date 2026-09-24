@@ -233,20 +233,21 @@ Add a Jira filter or notification on the label `chatbot-alert`.
 
 ## 6. The cron entry
 
-On the VM, as root, create `/etc/cron.d/abz-chatbot-alerts`:
+The line is already in `deploy/crontab.example`; install that file as
+`/etc/cron.d/abz-chatbot` (as root):
 
 ```cron
 SHELL=/bin/bash
 MAILTO=""
-* * * * * abz cd /opt/abz-chatbot && set -a && . /etc/abz-chatbot/env && set +a && flock -n /tmp/abz-chatbot-alerts.lock .venv/bin/python -m admin.alerts
+* * * * * root flock -n /tmp/abz-chatbot-alerts.lock /opt/abz-chatbot/current/deploy/admin.sh alerts >>/var/log/abz-chatbot/alerts.log 2>&1
 ```
 
-- It runs as the service user `abz`, so the files it writes in `data/` stay
-  writable by the app. That user must be able to read the env file:
-  `chown root:abz /etc/abz-chatbot/env && chmod 640 /etc/abz-chatbot/env`.
-- `set -a; . env` loads the same settings the service uses. Put every value in
-  single quotes: bash and systemd both strip them **[VERIFY with the systemd
-  version on the VM]**.
+- `deploy/admin.sh` reads `/etc/abz-chatbot/env` as root, then runs the
+  script as the service user `abz`, so the env file stays **root-only, mode
+  600**, and the files the script writes in `data/` stay writable by the app.
+- It loads the same settings the service uses. Put every value in single
+  quotes: bash and systemd both strip them **[VERIFY with the systemd version
+  on the VM]**.
 - `flock -n` skips a run if the previous one is still going (a slow Teams or
   Jira call).
 - The script prints nothing unless a Teams or Jira send failed. Set `MAILTO`

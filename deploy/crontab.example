@@ -14,7 +14,7 @@ MAILTO=""
 # ALERT_TEAMS_WEBHOOK_URL in /etc/abz-chatbot/env the Teams cards go to
 # data/alerts_mock.jsonl (mock mode); Jira alerts follow JIRA_ENABLED.
 # Silent unless a send failed.
-* * * * * root /opt/abz-chatbot/current/deploy/admin.sh alerts >>/var/log/abz-chatbot/alerts.log 2>&1
+* * * * * root flock -n /tmp/abz-chatbot-alerts.lock /opt/abz-chatbot/current/deploy/admin.sh alerts >>/var/log/abz-chatbot/alerts.log 2>&1
 
 # Weekly, Monday morning: the quality report (data/report.md) at 06:00, then
 # H4's "bot-wrong" export (customer turns agents tagged bot-wrong in the desk

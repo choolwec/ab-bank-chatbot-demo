@@ -305,3 +305,15 @@ def test_widget_endpoint_carries_the_question(client, monkeypatch, isolated_data
     assert data["meta"]["action"] == "csat:up"
     with store.web_session(sid) as (session, _):
         assert session.slots["csat_answered"] == CSAT_UP
+
+
+def test_thanks_followed_by_a_new_question_is_not_resolved(bot, rate):
+    # C10 answers both halves in one reply; the customer has just asked
+    # something new, so nothing is resolved yet.
+    rate(1)
+    b = bot()
+    b.say("what is etumba")
+    b.say("thank you so much and what are your opening hours")
+    assert b.last[1].get("intents") == ["thanks_goodbye", "opening_hours"]
+    assert not _asked(b)
+    assert CSAT_UP not in b.buttons

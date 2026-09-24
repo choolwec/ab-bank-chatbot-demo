@@ -606,7 +606,11 @@ def _resolved(session, replies, meta):
     marked = [r.pop("resolved") for r in replies if "resolved" in r]
     if marked:
         return marked[-1]
-    if meta.get("action") == "answer" and meta.get("intent") == "thanks_goodbye":
+    # Two answers in one reply (C10) carry meta["intents"]: only a goodbye
+    # that comes LAST resolves anything. "thanks, and what are your opening
+    # hours?" has just asked a new question.
+    intents = meta.get("intents") or [meta.get("intent")]
+    if meta.get("action") == "answer" and intents[-1] == "thanks_goodbye":
         # "thanks" as the very first message hasn't resolved anything.
         if sum(t["role"] == "user" for t in session.transcript) > 1:
             return "thanks_goodbye"

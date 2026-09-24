@@ -31,6 +31,7 @@ import uuid
 from dataclasses import dataclass, field
 
 from . import config
+from .identity import user_hash
 
 TRANSCRIPT_MAX_TURNS = 200
 
@@ -61,6 +62,9 @@ class Session:
     # Messaging channels (W8, M4): the 24-h window and human takeover.
     last_inbound_at: float = 0.0
     bot_paused_until: float = 0.0
+    # P6: HMAC of channel:user_key -- the only customer identity the audit
+    # log ever sees.
+    user_hash: str = ""
 
     def add(self, role: str, text: str) -> None:
         self.transcript.append({"role": role, "text": text, "ts": time.time()})
@@ -125,10 +129,13 @@ class _BaseStore:
         session = self._load(key) if key else None
         if session is not None:
             _refresh(session, now)
+            if not session.user_hash:  # sessions saved before P6
+                session.user_hash = user_hash(key)
             return key, session, False
         session = Session(id=uuid.uuid4().hex, created=now, last_active=now, channel=channel)
         if key is None:  # web: the session id is the user key
             key = web_key(session.id)
+        session.user_hash = user_hash(key)
         return key, session, True
 
     @contextlib.contextmanager

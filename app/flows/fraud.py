@@ -144,7 +144,7 @@ class FraudFlow(FormFlow):
         data = dict(session.flow_state.get("data", {}))
         data["kind"] = session.flow_state.get("kind") or "fraud"
         summary = self.summary(session)
-        ref = audit.create_ticket("fraud", data, session.transcript)
+        ref = self.create_ticket(session, "fraud", data)
         return [
             {
                 "text": msg("fraud.finish", ref=ref, summary=summary),

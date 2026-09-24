@@ -227,6 +227,12 @@ masked the text — nothing unmasked ever reaches storage. Tickets
 handoff never makes a customer repeat themselves. `purge_expired()` enforces
 `TRANSCRIPT_RETENTION_DAYS`/`TICKET_RETENTION_DAYS`, both currently
 placeholders pending legal.
+Since P6 every event and ticket has a `channel`. The only customer
+identity stored is `user_hash`, an HMAC of `channel:user_key` keyed by
+`USER_KEY_SECRET` (`app/identity.py`; generated into `data/` if unset). A
+raw phone number, BSUID or PSID is **never** logged; `Session.id` is random.
+Tickets carry a minimised `reply_to` ({channel, user_hash}). Schema changes
+go in `audit._MIGRATIONS` so existing databases upgrade in place.
 
 ### Contact-center handoff (`app/jira_export.py`)
 The contact center runs on Jira already and didn't want a second queue to

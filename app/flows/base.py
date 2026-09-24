@@ -12,6 +12,7 @@ confirmation summary. flows/__init__.py checks every one exists at import.
 
 import re
 
+from .. import audit
 from ..messages import button, msg, variant
 
 CANCEL_BUTTON = button("back_to_menu", "cancel_flow")
@@ -307,6 +308,14 @@ class FormFlow:
         finished = self.finish(session)
         finished[0] = _with_ack(ack, finished[0])
         return finished, True
+
+    def create_ticket(self, session, kind, data):
+        """Every flow ticket records its channel and how to reply (P6/H1)."""
+        return audit.create_ticket(
+            kind, data, session.transcript,
+            channel=session.channel,
+            reply_to={"channel": session.channel, "user_hash": session.user_hash},
+        )
 
     def finish(self, session):
         raise NotImplementedError

@@ -110,6 +110,12 @@ def _render(text: str) -> str:
         return text
 
 
+def _log(session, role, text, **kwargs):
+    audit.log_event(
+        session.id, role, text, channel=session.channel, user_hash=session.user_hash, **kwargs
+    )
+
+
 def welcome(session):
     session.greeted = True
     session.active_flow = None
@@ -117,7 +123,7 @@ def welcome(session):
     text = _render(msg("welcome"))
     replies = [{"text": text, "buttons": list(MENU_BUTTONS)}]
     session.add("bot", text)
-    audit.log_event(session.id, "bot", text, action="welcome")
+    _log(session, "bot", text, action="welcome")
     _remember_expecting(session, replies, {"action": "welcome"})
     return replies
 
@@ -140,7 +146,7 @@ def resume(session):
     for reply in replies:
         reply["text"] = _render(reply["text"])
         session.add("bot", reply["text"])
-        audit.log_event(session.id, "bot", reply["text"], action=meta["action"])
+        _log(session, "bot", reply["text"], action=meta["action"])
     _remember_expecting(session, replies, meta)
     return replies, meta
 
@@ -153,7 +159,7 @@ def handle(session, text=None, payload=None):
     session.add("user", inbound)
     if session.slots.get("context"):
         session.slots["context"]["age"] += 1  # C9: context fades with each message
-    audit.log_event(session.id, "user", inbound)
+    _log(session, "user", inbound)
 
     replies = []
     if findings:
@@ -171,8 +177,8 @@ def handle(session, text=None, payload=None):
     for reply in replies:
         reply["text"] = _render(reply["text"])
         session.add("bot", reply["text"])
-        audit.log_event(
-            session.id,
+        _log(
+            session,
             "bot",
             reply["text"],
             intent=meta.get("intent"),
@@ -441,8 +447,8 @@ def _context_follow_up(session, text, ranked):
             if not target:
                 return None
             # Inspectable: every context-driven decision is in the audit log.
-            audit.log_event(
-                session.id, "system",
+            _log(
+                session, "system",
                 f"context_boost: {name} -> {target['intent']} (topic {ctx['intent']})",
                 intent=target["intent"], confidence=round(score, 3), action="context_boost",
             )
@@ -568,7 +574,7 @@ def _free_text(session, text, urgent_flows=True):
 
     # Low confidence = a strike (§1 rule 2)
     session.strikes += 1
-    audit.log_event(session.id, "system", text, action="unmatched")
+    _log(session, "system", text, action="unmatched")
     if session.strikes >= 2:
         session.strikes = 0
         return (

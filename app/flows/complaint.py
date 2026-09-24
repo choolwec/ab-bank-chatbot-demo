@@ -35,5 +35,5 @@ class ComplaintFlow(FormFlow):
 
     def finish(self, session):
         data = dict(session.flow_state.get("data", {}))
-        ref = audit.create_ticket("complaint", data, session.transcript)
+        ref = self.create_ticket(session, "complaint", data)
         return [{"text": msg("complaint.finish", ref=ref), "buttons": [HUMAN_BUTTON, MENU_BUTTON]}]

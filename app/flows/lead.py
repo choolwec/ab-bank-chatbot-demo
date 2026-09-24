@@ -53,7 +53,7 @@ class LeadFlow(FormFlow):
 
     def finish(self, session):
         data = dict(session.flow_state.get("data", {}))
-        ref = audit.create_ticket("callback", data, session.transcript)
+        ref = self.create_ticket(session, "callback", data)
         return [
             {
                 "text": msg("lead.finish", ref=ref),

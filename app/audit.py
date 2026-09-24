@@ -61,12 +61,33 @@ def init_db() -> None:
                 transcript TEXT
             )"""
         )
+        _migrate(con)
         con.commit()
         con.close()
         _init_done = True
 
 
-def log_event(session_id, role, text, intent=None, confidence=None, action=None):
+# P6: columns added after launch. Each is (table, column, DDL); an existing
+# database gets them with a default, so old rows read as channel "web".
+_MIGRATIONS = [
+    ("events", "channel", "TEXT NOT NULL DEFAULT 'web'"),
+    ("events", "user_hash", "TEXT"),
+    ("tickets", "channel", "TEXT NOT NULL DEFAULT 'web'"),
+    ("tickets", "reply_to", "TEXT"),
+]
+
+
+def _migrate(con) -> None:
+    for table, column, ddl in _MIGRATIONS:
+        existing = {row[1] for row in con.execute(f"PRAGMA table_info({table})")}
+        if column not in existing:
+            con.execute(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}")
+
+
+def log_event(session_id, role, text, intent=None, confidence=None, action=None,
+              channel="web", user_hash=None):
+    """`user_hash` is identity.user_hash(...) -- NEVER a raw phone number or
+    platform id. Text is already masked by guards before it gets here."""
     row = {
         "ts": _now(),
         "session_id": session_id,
@@ -75,11 +96,13 @@ def log_event(session_id, role, text, intent=None, confidence=None, action=None)
         "intent": intent,
         "confidence": confidence,
         "action": action,
+        "channel": channel,
+        "user_hash": user_hash,
     }
     con = _connect()
     con.execute(
-        "INSERT INTO events (ts, session_id, role, text, intent, confidence, action)"
-        " VALUES (:ts, :session_id, :role, :text, :intent, :confidence, :action)",
+        "INSERT INTO events (ts, session_id, role, text, intent, confidence, action, channel, user_hash)"
+        " VALUES (:ts, :session_id, :role, :text, :intent, :confidence, :action, :channel, :user_hash)",
         row,
     )
     con.commit()
@@ -88,7 +111,10 @@ def log_event(session_id, role, text, intent=None, confidence=None, action=None)
         fh.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
-def create_ticket(kind: str, fields: dict, transcript: list) -> str:
+def create_ticket(kind: str, fields: dict, transcript: list, channel: str = "web",
+                  reply_to: dict | None = None) -> str:
+    """`reply_to` is minimised: how staff can reach the customer back on
+    their channel (a hashed id, never the raw one)."""
     prefix = _TICKET_PREFIX.get(kind, "TKT")
     suffix = "".join(
         secrets.choice(string.ascii_uppercase + string.digits) for _ in range(4)
@@ -96,19 +122,21 @@ def create_ticket(kind: str, fields: dict, transcript: list) -> str:
     ref = f"{prefix}-{dt.date.today():%Y%m%d}-{suffix}"
     con = _connect()
     con.execute(
-        "INSERT INTO tickets (ref, type, created, status, fields, transcript)"
-        " VALUES (?, ?, ?, 'open', ?, ?)",
+        "INSERT INTO tickets (ref, type, created, status, fields, transcript, channel, reply_to)"
+        " VALUES (?, ?, ?, 'open', ?, ?, ?, ?)",
         (
             ref,
             kind,
             _now(),
             json.dumps(fields, ensure_ascii=False),
             json.dumps(transcript, ensure_ascii=False),
+            channel,
+            json.dumps(reply_to, ensure_ascii=False) if reply_to else None,
         ),
     )
     con.commit()
     con.close()
-    log_event("-", "system", f"ticket created: {ref}", action=f"ticket:{kind}")
+    log_event("-", "system", f"ticket created: {ref}", action=f"ticket:{kind}", channel=channel)
     _push_to_jira(kind, ref, fields, transcript)
     return ref
 

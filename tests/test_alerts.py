@@ -403,6 +403,14 @@ def test_dry_run_when_all_is_well(env):
     assert printed == ["[dry run] All checks ok; nothing to send."]
 
 
+def test_dry_run_says_when_everything_was_already_sent(env):
+    body = failing("worker_queue", **QUEUE_STUCK)
+    alerts.run(now=T0, health=body)
+    printed = []
+    alerts.run(now=T0 + 60, health=body, dry_run=True, out=printed.append)
+    assert printed == ["[dry run] Firing: worker_queue; already sent within the rate limits."]
+
+
 def test_a_quiet_run_prints_nothing(env, capsys):
     alerts.run(now=T0, health=failing("worker_queue", **QUEUE_STUCK))
     alerts.run(now=T0 + 60, health=healthy())

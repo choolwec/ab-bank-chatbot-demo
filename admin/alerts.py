@@ -56,7 +56,7 @@ HEALTH_RETRY_SECONDS = 10.0
 RUNBOOK = "docs/runbook-incidents.md"
 
 SEVERITY_MEANING = {
-    1: "Sev 1: kill switch within 15 minutes, tell the PO and Compliance",
+    1: "Sev 1: contain within 15 minutes (kill switch or restart), tell the PO and Compliance",
     2: "Sev 2: fix within 1 working day",
     3: "Sev 3: next content release",
 }
@@ -429,6 +429,8 @@ def run(now: float | None = None, dry_run: bool = False, health: dict | None = N
     if dry_run:
         if not firing and not report["resolved"]:
             out("[dry run] All checks ok; nothing to send.")
+        elif firing and not (report["teams"] or report["jira"]):
+            out(f"[dry run] Firing: {', '.join(sorted(firing))}; already sent within the rate limits.")
     else:
         save_state(state)
     return report

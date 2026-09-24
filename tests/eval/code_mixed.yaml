@@ -1,0 +1,30 @@
+# N8: code-mixed Bemba / Nyanja - English phrasings.
+#
+# STATUS: UNVERIFIED SEED. These few items use only very common words
+# (greetings, thanks, "ndalama" = money, "khadi" = card) and were NOT written
+# by a native speaker. They exist so the harness runs; they must be replaced
+# by the >= 100 phrases collected at the N1 staff workshop and trial, each
+# checked by a Bemba or Nyanja speaker. Do not use these numbers for a
+# decision until then.
+#
+# Evaluate with: python -m admin.eval_code_mixed
+seed_unverified: true
+in_scope:
+  - {text: "muli bwanji, i want to open an account", intent: account_opening_how, lang: ny-en}
+  - {text: "mwashibukeni, where is your branch in kitwe", intent: branch_locator, lang: bem-en}
+  - {text: "zikomo, that's all", intent: thanks_goodbye, lang: ny-en}
+  - {text: "natotela kwati", intent: thanks_goodbye, lang: bem}
+  - {text: "twalumba sana", intent: thanks_goodbye, lang: bem}
+  - {text: "ndalama zanga pa etumba", intent: etumba_balance_check, lang: ny-en}
+  - {text: "how do i send ndalama with etumba", intent: etumba_transfer_mobile_money, lang: ny-en}
+  - {text: "khadi yanga yatayika", intent: lost_stolen_card, lang: ny}
+  - {text: "i lost my khadi", intent: lost_stolen_card, lang: ny-en}
+  - {text: "ndalama zanga zabedwa pa etumba", intent: fraud_scam, lang: ny-en}
+  - {text: "nifuna loan ya business", intent: msme_loan, lang: ny-en}
+  - {text: "ndifuna kutsegula account", intent: account_opening_how, lang: ny-en}
+  - {text: "nifuna kulankhula ndi munthu", intent: human_handoff, lang: ny}
+  - {text: "ndifuna kuyankhula ndi munthu wa bank", intent: human_handoff, lang: ny-en}
+  - {text: "etumba ni chani", intent: etumba_what_is, lang: ny-en}
+  - {text: "nshi etumba", intent: etumba_what_is, lang: bem-en}
+  - {text: "ma charges ya account", intent: fees_charges, lang: ny-en}
+  - {text: "nthawi yotsegula branch", intent: opening_hours, lang: ny-en}

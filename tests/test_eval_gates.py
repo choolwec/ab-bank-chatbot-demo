@@ -133,3 +133,16 @@ def test_export_reads_masked_user_messages(bot):
     assert texts.count("what is etumba") == 1
     assert not any("0977123456" in t for t in texts)
     assert rows[0]["predicted_intent"] == "etumba_what_is" and rows[0]["action"] == "answer"
+
+
+def test_code_mixed_harness_runs_and_is_marked_unverified():
+    """N8: the harness works; the seed stays flagged until native speakers
+    replace it with workshop data."""
+    from admin.eval_code_mixed import load, score
+
+    data = load()
+    assert data["in_scope"] and all(c["intent"] in matcher.intents for c in data["in_scope"])
+    direct, one_tap = score(matcher, data["in_scope"])
+    assert 0 <= direct <= one_tap <= 1
+    if len(data["in_scope"]) < 100:
+        assert data.get("seed_unverified") is True

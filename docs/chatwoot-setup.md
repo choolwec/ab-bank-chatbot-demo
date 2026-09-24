@@ -108,7 +108,10 @@ Chatwoot's webhooks carry no signature **[VERIFY for the installed
 version]**, so the secret in the path is what proves a call came from our
 Chatwoot. The bot compares it in constant time and answers 403 to a wrong
 one. Treat the URL like a password: do not paste it into tickets or chats,
-and rotate it (new secret in both places) if it leaks.
+and rotate it (new secret in both places) if it leaks. Because the secret
+is part of the path, web-server access logs would record it: configure the
+reverse proxy (and uvicorn's access log) not to log the path of
+`/webhooks/chatwoot/` requests, or to mask it **[CONFIRM with IT]**.
 
 ### 2.5 The API token
 

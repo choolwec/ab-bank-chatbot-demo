@@ -335,6 +335,10 @@ def test_desk_text_redacts_phone_numbers_but_not_references_or_amounts():
                  "HND-20260924-AB12, Jira CC-17"):
         assert bridge.desk_text(kept) == kept
     assert "[CARD REDACTED]" in bridge.desk_text("card 4111 1111 1111 1111")
+    for written in ("(0977) 123456", "0977.123.456", "0977/123/456", "+260 (97) 7123456"):
+        assert bridge.desk_text(f"call me on {written} please") == f"call me on {bridge.PHONE_MASK} please"
+    for kept in ("on 01/10/2026 10:30", "on 01.10.2026 10:30", "K 0.50"):
+        assert bridge.desk_text(kept) == kept
 
 
 def test_links_follow_retention_and_never_create_a_file_to_purge(tmp_path):

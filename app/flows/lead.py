@@ -123,6 +123,13 @@ class LeadFlow(FormFlow):
             prompt["yes"], prompt["no"] = yes, no  # a typed yes/no answers it (C3)
         return prompt
 
+    def _retry(self, field):
+        if field != CONSENT:
+            return super()._retry(field)
+        # The retry says "tap Yes or No", so it must carry those buttons.
+        prompt = self._prompt(self.steps.index(CONSENT))
+        return [dict(prompt, text=msg(f"{self.name}.retry.{CONSENT}"))], False
+
     def finish(self, session):
         data = dict(session.flow_state.get("data", {}))
         if CONSENT not in data:

@@ -91,6 +91,38 @@ def test_an_unclear_consent_answer_is_asked_again(bot):
     assert "tap yes or no" in b.text.lower()
 
 
+def test_an_unclear_consent_answer_keeps_the_yes_no_buttons(bot):
+    b = bot()
+    _to_summary(b)
+    b.say("maybe later")
+    assert b.buttons == ["marketing_consent:yes", "marketing_consent:no", "cancel_flow"]
+    b.say("yes")
+    assert b.session.flow_state["data"]["marketing_consent"] == "yes"
+
+
+def test_after_an_opt_out_consent_cannot_be_changed_back(bot):
+    b = bot()
+    _to_summary(b, consent="yes")
+    b.say("unsubscribe")
+    b.tap("confirm_change")
+    assert "change:marketing_consent" not in b.buttons
+    b.tap("change:marketing_consent")  # an old button is not honoured either
+    b.tap("marketing_consent:yes")
+    assert b.session.flow_state["data"]["marketing_consent"] == "no"
+
+
+def test_opting_out_while_changing_consent_never_records_yes(bot, isolated_data):
+    b = bot()
+    _to_summary(b, consent="yes")
+    b.tap("confirm_change")
+    b.tap("change:marketing_consent")
+    b.say("unsubscribe")
+    assert "shall i send it" in b.text.lower()
+    assert "news and offers from ab bank?" not in b.text.lower()
+    b.say("yes")  # the summary's yes: send it
+    assert _tickets()[-1][1]["marketing_consent"] == "no"
+
+
 def test_consent_can_be_changed_from_the_summary(bot):
     b = bot()
     _to_summary(b, consent="yes")

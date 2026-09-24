@@ -243,7 +243,7 @@ class FormFlow:
         data = session.flow_state.get("data", {})
         buttons = [
             {"label": msg(f"field.{f}"), "payload": CHANGE_PREFIX + f}
-            for f in self.steps if f in data
+            for f in self.steps if f in data and not self.skip_step(session, f)
         ]
         return {"text": msg("confirm.change"), "buttons": buttons + [SEND_BUTTON]}
 
@@ -254,6 +254,8 @@ class FormFlow:
         half-finished fraud report must never be silently discarded.
         """
         state = session.flow_state
+        if state.get("editing") and self.skip_step(session, state["editing"]):
+            state.pop("editing")  # e.g. opted out while changing consent (MK2)
         if state.get("editing"):
             return [self._prompt(self.steps.index(state["editing"]), session)]
         if state.get("changing"):
@@ -332,7 +334,8 @@ class FormFlow:
         if payload in ("confirm_change", "confirm_edit"):  # confirm_edit: pre-C7 buttons
             state["changing"] = True
             return [self._change_prompt(session)], False
-        if payload and payload.startswith(CHANGE_PREFIX) and payload[len(CHANGE_PREFIX):] in self.steps:
+        if (payload and payload.startswith(CHANGE_PREFIX) and payload[len(CHANGE_PREFIX):] in self.steps
+                and not self.skip_step(session, payload[len(CHANGE_PREFIX):])):
             state.pop("changing", None)
             state["editing"] = payload[len(CHANGE_PREFIX):]
             return [self._prompt(self.steps.index(state["editing"]), session)], False
@@ -349,6 +352,11 @@ class FormFlow:
             return self._apply_correction(session, *correction)
 
         editing = state.get("editing")
+        if editing and self.skip_step(session, editing):
+            # The field stopped applying while being changed (an opt-out, MK2):
+            # never store it; back to the summary.
+            state.pop("editing")
+            return [self._confirmation_prompt(session)], False
         if editing:
             if payload and payload.startswith(editing + ":"):
                 payload = payload[len(editing) + 1:]  # self-describing button id (P3)

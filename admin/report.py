@@ -94,6 +94,32 @@ class Traffic:
     def ordered_channels(self) -> list[str]:
         return list(CHANNELS) + sorted(self.channels - set(CHANNELS))
 
+    # Derived lines, shared by the channel tables and the §1 targets.
+    def strikes(self, ch) -> int:
+        return self.n(ch, "turn:fallback", "turn:two_strike")
+
+    def per_conversation(self, ch, value):
+        return _ratio(value, self.n(ch, "conv"))
+
+    def failures(self, ch) -> int:
+        return self.n(ch, "sys:send_failed", "sys:wa_status:failed")
+
+    def failure_rate(self, ch):
+        """Failures ÷ bot messages, on WhatsApp and Messenger only (None for
+        the web, which has no delivery receipts)."""
+        if ch is not None and ch not in MESSAGING:
+            return None
+        channels = MESSAGING if ch is None else (ch,)
+        return _ratio(sum(self.failures(c) for c in channels), sum(self.n(c, "bot") for c in channels))
+
+    def csat_answers(self, ch) -> int:
+        return self.n(ch, "turn:csat:up", "turn:csat:down")
+
+    def csat_score(self, ch):
+        """Thumbs-up share × 5, the §1 CSAT scale; None with no answers."""
+        share = _ratio(self.n(ch, "turn:csat:up"), self.csat_answers(ch))
+        return None if share is None else share * 5
+
 
 def collect(con, since: str) -> Traffic:
     t = Traffic()
@@ -259,25 +285,6 @@ def _line_groups(t: Traffic):
     None where the line doesn't apply (shown as a dash)."""
     n = t.n
 
-    def strikes(ch):
-        return n(ch, "turn:fallback", "turn:two_strike")
-
-    def failures(ch):
-        return n(ch, "sys:send_failed", "sys:wa_status:failed")
-
-    def failure_rate(ch):
-        if ch is not None and ch not in MESSAGING:
-            return None
-        sent = sum(n(c, "bot") for c in MESSAGING) if ch is None else n(ch, "bot")
-        return _ratio(failures(ch), sent)
-
-    def csat_answers(ch):
-        return n(ch, "turn:csat:up", "turn:csat:down")
-
-    def csat_score(ch):
-        share = _ratio(n(ch, "turn:csat:up"), csat_answers(ch))
-        return None if share is None else share * 5
-
     def count(*names):
         return lambda ch: n(ch, *names)
 
@@ -287,14 +294,14 @@ def _line_groups(t: Traffic):
             ("Customer messages", "role `user`", "int", count("user")),
             ("Bot messages (not counting the welcome)", "role `bot`", "int", count("bot")),
             ("Bot messages per conversation", "bot messages ÷ conversations", "ratio",
-             lambda ch: _ratio(n(ch, "bot"), n(ch, "conv"))),
+             lambda ch: t.per_conversation(ch, n(ch, "bot"))),
         ]),
         ("Understanding and repair", [
-            ("Strikes", "`fallback` + `two_strike`", "int", strikes),
+            ("Strikes", "`fallback` + `two_strike`", "int", t.strikes),
             ("Strikes per conversation", "strikes ÷ conversations", "ratio",
-             lambda ch: _ratio(strikes(ch), n(ch, "conv"))),
+             lambda ch: t.per_conversation(ch, t.strikes(ch))),
             ("Fallback rate", "strikes ÷ customer messages", "pct",
-             lambda ch: _ratio(strikes(ch), n(ch, "user"))),
+             lambda ch: _ratio(t.strikes(ch), n(ch, "user"))),
             ("Two-strike handoff offers", "`two_strike`", "int", count("turn:two_strike")),
             ("Repairs: repeat", "`repeat`", "int", count("turn:repeat")),
             ("Repairs: clarify", "`clarify`", "int", count("turn:clarify")),
@@ -318,8 +325,9 @@ def _line_groups(t: Traffic):
             ("Urgent confirmations declined", "`urgent_declined`", "int", count("turn:urgent_declined")),
         ]),
         ("Channels and delivery", [
-            ("Delivery failures", "`send_failed` + `wa_status:failed`", "int", failures),
-            ("Delivery failure rate", "failures ÷ bot messages (WhatsApp, Messenger)", "pct", failure_rate),
+            ("Delivery failures", "`send_failed` + `wa_status:failed`", "int", t.failures),
+            ("Delivery failure rate", "failures ÷ bot messages (WhatsApp, Messenger)", "pct",
+             t.failure_rate),
             ("Rate limited", "`rate_limited`", "int", count("sys:rate_limited")),
             ("Paused (a person has the conversation)", "`paused`", "int", count("sys:paused")),
         ]),
@@ -328,8 +336,8 @@ def _line_groups(t: Traffic):
             ("CSAT thumbs up", "`csat:up`", "int", count("turn:csat:up")),
             ("CSAT thumbs down", "`csat:down`", "int", count("turn:csat:down")),
             ("CSAT response rate", "(up + down) ÷ asked", "pct",
-             lambda ch: _ratio(csat_answers(ch), n(ch, "sys:csat_asked"))),
-            ("CSAT score (out of 5)", "thumbs-up share × 5", "ratio", csat_score),
+             lambda ch: _ratio(t.csat_answers(ch), n(ch, "sys:csat_asked"))),
+            ("CSAT score (out of 5)", "thumbs-up share × 5", "ratio", t.csat_score),
         ]),
     ]
 
@@ -401,7 +409,7 @@ def _targets(t: Traffic, offline: dict) -> list[list[str]]:
                             "wrong_direct", "<=", 0.02, "≤ 2%"))
 
     def strikes_per_conv(ch):
-        return _ratio(n(ch, "turn:fallback", "turn:two_strike"), n(ch, "conv"))
+        return t.per_conversation(ch, t.strikes(ch))
 
     rows.append([
         "Conversation", "Strikes per conversation", _fmt(strikes_per_conv(None), "ratio"),
@@ -409,30 +417,20 @@ def _targets(t: Traffic, offline: dict) -> list[list[str]]:
     ])
     rows.append(["Access to humans", "Handoff SLA met", DASH, DASH, "≥ 95%", f"{NA} (needs H2)"])
 
-    def csat(ch):
-        answers = n(ch, "turn:csat:up", "turn:csat:down")
-        return None if not answers else n(ch, "turn:csat:up") / answers * 5
-
-    answers = n(None, "turn:csat:up", "turn:csat:down")
+    score, answers = t.csat_score(None), t.csat_answers(None)
     rows.append([
         "Outcome", "CSAT (thumbs-up share × 5)",
-        DASH if not answers else f"{csat(None):.2f} ({n(None, 'turn:csat:up')} of {answers} thumbs up)",
-        per_channel(csat, "ratio"), "≥ 4.2", status(csat(None), ">=", 4.2),
+        DASH if score is None else f"{score:.2f} ({n(None, 'turn:csat:up')} of {answers} thumbs up)",
+        per_channel(t.csat_score, "ratio"), "≥ 4.2", status(score, ">=", 4.2),
     ])
-
-    def failure_rate(ch):
-        channels = MESSAGING if ch is None else (ch,)
-        sent = sum(n(c, "bot") for c in channels)
-        return _ratio(sum(n(c, "sys:send_failed", "sys:wa_status:failed") for c in channels), sent)
-
     rows.append([
-        "Channels", "Delivery failures (WhatsApp, Messenger)", _fmt(failure_rate(None), "pct"),
-        per_channel(failure_rate, "pct", [c for c in MESSAGING if n(c, "bot")]),
-        "≤ 1%", status(failure_rate(None), "<=", 0.01),
+        "Channels", "Delivery failures (WhatsApp, Messenger)", _fmt(t.failure_rate(None), "pct"),
+        per_channel(t.failure_rate, "pct", [c for c in MESSAGING if n(c, "bot")]),
+        "≤ 1%", status(t.failure_rate(None), "<=", 0.01),
     ])
 
     def bot_per_conv(ch):
-        return _ratio(n(ch, "bot"), n(ch, "conv"))
+        return t.per_conversation(ch, n(ch, "bot"))
 
     rows.append([
         "Channels", "Bot messages per conversation", _fmt(bot_per_conv(None), "ratio"),
@@ -585,7 +583,7 @@ def build_report(days: int = 7, offline: dict | None = None, run_offline: bool =
     now = dt.datetime.now(dt.timezone.utc)
     targets = _targets(t, offline)
     tally = collections.Counter(row[-1].split()[0] for row in targets)
-    answers = t.n(None, "turn:csat:up", "turn:csat:down")
+    score, answers = t.csat_score(None), t.csat_answers(None)
     callbacks = sum(1 for kind, _, _ in tickets if kind == "callback")
     per_channel = " · ".join(f"{ch} {t.n(ch, 'conv'):,}" for ch in channels)
 
@@ -600,8 +598,7 @@ def build_report(days: int = 7, offline: dict | None = None, run_offline: bool =
         f"- {t.n(None, 'conv'):,} conversations ({per_channel}) and {callbacks:,} callback requests.",
         f"- Launch targets: {tally[PASS]} met, {tally[FAIL]} not met, {tally[NA]} without data "
         "or not yet measurable.",
-        "- CSAT: " + (f"{t.n(None, 'turn:csat:up') / answers * 5:.2f} out of 5 from {answers:,} answers."
-                      if answers else "no answers yet."),
+        "- CSAT: " + (f"{score:.2f} out of 5 from {answers:,} answers." if answers else "no answers yet."),
         "- Draft figures: a qualified person checks them before they go into a management report.",
         "",
         "## Launch targets (excellence plan §1)",

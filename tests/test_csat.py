@@ -269,6 +269,27 @@ def test_web_keeps_the_ticket_reply_and_the_question_apart(bot, rate):
     assert b.last[0][0]["buttons"]  # the finish reply keeps its own buttons
 
 
+def test_whatsapp_webhook_round_trip(meta_env, monkeypatch):
+    from test_whatsapp import RAW_NUMBER, payload, say
+
+    monkeypatch.setenv("CSAT_SAMPLE_RATE", "1")
+    say(meta_env, "what is etumba")
+    say(meta_env, "thanks")
+    last = meta_env.outbox("whatsapp")[-1]
+    assert last["interactive"]["type"] == "button"
+    assert [b["reply"]["id"] for b in last["interactive"]["action"]["buttons"]] == [CSAT_UP, CSAT_DOWN, "menu"]
+    body = payload("button_reply")
+    message = body["entry"][0]["changes"][0]["value"]["messages"][0]
+    message["interactive"]["button_reply"]["id"] = CSAT_DOWN
+    message["id"] = "wamid.CSAT"
+    meta_env.post("whatsapp", body)
+    meta_env.process()
+    rows = [r for r in _events("csat:down") if r[0] == "bot"]
+    assert len(rows) == 1 and rows[0][1] == "whatsapp"
+    assert rows[0][2] and RAW_NUMBER not in rows[0][2]  # hashed, never the number
+    assert "Talk to a person" in json.dumps(meta_env.outbox("whatsapp")[-1])
+
+
 def test_widget_endpoint_carries_the_question(client, monkeypatch, isolated_data):
     from conftest import chat
 

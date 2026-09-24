@@ -28,7 +28,18 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Test suite (includes the E3 evaluation gates)
+      # N3: the embedding model is not in git. Fetched once from its official
+      # source at the pinned revision, sha256-verified, and cached.
+      - name: Cache the embedding model
+        uses: actions/cache@v4
+        with:
+          path: models
+          key: minilm-${{ hashFiles('app/config.py') }}
+
+      - name: Fetch and verify the embedding model
+        run: python -m admin.fetch_model
+
+      - name: Test suite (E3 gates in both matcher modes)
         run: pytest -q
 
       - name: Matcher benchmark (informational)

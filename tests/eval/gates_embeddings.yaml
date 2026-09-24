@@ -1,0 +1,17 @@
+# E3 gates for the HYBRID matcher (N3: character + local embeddings), checked
+# by tests/test_embeddings.py whenever the model is present (always in CI).
+# Production still runs the character matcher (gates.yaml) until shadow mode
+# (N4) signs the switch off. Same ratchet rule as gates.yaml.
+#
+# History:
+#   2026-09-24  baseline at N5's calibration (EMB_HIGH 0.715, EMB_MEDIUM 0.41)
+gates:
+  right_direct_min: 0.758
+  wrong_direct_max: 0.044
+  oos_direct_max: 0.133
+  one_tap_min: 0.934
+  oos_large_direct_max: 0.066
+  b77_right_direct_min: 0.231
+  b77_wrong_direct_max: 0.031
+  b77_oos_direct_max: 0.003
+  b77_urgent_recall_min: 0.749

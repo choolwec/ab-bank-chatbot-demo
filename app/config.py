@@ -133,6 +133,31 @@ CONTACTS = {
 }
 
 
+# --- Local embedding model (N3) ---------------------------------------------
+# sentence-transformers/all-MiniLM-L6-v2 (Apache-2.0), downloaded once by
+# `python -m admin.fetch_model` from its official source at this pinned
+# revision. The files are NOT in git; each must match its sha256 or the app
+# refuses to load them and keeps the character matcher.
+EMBED_MODEL_DIR = Path(os.environ.get("EMBED_MODEL_DIR", str(BASE_DIR / "models" / "all-MiniLM-L6-v2")))
+EMBED_MODEL_REVISION = "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
+EMBED_MODEL_SHA256 = {
+    "tokenizer.json": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037",
+    "onnx/model.onnx": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452",  # = HF LFS sha256
+}
+
+
+# Embedding-similarity thresholds for the decision in hybrid mode. Set by
+# calibration (N5, `python -m admin.calibrate`), never tuned on the test split.
+EMB_HIGH = float(os.environ.get("EMB_HIGH", "0.715"))  # N5: seed 7, OOS <= 3% on calibration
+EMB_MEDIUM = float(os.environ.get("EMB_MEDIUM", "0.41"))  # N5: OOS suggestions <= 45%, so gibberish falls back
+
+
+def embeddings_enabled() -> bool:
+    """Kill switch (N3). Off, or model missing/unverified -> exactly the
+    pre-N3 character matcher."""
+    return flag("EMBEDDINGS_ENABLED", False)
+
+
 def _flags_from_file() -> dict:
     try:
         return json.loads(FLAGS_FILE.read_text(encoding="utf-8"))

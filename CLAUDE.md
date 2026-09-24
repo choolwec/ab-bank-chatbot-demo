@@ -148,6 +148,22 @@ A branch lookup counts as a direct answer when the clause names a branch or
 town; the locator itself also answers straight away when its trigger does
 ("where is the kitwe branch").
 
+**Local embeddings (N3/N5).** With `EMBEDDINGS_ENABLED` on (**off by
+default** until the N4 shadow review), the matcher *ranks* by 0.5·character +
+0.5·all-MiniLM-L6-v2 similarity. It *decides* (answer / did you mean /
+fallback) on the embedding score alone, mapped by `matcher.calibrated()` so
+`EMB_HIGH`/`EMB_MEDIUM` land on the usual thresholds. Letting the character
+score also decide was measured and rejected: it brings back its confident
+out-of-scope mistakes. The model (Apache-2.0) runs locally on CPU through
+onnxruntime. Fetch it with `python -m admin.fetch_model`, which checks the
+pinned revision and sha256 (`config.EMBED_MODEL_SHA256`); an unverified or
+missing model means character mode, never a crash. Thresholds come from
+`python -m admin.calibrate` (calibration split only). Hybrid-mode gates are in
+`tests/eval/gates_embeddings.yaml`, and known differences from character mode
+are a strict list in `tests/test_embeddings.py`. The main one is negation ("I
+don't want a loan, I want an account"), which must be fixed before switching
+production over.
+
 **Evaluation gates (E3).** `tests/test_eval_gates.py` scores the matcher on
 the held-out set `tests/eval/heldout.yaml` at the production thresholds and
 fails the build if any metric crosses `tests/eval/gates.yaml` (right/wrong

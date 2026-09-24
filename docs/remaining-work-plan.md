@@ -45,11 +45,13 @@ longer writes to `data/` (P7); README and INSTRUCTIONS list the admin
 commands and content files (this update). The "Hybrid matcher switch-over"
 items 1-3 are done; the shadow reviews and the flag flip remain.
 
-Being fixed in parallel, not in this branch yet: CSAT keeping "Talk to a
-person", a distinct `request_callback` payload, email masking before
-Chatwoot, the desk-failure message, start-up purge resilience, the crontab
-and nginx changes, and the WhatsApp coexistence pause (W11,
-`COEXISTENCE_ENABLED`).
+Since fixed and merged: CSAT keeps "Talk to a person", a distinct
+`request_callback` payload (always the lead flow), email masking before
+Chatwoot, no customer text in inbox error rows, start-up purge resilience,
+the crontab and nginx changes, and the WhatsApp coexistence pause (W11,
+`COEXISTENCE_ENABLED`, off; see `docs/whatsapp-coexistence.md`). Still open:
+the message a customer gets when opening the Chatwoot conversation fails
+(concern: they are told a person will reply, but the bot is not paused).
 
 ### What remains, by owner
 
@@ -61,7 +63,7 @@ and nginx changes, and the WhatsApp coexistence pause (W11,
 | Contact-centre lead | Review the `desk.*` staff notes; Chatwoot agent training (W19); pilot roles and testers |
 | Marketing | MK1 launch communications; name an owner for opt-out suppression (opt-outs exist only as `marketing_opt_out` audit events keyed by `user_hash`); campaign codes |
 | Content owner + staff | N1 phrase workshop and two-person labelling; N8 native-speaker check of the draft Bemba/Nyanja phrases (`mwabuka shani`, `mulishani`, `ndifuna loan`, `ndefwaya loan`) |
-| Dev | P7 acceptance on the VM (two deploys, two rollbacks, one restore; a dry run of `deploy.sh` as the non-root user); P9 30-minute staging and VM runs; W11; the [VERIFY] checks against a live Chatwoot, Meta and the bank's Jira; the parallel fixes above; a decision on the serial WhatsApp send worker (about 1.6 messages/s at 250 ms per Graph call) before volume grows |
+| Dev | P7 acceptance on the VM (two deploys, two rollbacks, one restore; a dry run of `deploy.sh` as the non-root user); P9 30-minute staging and VM runs; W11 [VERIFY] checks on the staff test number (echo payload, which messages Meta echoes); the [VERIFY] checks against a live Chatwoot, Meta and the bank's Jira; the parallel fixes above; a decision on the serial WhatsApp send worker (about 1.6 messages/s at 250 ms per Graph call) before volume grows |
 
 ### Decision recorded: env file mode 600 (root-only)
 
@@ -99,7 +101,7 @@ needed a weaker file mode for no benefit.)
 | 20 | Campaign source is logged as a separate `session_source` event rather than on the session-start event | PO | Open |
 | 21 | `guards.yes_no` counts loose replies such as "sure" as marketing consent. Does that meet the ECT Act 2021 opt-in standard? | Legal | Open |
 | 22 | The Contact Centre number 888 appears in the marketing kit's anti-scam copy without a [CONFIRM] marker at every use | Marketing + Legal | Open |
-| 23 | The WhatsApp coexistence pause (bot stops when staff reply from the Business app) was not built; needed before the staff pilot if decision D5 (coexistence) stands | Dev | In progress (W11) |
+| 23 | The WhatsApp coexistence pause (bot stops when staff reply from the Business app) was not built; needed before the staff pilot if decision D5 (coexistence) stands | Dev | Built (W11), off by default; needs the [VERIFY] checks on the staff test number before the pilot, and the CC must open the Business app at least every 13 days [VERIFY] |
 | 24 | Tickets with names and phone numbers go to Jira; if Jira is Atlassian Cloud this is likely a cross-border transfer. Real Jira stays in mock mode until Legal rules | Legal | Open |
 | 25 | The single WhatsApp send worker is serial (about 1.6 messages/s) | PO + Dev | Open |
 | 26 | Env file mode 600 or 640 (see above) | Dev | Decided 600; runbook, crontab and `lib.sh` aligned |

@@ -113,7 +113,7 @@ Production is planned on a VM in Lusaka, set up from `deploy/` (systemd,
 nginx, deploy / rollback / backup / restore scripts, `env.example`,
 crontab). Follow `docs/runbook-production.md`; incidents and alerts are in
 `docs/runbook-incidents.md`, the Chatwoot agent desk in
-`docs/chatwoot-setup.md`, and load-test results in
+`docs/chatwoot-setup.md`, WhatsApp coexistence (staff and bot on one number) in `docs/whatsapp-coexistence.md`, and load-test results in
 `docs/load-test-results.md`. `ABZ_DATA_DIR` and `ABZ_FLAGS_FILE` move the
 data directory and `flags.json` outside the release directory.
 

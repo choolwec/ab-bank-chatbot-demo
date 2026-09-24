@@ -89,7 +89,8 @@ catches this. An env var set in the production env file silently overrides
 `flags.json`. Switches: `FREE_TEXT_ENABLED`, `WIDGET_ENABLED`,
 `WHATSAPP_ENABLED`, `MESSENGER_ENABLED`, `JIRA_ENABLED`, `CHATWOOT_ENABLED`,
 `EMBEDDINGS_ENABLED`, `URGENT_MODEL_ENABLED`, `SHADOW_MATCHER`,
-`MESSENGER_PUBLIC_REPLIES`, `MARKETING_CONSENT_ENABLED`, `WA_LINK_ENABLED`; `CSAT_SAMPLE_RATE` (0-1) is
+`MESSENGER_PUBLIC_REPLIES`, `MARKETING_CONSENT_ENABLED`, `WA_LINK_ENABLED`,
+`COEXISTENCE_ENABLED`; `CSAT_SAMPLE_RATE` (0-1) is
 read the same way. Full steps: `docs/runbook-incidents.md` section 4.
 `ABZ_DATA_DIR` and `ABZ_FLAGS_FILE` move `data/` and `flags.json` out of the
 release directory (on the VM: `/var/lib/abz-chatbot`, `/etc/abz-chatbot`);
@@ -181,6 +182,19 @@ PII. First touch wins (`slots["source"]`), logged once as
 (off) `/health` returns `wa_link`, and the widget shows "Continue on
 WhatsApp" (`https://wa.me/<WA_LINK_NUMBER>?text=Hi ref:<source>`, no
 session data). Messenger `m.me` referrals are not read yet.
+
+**Coexistence (W11, `app/channels/coexistence.py`, off by default).** When
+staff reply from the WhatsApp Business app on the same number, Meta's
+`smb_message_echoes` event becomes an InboundMessage of kind "echo" (same
+signature check, inbox and worker; the staff text is dropped on parse). It
+pauses the bot for that customer through the same `bot_paused_until` pause
+the desk and Messenger use, for `COEXISTENCE_PAUSE_HOURS` (12) after the last
+echo, or until a whole-message menu command. A hard urgent signal while
+paused still creates a fraud ticket and sends one draft safety reply per
+pause. Audit actions: `human_reply_echo`, `human_reply_echo_ignored`,
+`human_reply_echo_stale`, `coexistence_resumed`, `coexistence_urgent`,
+`coexistence_urgent_repeat`, `coexistence_unfinished_ticket`. See
+`docs/whatsapp-coexistence.md` for the [VERIFY] items.
 
 ### Free-text matching (`app/matcher.py`)
 Fully local, no external API: TF-IDF over character n-grams

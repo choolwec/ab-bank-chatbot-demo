@@ -1428,7 +1428,7 @@ that finishes the ticket.
 | W8 | 24-h window and stale messages | 3b | W12 | 1.5 | W2, P1 | Dev 2 | ☑ |
 | W9 | WhatsApp content variants | 3b | W12 | 0.5 | P3 | Dev 2 + CO | ☑ |
 | W10 | Pilot runbook | 3b | W14–17 | — | — | PO + CC | ◐ |
-| W11 | WhatsApp coexistence pause (bot stops when staff reply from the Business app; `COEXISTENCE_ENABLED`) | 3b | before W15 | — | W2, W4 | Dev | ◐ |
+| W11 | WhatsApp coexistence pause (bot stops when staff reply from the Business app; `COEXISTENCE_ENABLED`) | 3b | before W15 | — | W2, W4 | Dev | ☑ |
 | M1 | Messenger App Review pack | 3c | W15 | 1 | M2 | PO + Legal | ☑ |
 | M2 | Messenger adapter | 3c | W15 | 3 | P2, P3 | Dev | ☑ |
 | M3 | Page profile (Get Started, menu, ice breakers) | 3c | W15 | 1 | M2 | Dev | ☑ |
@@ -1480,8 +1480,8 @@ rest needs infrastructure or people. Details, owners and open decisions:
   flow in one tap, and `docs/marketing-launch-kit.md` is a draft for
   Legal/Compliance. `WA_LINK_ENABLED` stays off until the WhatsApp number is
   confirmed. MK1 stays with Marketing.
-- **W11:** the coexistence pause is being built in parallel; not in this
-  branch yet.
+- **W11:** built behind `COEXISTENCE_ENABLED` (off until D5 is confirmed);
+  [VERIFY] items in `docs/whatsapp-coexistence.md`.
 
 ## Appendix B: the ticket-to-target map
 

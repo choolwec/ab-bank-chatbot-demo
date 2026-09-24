@@ -15,7 +15,7 @@ from .messages import button, has, msg
 from .flows import FLOWS
 from .flows.locator import CITY_PREFIX, branches_mentioned
 from .render import MORE_PAYLOAD
-from .matcher import Matcher
+from .matcher import CLAUSE_MIN_WORDS, CLAUSE_SPLIT_RE as _CLAUSE_SPLIT_RE, Matcher
 
 matcher = Matcher()
 
@@ -522,8 +522,6 @@ def _context_follow_up(session, text, ranked):
 
 
 # --- C10: two questions in one message --------------------------------------
-_CLAUSE_SPLIT_RE = re.compile(r"\?|\band\b|\balso\b", re.IGNORECASE)
-CLAUSE_MIN_WORDS = 3
 MAX_BUTTONS = 5
 
 
@@ -554,6 +552,8 @@ def _two_questions(session, text):
     clauses = [c for c in clauses if c]
     if len(clauses) != 2 or any(len(c.split()) < CLAUSE_MIN_WORDS for c in clauses):
         return None
+    if any(guards.NEGATED_REQUEST_RE.search(c) for c in clauses):
+        return None  # "I don't want a loan and I want an account" is ONE question
     answers = [_clause_answer(session, c) for c in clauses]
     if not all(answers) or answers[0][0] == answers[1][0]:
         return None

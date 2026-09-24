@@ -25,11 +25,8 @@ GATES_FILE = Path(__file__).parent / "eval" / "gates_embeddings.yaml"
 # existing suites. STRICT both ways: a new difference fails the build, and a
 # listed one that stops happening must be removed from here.
 KNOWN_HYBRID_DIFFERENCES = {
-    # Negation: embeddings read "I don't want a loan, I want to open an
-    # account" as about loans AND accounts -> "did you mean" instead of the
-    # account answer. A real weakness; one reason production stays on the
-    # character matcher until the N4 shadow review.
-    "probe-12-negation",
+    # (probe-12-negation was here until 2026-09-24: negated clauses are now
+    # dropped before scoring, matcher.drop_negated_clauses.)
     # "loan" alone is answered directly (MSME loans) instead of "did you mean".
     "n6-out-of-scope-answer",
     # Answered with savings_account (which states its fees) rather than

@@ -259,12 +259,28 @@ NEGATED_FRAUD_RE = re.compile(
     r"(?:been\s+|a\s+|an\s+|any\s+)*"
     r"(?:stole|stolen|stollen|scam|scammed|fraud|fraudulent|hacked|defrauded)\b"
 )
+# The negator words, shared with NEGATED_REQUEST_RE below.
+NEGATOR = (
+    r"(?:do\s*n'?t|dont|do\s+not|does\s*n'?t|did\s*n'?t|not|never|no|"
+    r"rather\s+not|prefer\s+not\s+to)"
+)
 NEGATED_COMPLAINT_RE = re.compile(
-    r"(?i)\b(?:do\s*n'?t|dont|do\s+not|does\s*n'?t|did\s*n'?t|not|never|no|"
-    r"rather\s+not|prefer\s+not\s+to)\s+"
+    r"(?i)\b" + NEGATOR + r"\s+"
     r"(?:really\s+|just\s+|want\s+to\s+|wanna\s+|wish\s+to\s+|trying\s+to\s+|"
     r"going\s+to\s+|gonna\s+|mean\s+to\s+|a\s+|an\s+|any\s+)*"
     r"(?:complain\w*|compliant|dispute)\b"
+)
+# "I don't want a loan, I want to open an account": a clause saying what the
+# customer is NOT asking about. The matcher drops such a clause before
+# scoring (matcher.drop_negated_clauses) -- only a clause about wanting or
+# asking, never a problem report: "my card is not working" is kept.
+NEGATED_REQUEST_RE = re.compile(
+    r"(?i)\b" + NEGATOR + r"\s+"
+    r"(?:really\s+|just\s+|even\s+|actually\s+|looking\s+to\s+)*"
+    r"(?:want|wanna|need|looking\s+for|interested\s+in|asking\s+(?:about|for)|"
+    r"talking\s+about|mean|about)\b"
+    # "..., not a loan" / a bare "no," before the real request
+    r"|^\s*not\b|^\s*(?:no|nope)(?:\s+no)*\s*$"
 )
 # "is it rude to ask about fees" is a question about etiquette, not a report.
 RUDE_QUESTION_RE = re.compile(

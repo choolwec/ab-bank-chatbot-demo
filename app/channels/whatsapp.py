@@ -46,6 +46,7 @@ from fastapi.responses import PlainTextResponse
 from .. import audit, config, metrics, render
 from ..identity import user_hash
 from ..inbox import inbox
+from ..messages import button, msg
 from .base import InboundMessage
 
 api = APIRouter()
@@ -294,10 +295,20 @@ class WhatsAppSender:
         bot, like Messenger's pass_to_inbox(). `user_key` only derives the
         hashed session key an agent's reply comes back to; Chatwoot never sees
         it."""
+        from .. import router
         from ..desk import bridge
 
         ref = session.slots.pop("handoff_requested", None)
-        return bridge.open_conversation(session, f"{NAME}:{user_hash(f'{NAME}:{user_key}')}", ref)
+        if bridge.open_conversation(session, f"{NAME}:{user_hash(f'{NAME}:{user_key}')}", ref):
+            return True
+        # Concern #13: the customer was just told a person will reply here,
+        # but nobody is watching and the bot is not paused. Say so, once.
+        replies, _ = router.respond(session, [{
+            "text": msg("handoff_desk_failed", ref=ref or ""),
+            "buttons": [button("request_a_callback", router.REQUEST_CALLBACK), button("main_menu", "menu")],
+        }], {"intent": "human_handoff", "action": "handoff_desk_failed"})
+        self.send(user_key, replies)
+        return False
 
     def send_template(self, user_key: str, name: str, **params) -> bool:
         """W7: an approved utility template, allowed outside the window."""

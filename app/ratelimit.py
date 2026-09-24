@@ -22,12 +22,15 @@ class SlidingWindowLimiter:
         self.limit_fn = limit_fn  # read per call, so config changes apply live
         self.window = window_seconds
         self.hits: dict[str, deque] = defaultdict(deque)
+        self.reported: dict[str, float] = {}  # key -> when first_refusal() last said yes
 
     def limited(self, key: str) -> bool:
         now = time.time()
         if len(self.hits) > 1024:  # shed buckets idle past the window (scanner churn)
             for k in [k for k, w in self.hits.items() if not w or now - w[-1] > self.window]:
                 del self.hits[k]
+            for k in [k for k, t in self.reported.items() if now - t > self.window]:
+                del self.reported[k]
         window = self.hits[key]
         while window and now - window[0] > self.window:
             window.popleft()
@@ -35,6 +38,16 @@ class SlidingWindowLimiter:
             return True
         window.append(now)
         return False
+
+    def first_refusal(self, key: str) -> bool:
+        """True at most once per window for a limited key, so a flood writes
+        one audit event a minute rather than one per refused request."""
+        now = time.time()
+        last = self.reported.get(key)
+        if last is not None and now - last <= self.window:
+            return False
+        self.reported[key] = now
+        return True
 
 
 ip_limiter = SlidingWindowLimiter(lambda: config.RATE_LIMIT_PER_MINUTE)

@@ -88,6 +88,16 @@ def jira_configured() -> bool:
     return bool(JIRA_BASE_URL and JIRA_EMAIL and JIRA_API_TOKEN and JIRA_PROJECT_KEY)
 
 
+# Concern #6: a ticket whose real Jira push failed is retried (audit.retry_jira)
+# every JIRA_RETRY_SECONDS, backing off, for JIRA_RETRY_HOURS; the first retry
+# waits JIRA_RETRY_FIRST_SECONDS so it never races the ticket's own push.
+# /health's jira_backlog fails when one has waited JIRA_BACKLOG_MAX_MINUTES.
+JIRA_RETRY_SECONDS = 300
+JIRA_RETRY_FIRST_SECONDS = 120
+JIRA_RETRY_HOURS = 24
+JIRA_BACKLOG_MAX_MINUTES = 30
+
+
 # --- Admin routes (every /admin/*, ticket P8) ---
 # HTTP Basic auth. OFF by default: with ADMIN_USER/ADMIN_PASSWORD unset every
 # /admin/* route returns 404, so a fresh deploy never exposes customer names,

@@ -20,6 +20,10 @@ invalid PURGE_HOUR falls back to 02:00 with a warning (config.purge_hour()).
 At start-up, purge_at_startup() runs the same purge but never stops the app:
 a locked or corrupt database is logged (the exception type only, never its
 message) and the app starts anyway; the nightly run tries again.
+
+The JiraRetrier (concern #6) runs audit.retry_jira() at start-up and every
+JIRA_RETRY_SECONDS: tickets whose Jira copy was lost to a restart or a Jira
+outage are pushed again.
 """
 
 import asyncio
@@ -62,6 +66,33 @@ def seconds_until_next_run(now: dt.datetime | None = None) -> float:
     return (target - now).total_seconds()
 
 
+class JiraRetrier:
+    def __init__(self) -> None:
+        self._task = None
+
+    async def _run(self) -> None:
+        while True:
+            try:
+                counts = await asyncio.to_thread(audit.retry_jira)
+                if any(counts.values()):
+                    log.info("jira retry: %s", counts)
+            except Exception as exc:  # noqa: BLE001 -- never let the loop die
+                log.error("jira retry failed (%s)", type(exc).__name__)
+            await asyncio.sleep(config.JIRA_RETRY_SECONDS)
+
+    def start(self) -> None:
+        self._task = asyncio.create_task(self._run())
+
+    async def stop(self) -> None:
+        if self._task:
+            self._task.cancel()
+            try:
+                await self._task
+            except asyncio.CancelledError:
+                pass
+        self._task = None
+
+
 class Housekeeper:
     def __init__(self) -> None:
         self._task = None
@@ -88,3 +119,4 @@ class Housekeeper:
 
 
 housekeeper = Housekeeper()
+jira_retrier = JiraRetrier()

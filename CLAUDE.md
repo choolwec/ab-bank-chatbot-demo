@@ -374,7 +374,9 @@ through `MultiFernet`, primary first; `python -m admin.rotate_reply_key`
 re-encrypts stored sealed values, after which the old key can go. Newer
 actions: `correction` (flow and field name only, never the value),
 `multi_answer`, `csat_asked`, `csat:up`/`csat:down`/`csat_ignored`,
-`marketing_opt_out`, `session_source`, `desk_failed`.
+`marketing_opt_out`, `session_source`, `desk_failed`,
+`handoff_desk_failed`, `jira_push_abandoned`, and `rate_limited` on the
+web (once a minute per visitor, never the IP).
 
 ### Contact-center handoff (`app/jira_export.py`)
 The contact center runs on Jira already and didn't want a second queue to
@@ -395,6 +397,14 @@ to turn the admin pages on; with either unset they return **404**, so a
 fresh deploy never exposes names, numbers or transcripts. New admin routes
 must add `dependencies=[Depends(require_admin)]` (`tests/test_admin.py`
 checks every registered `/admin` path).
+With real credentials, a push that fails (Jira down, or the app restarted
+mid-push) leaves the ticket owed (`tickets.jira_pending`);
+`audit.retry_jira()` (run by `housekeeping.JiraRetrier` at start-up and every
+5 minutes) retries it with back-off for 24 hours, then logs
+`jira_push_abandoned`. `/health`'s `jira_backlog` check alerts after 30
+minutes. A crash just after Jira accepted an issue can create one duplicate:
+accepted on purpose, over a missing fraud report. Tickets from before the
+column, and mock-mode tickets, are never retried.
 Once those four env vars are set (see `docs/deployment-and-jira-setup.md`
 for where each one comes from — self-service via the contact-center team's
 own Jira login in most cases, not necessarily IT), setting them flips
@@ -440,6 +450,10 @@ the API-channel inbox with `ticket_ref`/`jira_key`/`channel` attributes, the
 masked transcript as a private note, then the bot pauses
 (`slots["chatwoot_conversation_id"]`). If opening fails the bot is not
 paused and `desk_failed` is logged; the ticket and Jira stay the record.
+The customer, just promised "a person will reply to you right here", then
+gets `handoff_desk_failed` (their case ref, the emergency number,
+[Request a callback] [Main menu]) through `router.respond`, so it is in the
+transcript and audit like any reply.
 While paused, customer messages (urgent ones included, as with M4) are only
 forwarded, masked. `POST /webhooks/chatwoot/{secret}` (constant-time
 compare, 403 on a wrong secret, 404 when unconfigured or the secret is
@@ -471,7 +485,8 @@ tags, a virtualenv per release, `fetch_model` and the full suite as the app
 user on scratch data before the symlink switch, automatic switch back if
 `/health` fails), `rollback.sh` (release names only, never paths),
 `backup.sh`/`restore.sh` (the three databases plus `user_key_secret` and
-`reply_key`), `admin.sh`, logrotate, `crontab.example` and `env.example`
+`reply_key`; the live databases are read as the app user, never root, so
+sqlite3 can't leave root-owned `-wal`/`-shm` files behind), `admin.sh`, logrotate, `crontab.example` and `env.example`
 (every variable the app reads). Shellcheck runs in CI and a test forbids
 secret-looking values in `deploy/`. `render.yaml` (staging) fetches the
 model and runs `SHADOW_MATCHER=true`. Runbook: `docs/runbook-production.md`;

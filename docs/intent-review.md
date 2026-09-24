@@ -945,7 +945,7 @@ Submitted to Meta under these names; `{{1}}` is the case reference.
 > Hello, this is AB Bank. Your callback request {{1}} is booked, and our team will call you within one working day.
 
 
-## System messages (152 texts)
+## System messages (153 texts)
 
 Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts, retries, confirmations. Source: `knowledge/system_messages.yaml`. `{placeholders}` are filled in by the bot (contact details from `app/config.py`, or the values listed).
 
@@ -1144,6 +1144,13 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Filled in by the bot: `{ref}`
 
 > I've passed our conversation to our team, with everything you've told me so far — a person will reply to you right here. Your reference is {ref}. If your card is lost or money was taken, please also call {emergency_phone} now.
+
+### `handoff_desk_failed`
+
+- Status: **draft**
+- Filled in by the bot: `{ref}`
+
+> Sorry, I couldn't reach our team's chat just now, so a person may not be able to reply here. Your case {ref} is saved and our team will follow it up. If your card is lost or money was taken, please call {emergency_phone} now. Or I can arrange a call back.
 
 ### `coexistence.urgent_safety`
 

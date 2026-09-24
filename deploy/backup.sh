@@ -6,7 +6,11 @@
 # One archive per night, abz-<UTC time>.tar.gz[.age], in BACKUP_DIR:
 #   data/audit.db, sessions.db, inbox.db  consistent copies taken while the
 #                                        service runs (sqlite3 .backup), each
-#                                        checked with PRAGMA integrity_check
+#                                        checked with PRAGMA integrity_check.
+#                                        Read as APP_USER, never root: sqlite3
+#                                        can create -wal/-shm files next to a
+#                                        live WAL database, and root-owned ones
+#                                        would stop the app opening it
 #   data/audit.jsonl                     the append-only audit copy
 #   data/user_key_secret, reply_key      when the app generated them into data/
 #   etc/env, etc/flags.json              the env file holds USER_KEY_SECRET and
@@ -24,7 +28,7 @@ set -Eeuo pipefail
 umask 077
 
 BACKUP_CONF=${BACKUP_CONF:-/etc/abz-chatbot/backup.conf}
-SETTINGS=" DATA_DIR ENV_FILE FLAGS_FILE BACKUP_DIR RETENTION_DAYS BACKUP_AGE_RECIPIENT OFFSITE_DEST OFFSITE_SSH_KEY "
+SETTINGS=" DATA_DIR ENV_FILE FLAGS_FILE BACKUP_DIR RETENTION_DAYS BACKUP_AGE_RECIPIENT OFFSITE_DEST OFFSITE_SSH_KEY APP_USER "
 if [[ -r $BACKUP_CONF ]]; then
     while IFS= read -r line || [[ -n $line ]]; do
         if [[ $line =~ ^([A-Z_][A-Z0-9_]*)=(.*)$ && $SETTINGS == *" ${BASH_REMATCH[1]} "* ]]; then
@@ -40,6 +44,7 @@ RETENTION_DAYS=${RETENTION_DAYS:-14}
 BACKUP_AGE_RECIPIENT=${BACKUP_AGE_RECIPIENT:-}  # age1... public key [CONFIRM: key custodian]
 OFFSITE_DEST=${OFFSITE_DEST:-}                  # [CONFIRM: destination inside Zambia, IT]
 OFFSITE_SSH_KEY=${OFFSITE_SSH_KEY:-/root/.ssh/abz_backup}
+APP_USER=${APP_USER:-abz}  # owns DATA_DIR and runs the service (deploy/lib.sh)
 DATABASES=(audit.db sessions.db inbox.db)
 KEY_FILES=(user_key_secret reply_key)
 
@@ -53,12 +58,31 @@ die() {
     exit 1
 }
 
+# Run a command as APP_USER when this script runs as root (cron); as itself
+# otherwise (the test suite).
+as_app() {
+    if [[ $EUID -eq 0 ]]; then
+        runuser -u "$APP_USER" -- "$@"
+    else
+        "$@"
+    fi
+}
+
 command -v sqlite3 >/dev/null || die "sqlite3 is not installed (apt install sqlite3)"
 [[ -d $DATA_DIR ]] || die "no data directory at $DATA_DIR"
+if [[ $EUID -eq 0 ]]; then
+    id -u "$APP_USER" >/dev/null 2>&1 || die "no user $APP_USER to read the databases as (APP_USER)"
+fi
 mkdir -p "$BACKUP_DIR"
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 work=$(mktemp -d "$BACKUP_DIR/.work-$stamp.XXXXXX")
-trap 'rm -rf "$work"' EXIT
+# APP_USER cannot write into BACKUP_DIR (root, 700), so it writes its copies
+# here, on its own data volume; root then moves them into the archive.
+stage=$(mktemp -d "$DATA_DIR/.backup-$stamp.XXXXXX")
+trap 'rm -rf "$work" "$stage"' EXIT
+if [[ $EUID -eq 0 ]]; then
+    chown "$APP_USER" "$stage"
+fi
 snap=$work/abz-$stamp
 mkdir -p "$snap/data" "$snap/etc"
 
@@ -67,7 +91,8 @@ for db in "${DATABASES[@]}"; do
         say "note: $db does not exist yet; skipped"
         continue
     fi
-    sqlite3 -cmd ".timeout 10000" "$DATA_DIR/$db" ".backup '$snap/data/$db'" || die "could not copy $db"
+    as_app sqlite3 -cmd ".timeout 10000" "$DATA_DIR/$db" ".backup '$stage/$db'" || die "could not copy $db"
+    mv "$stage/$db" "$snap/data/$db"
     check=$(sqlite3 "$snap/data/$db" "PRAGMA integrity_check;")
     [[ $check == ok ]] || die "the copy of $db failed its integrity check: $check"
 done
@@ -115,6 +140,7 @@ say "written $final ($(du -h "$final" | cut -f1))"
 find "$BACKUP_DIR" -maxdepth 1 -type f -name 'abz-*' -mtime +"$((RETENTION_DAYS - 1))" -print -delete |
     while IFS= read -r old; do say "pruned $old"; done
 find "$BACKUP_DIR" -maxdepth 1 -type d -name '.work-*' -mtime +1 -exec rm -rf {} + 2>/dev/null || true
+find "$DATA_DIR" -maxdepth 1 -type d -name '.backup-*' -mtime +1 -exec rm -rf {} + 2>/dev/null || true
 
 [[ -n $OFFSITE_DEST ]] || die "local backup written, but OFFSITE_DEST is not set: there is no off-VM copy"
 rsync -a --chmod=F600 -e "ssh -i $OFFSITE_SSH_KEY -o BatchMode=yes -o StrictHostKeyChecking=yes" \

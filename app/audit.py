@@ -76,7 +76,14 @@ _MIGRATIONS = [
     ("tickets", "channel", "TEXT NOT NULL DEFAULT 'web'"),
     ("tickets", "reply_to", "TEXT"),
     ("tickets", "jira_key", "TEXT"),  # H2: the agent desk links to it
+    # Concern #6: the Jira copy is owed (JIRA_OWED) until a push succeeds;
+    # retry_jira() retries it until JIRA_RETRY_HOURS, then gives up
+    # (JIRA_ABANDONED). Tickets from before this column are 0: never pushed.
+    ("tickets", "jira_pending", "INTEGER NOT NULL DEFAULT 0"),
+    ("tickets", "jira_attempts", "INTEGER NOT NULL DEFAULT 0"),
+    ("tickets", "jira_next_try", "TEXT"),
 ]
+JIRA_OWED, JIRA_ABANDONED = 1, 2
 
 
 def _migrate(con) -> None:
@@ -122,10 +129,11 @@ def create_ticket(kind: str, fields: dict, transcript: list, channel: str = "web
         secrets.choice(string.ascii_uppercase + string.digits) for _ in range(4)
     )
     ref = f"{prefix}-{dt.date.today():%Y%m%d}-{suffix}"
+    real_push = config.jira_enabled() and config.jira_configured()
     con = _connect()
     con.execute(
-        "INSERT INTO tickets (ref, type, created, status, fields, transcript, channel, reply_to)"
-        " VALUES (?, ?, ?, 'open', ?, ?, ?, ?)",
+        "INSERT INTO tickets (ref, type, created, status, fields, transcript, channel, reply_to,"
+        " jira_pending, jira_next_try) VALUES (?, ?, ?, 'open', ?, ?, ?, ?, ?, ?)",
         (
             ref,
             kind,
@@ -134,12 +142,17 @@ def create_ticket(kind: str, fields: dict, transcript: list, channel: str = "web
             json.dumps(transcript, ensure_ascii=False),
             channel,
             json.dumps(reply_to, ensure_ascii=False) if reply_to else None,
+            # Owed until the push below succeeds. The first retry waits long
+            # enough for that push to finish (its timeout is 8 s), so a slow
+            # Jira is not sent the same ticket twice.
+            JIRA_OWED if real_push else 0,
+            _iso_in(config.JIRA_RETRY_FIRST_SECONDS) if real_push else None,
         ),
     )
     con.commit()
     con.close()
     log_event("-", "system", f"ticket created: {ref}", action=f"ticket:{kind}", channel=channel)
-    if config.jira_enabled() and config.jira_configured():
+    if real_push:
         # P9: a real Jira round trip must not hold up the customer's reply
         # (a 250 ms Jira put /chat p95 at 322 ms). The ticket is already
         # stored above, so the push stays best-effort, as before. Mock mode
@@ -154,25 +167,85 @@ def create_ticket(kind: str, fields: dict, transcript: list, channel: str = "web
     return ref
 
 
-def _push_to_jira(kind: str, ref: str, fields: dict, transcript: list, channel="web", reply_to=None) -> None:
+def _push_to_jira(kind: str, ref: str, fields: dict, transcript: list, channel="web", reply_to=None) -> bool:
     """Best-effort: a Jira outage or bad credentials must never block the
-    customer-facing ticket flow (§1 rule 1 — no dead ends, extended to us)."""
+    customer-facing ticket flow (§1 rule 1 — no dead ends, extended to us).
+    A failed real push leaves the ticket owed, for retry_jira()."""
     try:
         result = jira_export.push_ticket(kind, ref, fields, transcript, channel=channel, reply_to=reply_to)
     except Exception:
         result = None
+    try:  # H2: the desk links to the key; never let this block the ticket
+        con = _connect()
+        if result:
+            con.execute("UPDATE tickets SET jira_key = ?, jira_pending = 0 WHERE ref = ?", (result["key"], ref))
+        else:
+            con.execute("UPDATE tickets SET jira_attempts = jira_attempts + 1 WHERE ref = ? AND jira_pending = ?",
+                        (ref, JIRA_OWED))
+        con.commit()
+        con.close()
+    except Exception:
+        pass
     if result:
-        try:  # H2: the desk links to the key; never let this block the ticket
-            con = _connect()
-            con.execute("UPDATE tickets SET jira_key = ? WHERE ref = ?", (result["key"], ref))
-            con.commit()
-            con.close()
-        except Exception:
-            pass
         log_event(
             "-", "system", f"jira issue created: {result['key']} ({result['mode']})",
             action="jira_push",
         )
+    return bool(result)
+
+
+def _iso_in(seconds: float, now: dt.datetime | None = None) -> str:
+    moment = (now or dt.datetime.now(dt.timezone.utc)) + dt.timedelta(seconds=seconds)
+    return moment.isoformat(timespec="seconds")
+
+
+def retry_jira(now: dt.datetime | None = None) -> dict:
+    """Concern #6: push every ticket whose Jira copy is still owed (the app
+    restarted mid-push, or Jira was down). Backs off 5, 10, 20... minutes,
+    capped at an hour; after JIRA_RETRY_HOURS it gives up and logs
+    `jira_push_abandoned`, and staff copy the ticket from /admin/cases.
+    Runs only with real Jira on: nothing is owed in mock mode. A crash just
+    after Jira accepted an issue can mean one duplicate issue; that is
+    accepted, a missing fraud report is not. Returns counts only."""
+    counts = {"pushed": 0, "failed": 0, "abandoned": 0}
+    if not (config.jira_enabled() and config.jira_configured()):
+        return counts
+    now = now or dt.datetime.now(dt.timezone.utc)
+    cutoff = (now - dt.timedelta(hours=config.JIRA_RETRY_HOURS)).isoformat(timespec="seconds")
+    con = _connect()
+    rows = con.execute(
+        "SELECT ref, type, created, fields, transcript, channel, reply_to, jira_attempts FROM tickets"
+        " WHERE jira_pending = ? AND jira_key IS NULL AND COALESCE(jira_next_try, '') <= ? ORDER BY created",
+        (JIRA_OWED, now.isoformat(timespec="seconds")),
+    ).fetchall()
+    for ref, kind, created, fields, transcript, channel, reply_to, attempts in rows:
+        if created < cutoff:
+            con.execute("UPDATE tickets SET jira_pending = ? WHERE ref = ?", (JIRA_ABANDONED, ref))
+            con.commit()
+            log_event("-", "system", f"jira push abandoned: {ref}", action="jira_push_abandoned", channel=channel)
+            counts["abandoned"] += 1
+            continue
+        wait = min(config.JIRA_RETRY_SECONDS * 2 ** attempts, 3600)
+        con.execute("UPDATE tickets SET jira_next_try = ? WHERE ref = ?", (_iso_in(wait, now), ref))
+        con.commit()
+        pushed = _push_to_jira(kind, ref, json.loads(fields or "{}"), json.loads(transcript or "[]"),
+                               channel, json.loads(reply_to) if reply_to else None)
+        counts["pushed" if pushed else "failed"] += 1
+    con.close()
+    return counts
+
+
+def jira_backlog(now: dt.datetime | None = None) -> dict:
+    """For /health: how many tickets still owe their Jira copy, and the age
+    of the oldest in minutes. Counts only."""
+    now = now or dt.datetime.now(dt.timezone.utc)
+    con = _connect()
+    count, oldest = con.execute(
+        "SELECT COUNT(*), MIN(created) FROM tickets WHERE jira_pending = ? AND jira_key IS NULL", (JIRA_OWED,)
+    ).fetchone()
+    con.close()
+    age = (now - dt.datetime.fromisoformat(oldest)).total_seconds() / 60 if oldest else 0.0
+    return {"pending": count, "oldest_pending_minutes": int(age)}
 
 
 def get_ticket(ref: str) -> dict | None:

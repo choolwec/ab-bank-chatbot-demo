@@ -42,6 +42,7 @@ and sends each failing check to **Teams** (the Chatbot alerts group chat) and
 | `send_failures` | More than 2% of replies to Meta failed in the last hour | Sev 2 | Look for `send failed` in the log and check Meta's status page. HTTP 401/403 usually means an expired `WA_ACCESS_TOKEN` or `MS_PAGE_TOKEN`. If nothing gets through, switch that channel off. |
 | `webhook_errors` | More than 1% of `/webhooks/*` requests got a 5xx in the last hour | Sev 2 | Tracebacks in the log. Meta retries, so fix and restart; if it persists, switch the channel off. |
 | `webhook_rejected` | More than 2 requests carrying Meta's signature were refused (4xx) in the last hour | Sev 2 | Almost always a wrong or rotated `WA_APP_SECRET` / `MS_APP_SECRET`. Compare with the Meta app dashboard; restart. |
+| `jira_backlog` | A ticket's Jira copy has been owed for more than 30 minutes (real Jira only; failed pushes are retried every 5 minutes, backing off, for 24 hours) | Sev 2: the ticket is safe in the bot but the contact centre can't see it in Jira | Check the service log and Jira; a 401/403 usually means an expired `JIRA_API_TOKEN`. After 24 hours a ticket is given up (audit action `jira_push_abandoned`): copy it into Jira by hand from `/admin/cases`. |
 | `embedding_model` | The local model did not verify while a feature needs it (`URGENT_MODEL_ENABLED` is on by default) | Sev 2: the second fraud check is off; the keyword rules still work | `.venv/bin/python -m admin.fetch_model`, then restart. |
 
 Notes:
@@ -83,6 +84,7 @@ own stores answers 503. Every check has `ok`; uptime checkers read
     "webhook_errors":   {"ok": true, "requests": 57, "count_5xx": 0, "count_4xx": 1, "rate": 0.0, "threshold": 0.01, "window_minutes": 60},
     "webhook_rejected": {"ok": true, "count": 0, "threshold": 2, "window_minutes": 60},
     "embedding_model":  {"ok": true, "verified": true, "needed_by": ["URGENT_MODEL_ENABLED"]},
+    "jira_backlog":     {"ok": true, "active": true, "pending": 0, "oldest_pending_minutes": 0, "threshold_minutes": 30},
     "flags_file":       {"ok": true, "readable": true, "invalid": []}
   }
 }

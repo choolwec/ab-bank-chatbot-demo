@@ -407,6 +407,15 @@ def _backup(tmp_path, **settings):
                           capture_output=True, text=True)
 
 
+def test_backup_reads_the_live_databases_as_the_app_user():
+    # Concern #8: a root sqlite3 on a live WAL database can leave root-owned
+    # -wal/-shm files behind, and then the app cannot open its own database.
+    script = (DEPLOY / "backup.sh").read_text(encoding="utf-8")
+    live = [line.strip() for line in script.splitlines() if '"$DATA_DIR/$db"' in line and "sqlite3" in line]
+    assert live and all(line.startswith("as_app sqlite3") for line in live)
+    assert 'runuser -u "$APP_USER"' in script
+
+
 @needs_sqlite
 def test_backup_copies_databases_and_both_keys_off_the_vm(tmp_path):
     data, env_file = tmp_path / "data", tmp_path / "env"

@@ -423,3 +423,26 @@ def test_a_chatwoot_outage_leaves_the_bot_answering(meta_env, desk):
     assert "HTTP 503" in failed["text"]
     wa(meta_env, "what is etumba")
     assert "mobile wallet" in meta_env.sent_texts("whatsapp")[-1]
+
+
+def test_a_chatwoot_outage_withdraws_the_promise_of_a_person(meta_env, desk):
+    # Concern #13: "a person will reply to you right here" can't be kept.
+    desk.fail["/conversations"] = 503
+    handoff(meta_env)
+    promise, follow_up = meta_env.sent_texts("whatsapp")[-2:]
+    ref = session_state(meta_env).transcript[-2]["text"].split("Your reference is ")[1].split(".")[0]
+    assert "a person will reply" in promise
+    assert "couldn't reach our team" in follow_up and ref in follow_up and "888" in follow_up
+    last = meta_env.outbox("whatsapp")[-1]
+    ids = [b["reply"]["id"] for b in last["interactive"]["action"]["buttons"]]
+    assert ids == ["request_callback", "menu"]
+    (logged,) = events("handoff_desk_failed")
+    assert logged["role"] == "bot" and ref in logged["text"]
+    wa(meta_env, button="request_callback")  # the way out works
+    assert session_state(meta_env).active_flow == "lead"
+
+
+def test_a_working_desk_sends_no_apology(meta_env, desk):
+    handoff(meta_env)
+    assert not any("couldn't reach our team" in t for t in meta_env.sent_texts("whatsapp"))
+    assert events("handoff_desk_failed") == []

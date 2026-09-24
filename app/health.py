@@ -14,6 +14,8 @@ Nothing here ever carries an id, a user hash or message text.
   webhook_errors      share of /webhooks/* responses that were 5xx
   webhook_rejected    signed Meta requests refused with a 4xx (a wrong secret)
   embedding_model     whether the model verified, when a feature needs it
+  jira_backlog        tickets whose Jira copy is still owed (concern #6), by
+                      the age of the oldest; only while real Jira is on
   flags_file          flags.json parses and every value is true/false: anything
                       else is silently ignored by config.flag(), which puts
                       each switch back to its default -- a kill switch undone
@@ -25,7 +27,7 @@ ChecksBroken, and /health answers 503: that is "the app itself is broken".
 
 import json
 
-from . import config, embedder, guards, metrics, shadow, urgent_model
+from . import audit, config, embedder, guards, metrics, shadow, urgent_model
 from . import inbox as inbox_mod
 
 
@@ -139,6 +141,19 @@ def embedding_model() -> dict:
     return {"ok": verified or not needed_by, "verified": verified, "needed_by": needed_by}
 
 
+def jira_backlog() -> dict:
+    if not (config.jira_enabled() and config.jira_configured()):
+        return {"ok": True, "active": False, "pending": 0, "oldest_pending_minutes": 0,
+                "threshold_minutes": config.JIRA_BACKLOG_MAX_MINUTES}
+    backlog = audit.jira_backlog()
+    return {
+        "ok": backlog["oldest_pending_minutes"] <= config.JIRA_BACKLOG_MAX_MINUTES,
+        "active": True,
+        **backlog,
+        "threshold_minutes": config.JIRA_BACKLOG_MAX_MINUTES,
+    }
+
+
 def flags_file() -> dict:
     """Flag NAMES only in `invalid` (config keys, never customer data)."""
     try:
@@ -160,6 +175,7 @@ CHECKS = {
     "webhook_errors": webhook_errors,
     "webhook_rejected": webhook_rejected,
     "embedding_model": embedding_model,
+    "jira_backlog": jira_backlog,
     "flags_file": flags_file,
 }
 

@@ -113,6 +113,12 @@ messages:
     status: draft
     fills: [ref]
     text: I've passed our conversation to our team, with everything you've told me so far — a person will reply to you right here. Your reference is {ref}. If your card is lost or money was taken, please also call {emergency_phone} now.
+  # Sent straight after handoff_inbox when the agent desk could not be
+  # reached (concern #13): the promise above can't be kept in this chat.
+  handoff_desk_failed:
+    status: draft
+    fills: [ref]
+    text: Sorry, I couldn't reach our team's chat just now, so a person may not be able to reply here. Your case {ref} is saved and our team will follow it up. If your card is lost or money was taken, please call {emergency_phone} now. Or I can arrange a call back.
   # W11: sent at most once per coexistence pause, only when a customer whom
   # staff are answering from the WhatsApp Business app reports fraud or a
   # lost card. Ops/Risk to review with the emergency number.

@@ -27,7 +27,7 @@ CALLBACKS = [
     ("whatsapp", {"name": "Bupe Zulu", "phone": "0955111222", "topic": "a loan", "time": "Morning",
                   "source": "qr_branch_cairo"}),
     ("whatsapp", {"name": "Natasha Mumba", "phone": "0977000111", "topic": "call me on 0977 000 111",
-                  "time": "Morning", "source": "qr_branch_cairo", "marketing_consent": True}),
+                  "time": "Morning", "source": "qr_branch_cairo", "marketing_consent": "not_asked"}),
 ]
 PERSONAL = ["0977123456", "0966555444", "0955111222", "0977000111", "0977 000 111",
             "Mwila", "Tembo", "Chanda", "Phiri", "Bupe", "Zulu", "Natasha", "Mumba"]
@@ -347,9 +347,17 @@ def test_lead_section(seeded):
     assert cells(sources, "qr_branch_cairo") == ["2"]
     assert cells(sources, "facebook_ad") == ["1"] and cells(sources, "unknown") == ["1"]
     consent = section(seeded, "### Marketing consent")
-    assert cells(consent, "yes") == ["2"]  # "yes" and True
-    assert cells(consent, "no") == ["1"] and cells(consent, "unknown") == ["1"]
-    assert "Share of callbacks with marketing consent: 50.0%" in consent
+    assert cells(consent, "yes") == ["1"] and cells(consent, "no") == ["1"]
+    assert cells(consent, "not asked") == ["1"] and cells(consent, "unknown") == ["1"]
+    assert "Share of callbacks with marketing consent: 25.0%" in consent
+
+
+@pytest.mark.parametrize("value", [True, "true", "True", "YES", " yes", 1, "agree"])
+def test_consent_counts_only_the_values_the_flow_writes(value):
+    # Concern #12: a loose value is not a recorded consent.
+    assert report._consent({"marketing_consent": value}) == "unknown"
+    assert report._consent({"marketing_consent": "yes"}) == "yes"
+    assert report._consent({"marketing_consent": "not_asked"}) == "not asked"
 
 
 def test_lead_section_without_source_or_consent_fields(isolated_data):

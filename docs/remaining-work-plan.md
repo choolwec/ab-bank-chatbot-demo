@@ -49,9 +49,11 @@ Since fixed and merged: CSAT keeps "Talk to a person", a distinct
 `request_callback` payload (always the lead flow), email masking before
 Chatwoot, no customer text in inbox error rows, start-up purge resilience,
 the crontab and nginx changes, and the WhatsApp coexistence pause (W11,
-`COEXISTENCE_ENABLED`, off; see `docs/whatsapp-coexistence.md`). Still open:
-the message a customer gets when opening the Chatwoot conversation fails
-(concern: they are told a person will reply, but the bot is not paused).
+`COEXISTENCE_ENABLED`, off; see `docs/whatsapp-coexistence.md`). Fixed on
+24/09 after the PO's decisions: the Jira retry list (#6), the desk-failure
+follow-up message (#13), web rate-limit logging (#10), exact consent counting
+(#12) and the backup running as the app user (#8). The table below is
+current as of that commit.
 
 ### What remains, by owner
 
@@ -63,7 +65,7 @@ the message a customer gets when opening the Chatwoot conversation fails
 | Contact-centre lead | Review the `desk.*` staff notes; Chatwoot agent training (W19); pilot roles and testers |
 | Marketing | MK1 launch communications; name an owner for opt-out suppression (opt-outs exist only as `marketing_opt_out` audit events keyed by `user_hash`); campaign codes |
 | Content owner + staff | N1 phrase workshop and two-person labelling; N8 native-speaker check of the draft Bemba/Nyanja phrases (`mwabuka shani`, `mulishani`, `ndifuna loan`, `ndefwaya loan`) |
-| Dev | P7 acceptance on the VM (two deploys, two rollbacks, one restore; a dry run of `deploy.sh` as the non-root user); P9 30-minute staging and VM runs; W11 [VERIFY] checks on the staff test number (echo payload, which messages Meta echoes); the [VERIFY] checks against a live Chatwoot, Meta and the bank's Jira; the parallel fixes above; a decision on the serial WhatsApp send worker (about 1.6 messages/s at 250 ms per Graph call) before volume grows |
+| Dev | P7 acceptance on the VM (two deploys, two rollbacks, one restore; a dry run of `deploy.sh` as the non-root user); P9 30-minute staging and VM runs; W11 [VERIFY] checks on the staff test number (echo payload, which messages Meta echoes); the [VERIFY] checks against a live Chatwoot, Meta and the bank's Jira; parallel WhatsApp sending before the public launch if pilot volumes need it (D15) |
 
 ### Decision recorded: env file mode 600 (root-only)
 
@@ -80,30 +82,30 @@ needed a weaker file mode for no benefit.)
 | # | Concern | Who decides | Status |
 |---|---|---|---|
 | 1 | After a Teams "Resolved" post, a re-firing issue waits out the 15-minute limit. In a crash-restart loop the chat can show "Resolved" for up to about 14 minutes while the bot is down. Options: repost a re-firing Sev 1 at once, or hold "Resolved" posts for 15 minutes | PO | Open |
-| 2 | `inbox.py` stores the handler's exception text in failed rows; raw PII could land in `inbox.db` if an exception ever includes it. Suggest storing the exception type only | Dev + PO | Open |
+| 2 | `inbox.py` stores the handler's exception text in failed rows; raw PII could land in `inbox.db` if an exception ever includes it. Suggest storing the exception type only | Dev + PO | Fixed (129a85f): the error column holds the exception type only |
 | 3 | A `/health` 503 (app up, store unreadable) raises "The chatbot is not responding" (Sev 1); the wording could mislead the responder | PO | Open |
-| 4 | A locked or corrupt database stops start-up (the start-up purge is not wrapped); an invalid `PURGE_HOUR` silently ends the nightly task | Dev | In progress (parallel fix) |
+| 4 | A locked or corrupt database stops start-up (the start-up purge is not wrapped); an invalid `PURGE_HOUR` silently ends the nightly task | Dev | Fixed (993cde5): the start-up purge logs and carries on; a bad `PURGE_HOUR` falls back to 02:00 |
 | 5 | `/health` is public and shows operational counts and invalid flag names (no ids or text). IT may want nginx to limit the detail to internal addresses | IT | Open |
-| 6 | A real Jira push runs in a daemon thread; a restart mid-push loses it (the local ticket is safe). Needs a retry or outbox before real Jira credentials go live | PO + Dev | Open |
+| 6 | A real Jira push runs in a daemon thread; a restart mid-push loses it (the local ticket is safe). Needs a retry or outbox before real Jira credentials go live | PO + Dev | Fixed 24/09 (PO chose the retry list): owed tickets are retried with back-off for 24 h, then `jira_push_abandoned`; `/health` `jira_backlog` alerts after 30 min. Rarely one duplicate Jira issue, accepted |
 | 7 | nginx sets X-Frame-Options/frame-ancestors on every path, `/widget/` included. Harmless while the widget is a script; it would break an iframe widget | Dev | Noted |
-| 8 | `backup.sh` runs `sqlite3` as root on WAL-mode databases; consider running the backup step as `abz` | Dev | Open |
-| 9 | CSAT on WhatsApp and Messenger merges into the resolving bubble and drops its "Talk to a person" and "Done" buttons | PO | In progress (parallel fix) |
-| 10 | Web rate-limit hits are never logged, so the report's "Rate limited" line always shows 0 for the web | Dev | Open |
+| 8 | `backup.sh` runs `sqlite3` as root on WAL-mode databases; consider running the backup step as `abz` | Dev | Fixed 24/09: `backup.sh` reads the live databases as `APP_USER` (`runuser`), so no root-owned `-wal`/`-shm` files |
+| 9 | CSAT on WhatsApp and Messenger merges into the resolving bubble and drops its "Talk to a person" and "Done" buttons | PO | Fixed (0f950c5): merging keeps "Talk to a person", and it is the CSAT question's third button |
+| 10 | Web rate-limit hits are never logged, so the report's "Rate limited" line always shows 0 for the web | Dev | Fixed 24/09: web refusals logged as `rate_limited`, once a minute per visitor, no IP |
 | 11 | The report's "Topics as typed (masked)" table gives Marketing free text; personal names inside it would not be caught. Free text, or topic groups only? | PO + DPO | Open |
-| 12 | The lead section counts `marketing_consent` values `true`/`"true"` as yes, as well as `"yes"`. The flow writes `yes`/`no`/`not_asked`; confirm and tighten | Dev | Open |
-| 13 | If opening the Chatwoot conversation fails, the customer has already been told a person will reply there, but the bot is not paused | PO + CC | In progress (parallel fix) |
-| 14 | Email addresses are not masked before reaching Chatwoot | DPO | In progress (parallel fix) |
-| 15 | The Chatwoot webhook secret sits in the URL path, so access logs that record paths would hold it | IT | In progress (nginx) |
+| 12 | The lead section counts `marketing_consent` values `true`/`"true"` as yes, as well as `"yes"`. The flow writes `yes`/`no`/`not_asked`; confirm and tighten | Dev | Fixed 24/09: only `yes` counts as consent; the table shows yes / no / not asked / unknown |
+| 13 | If opening the Chatwoot conversation fails, the customer has already been told a person will reply there, but the bot is not paused | PO + CC | Fixed 24/09 (PO chose the follow-up message): `handoff_desk_failed` gives the case ref, the emergency number and [Request a callback] [Main menu]. Draft wording, in the legal export |
+| 14 | Email addresses are not masked before reaching Chatwoot | DPO | Fixed (24928f5): emails become [EMAIL REDACTED] before Chatwoot; the ticket keeps the contact |
+| 15 | The Chatwoot webhook secret sits in the URL path, so access logs that record paths would hold it | IT | Fixed in `deploy/nginx.conf` (b2362fa); IT to confirm no other proxy in front logs the path |
 | 16 | While the desk has a conversation, urgent messages (fraud, lost card) are only forwarded to the agent and do not start the fraud flow (same as Messenger M4) | PO + Ops | Open |
 | 17 | Launch in hybrid mode although neither mode meets all the section 1 targets (hybrid right 0.835, wrong 0.022, OOS 0.067). Hybrid BANKING77 wrong answers are 0.031 (mostly fraud reports routed as lost card; both reach the fraud flow) | PO | Open |
 | 18 | The matcher builder read a doc quoting 12 held-out items and removed 8 phrases that exactly matched eval items: a mild fit to the eval sets. The N1 golden set and shadow reviews are the independent check | PO | Noted |
-| 19 | "Request a callback" on product answers uses `human_handoff`; on Messenger, and on WhatsApp with Chatwoot, it opens a live handoff, so no consent is asked and no source is recorded | PO | In progress (parallel fix: `request_callback`) |
+| 19 | "Request a callback" on product answers uses `human_handoff`; on Messenger, and on WhatsApp with Chatwoot, it opens a live handoff, so no consent is asked and no source is recorded | PO | Fixed (0f950c5): a distinct `request_callback` payload always opens the lead flow |
 | 20 | Campaign source is logged as a separate `session_source` event rather than on the session-start event | PO | Open |
 | 21 | `guards.yes_no` counts loose replies such as "sure" as marketing consent. Does that meet the ECT Act 2021 opt-in standard? | Legal | Open |
 | 22 | The Contact Centre number 888 appears in the marketing kit's anti-scam copy without a [CONFIRM] marker at every use | Marketing + Legal | Open |
 | 23 | The WhatsApp coexistence pause (bot stops when staff reply from the Business app) was not built; needed before the staff pilot if decision D5 (coexistence) stands | Dev | Built (W11), off by default; needs the [VERIFY] checks on the staff test number before the pilot, and the CC must open the Business app at least every 13 days [VERIFY] |
 | 24 | Tickets with names and phone numbers go to Jira; if Jira is Atlassian Cloud this is likely a cross-border transfer. Real Jira stays in mock mode until Legal rules | Legal | Open |
-| 25 | The single WhatsApp send worker is serial (about 1.6 messages/s) | PO + Dev | Open |
+| 25 | The single WhatsApp send worker is serial (about 1.6 messages/s) | PO + Dev | Decided 24/09: keep the serial worker for the pilot; decide before the public launch from pilot volumes (the `worker_queue` alert already fires on a backlog) |
 | 26 | Env file mode 600 or 640 (see above) | Dev | Decided 600; runbook, crontab and `lib.sh` aligned |
 
 ---

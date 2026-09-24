@@ -8,7 +8,7 @@ channels use. The per-IP rate limiter applies here only (see ratelimit.py).
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from .. import campaign, config, router
+from .. import audit, campaign, config, router
 from ..ratelimit import client_ip, ip_limiter
 from ..session import store
 
@@ -29,7 +29,12 @@ class ChatIn(BaseModel):
 def chat(body: ChatIn, request: Request):
     if not config.widget_enabled():
         raise HTTPException(status_code=503, detail="Chat is currently unavailable.")
-    if ip_limiter.limited(client_ip(request)):
+    ip = client_ip(request)
+    if ip_limiter.limited(ip):
+        if ip_limiter.first_refusal(ip):
+            # Once a minute per visitor, for the weekly report. No session
+            # (the id in the body is the client's claim) and never the IP.
+            audit.log_event("-", "system", "rate limited", action="rate_limited", channel="web")
         raise HTTPException(status_code=429, detail="Too many messages — please slow down.")
 
     with store.web_session(body.session_id) as (session, created):

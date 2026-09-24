@@ -119,6 +119,12 @@ ISSUES = {
         "true or false without quotes. Until then every switch is at its default (free text, widget, "
         "WhatsApp and Messenger on; Jira off).",
     ),
+    "jira_backlog": (
+        2, "Tickets are not reaching Jira",
+        "The tickets are safe in the bot (/admin/cases) and are retried every few minutes. Check the service "
+        "log and Jira itself: an HTTP 401 or 403 usually means an expired JIRA_API_TOKEN. A ticket still not "
+        "in Jira after 24 hours is given up (audit action jira_push_abandoned): copy it into Jira by hand.",
+    ),
     "embedding_model": (
         2, "The local model did not verify",
         "The second fraud check and the hybrid matcher are off; the keyword rules still work. Run "
@@ -189,6 +195,9 @@ def describe(name: str, check: dict) -> tuple[str, str]:
                 return "not valid JSON", "valid JSON with true/false values"
             return ("not true/false: " + ", ".join(check.get("invalid") or []),
                     "valid JSON with true/false values")
+        if name == "jira_backlog":
+            return (f"{check['pending']} waiting, the oldest for {check['oldest_pending_minutes']} min",
+                    f"{check['threshold_minutes']} min")
         if name == "embedding_model":
             needed = ", ".join(check.get("needed_by") or []) or "nothing"
             return ("verified" if check.get("verified") else f"not verified (needed by {needed})",

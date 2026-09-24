@@ -23,7 +23,7 @@ from . import health as health_checks
 from . import inbox as inbox_mod
 from .adminauth import require_admin
 from .channels import messenger, web, whatsapp
-from .housekeeping import housekeeper, purge_at_startup
+from .housekeeping import housekeeper, jira_retrier, purge_at_startup
 from .desk import bridge
 from .ratelimit import client_ip as _client_ip  # noqa: F401  (tests, docs)
 from .ratelimit import ip_limiter
@@ -43,7 +43,9 @@ async def lifespan(app):
     purge_at_startup()
     worker.start()  # webhook channels: processes the durable inbox (W2)
     housekeeper.start()
+    jira_retrier.start()  # tickets whose Jira copy is still owed (concern #6)
     yield
+    await jira_retrier.stop()
     await housekeeper.stop()
     await worker.stop()
 

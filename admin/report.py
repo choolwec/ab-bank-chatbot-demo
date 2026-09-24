@@ -328,7 +328,8 @@ def _line_groups(t: Traffic):
             ("Delivery failures", "`send_failed` + `wa_status:failed`", "int", t.failures),
             ("Delivery failure rate", "failures ÷ bot messages (WhatsApp, Messenger)", "pct",
              t.failure_rate),
-            ("Rate limited", "`rate_limited`", "int", count("sys:rate_limited")),
+            ("Rate limited", "`rate_limited` (web: once a minute per visitor)", "int",
+             count("sys:rate_limited")),
             ("Paused (a person has the conversation)", "`paused`", "int", count("sys:paused")),
         ]),
         ("Feedback (CSAT, sampled)", [
@@ -495,10 +496,14 @@ def topic_group(text: str) -> str:
     return TOPIC_GROUPS.get(matcher.get(top).get("category"), OTHER_TOPIC)
 
 
+# The only values the callback flow writes (flows/lead.py). Anything else,
+# True or "true" included, is not a recorded consent and counts as unknown.
+CONSENT_VALUES = {"yes": "yes", "no": "no", "not_asked": "not asked"}
+
+
 def _consent(fields: dict) -> str:
     value = fields.get("marketing_consent")
-    text = "" if value is None else str(value).strip().lower()
-    return {"yes": "yes", "true": "yes", "no": "no", "false": "no"}.get(text, "unknown")
+    return CONSENT_VALUES.get(value, "unknown") if isinstance(value, str) else "unknown"
 
 
 def _clean_value(value) -> str | None:
@@ -554,7 +559,8 @@ def _lead_lines(tickets, channels) -> list[str]:
     if not any("marketing_consent" in fields for _, fields in callbacks):
         return out + ["Not recorded on any callback in this window."]
     consent = collections.Counter(_consent(fields) for _, fields in callbacks)
-    out += _table(["Consent", "Callbacks"], [[k, str(consent[k])] for k in ("yes", "no", "unknown")])
+    out += _table(["Consent", "Callbacks"],
+                  [[k, str(consent[k])] for k in (*CONSENT_VALUES.values(), "unknown")])
     out.append(f"\nShare of callbacks with marketing consent: "
                f"{_fmt(_ratio(consent['yes'], len(callbacks)), 'pct')} (yes ÷ all callbacks).")
     return out

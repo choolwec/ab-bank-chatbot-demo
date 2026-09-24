@@ -108,6 +108,15 @@ not incidental:
 - Two unmatched free-text messages in a row (`session.strikes`) force a
   human-handoff offer instead of a third guess.
 
+### Channels (`app/channels/`)
+Every channel turns its traffic into `channels.base.InboundMessage` and goes
+through the same unchanged `router.handle()`, so the invariants hold per
+channel by construction. `web.py` is the widget's synchronous `POST /chat`,
+with the per-IP limiter (`app/ratelimit.py`). `whatsapp.py` and
+`messenger.py` are webhook adapters (see their sections). `main.py` is only
+the app shell: CORS, `/health`, the demo page, admin routes (all behind
+`adminauth.require_admin`), and mounting the channel routers.
+
 ### Free-text matching (`app/matcher.py`)
 Fully local, no external API: TF-IDF over character n-grams
 (misspelling-tolerant) blended with RapidFuzz ratios, scored per intent

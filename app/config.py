@@ -34,6 +34,8 @@ FLOW_EXPIRY_HOURS_URGENT = int(os.environ.get("FLOW_EXPIRY_HOURS_URGENT", "72"))
 # --- Input hygiene (§3.3) ---
 MAX_MESSAGE_CHARS = 500
 RATE_LIMIT_PER_MINUTE = int(os.environ.get("RATE_LIMIT_PER_MINUTE", "20"))
+# Per customer on the Meta webhooks (P4): they all arrive from Meta's IPs.
+USER_RATE_LIMIT_PER_MINUTE = int(os.environ.get("USER_RATE_LIMIT_PER_MINUTE", "20"))
 
 
 def proxy_hops() -> int:

@@ -48,7 +48,7 @@ def test_purge_all_covers_audit_sessions_and_inbox(stores, monkeypatch):
 
     purged = housekeeping.purge_all()
 
-    assert purged == {"events": 1, "tickets": 0, "sessions": 1, "inbox": 2}
+    assert purged == {"events": 1, "tickets": 0, "sessions": 1, "inbox": 2, "desk_links": 0}
     with sqlite3.connect(box.path) as con:
         left = {row[0] for row in con.execute("SELECT id FROM inbound")}
     assert left == {"whatsapp:old-new", "whatsapp:recent-done"}

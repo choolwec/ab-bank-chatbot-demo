@@ -24,6 +24,7 @@ from . import inbox as inbox_mod
 from .adminauth import require_admin
 from .channels import messenger, web, whatsapp
 from .housekeeping import housekeeper, purge_all
+from .desk import bridge
 from .ratelimit import client_ip as _client_ip  # noqa: F401  (tests, docs)
 from .ratelimit import ip_limiter
 from .session import store
@@ -58,6 +59,7 @@ app.mount("/widget", StaticFiles(directory=WIDGET_DIR), name="widget")
 app.include_router(web.api)
 app.include_router(whatsapp.api)
 app.include_router(messenger.api)
+app.include_router(bridge.api)  # the agent desk's webhook (H2)
 app.include_router(admin_cases.api)
 
 

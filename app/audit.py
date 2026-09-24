@@ -74,6 +74,7 @@ _MIGRATIONS = [
     ("events", "user_hash", "TEXT"),
     ("tickets", "channel", "TEXT NOT NULL DEFAULT 'web'"),
     ("tickets", "reply_to", "TEXT"),
+    ("tickets", "jira_key", "TEXT"),  # H2: the agent desk links to it
 ]
 
 
@@ -157,10 +158,27 @@ def _push_to_jira(kind: str, ref: str, fields: dict, transcript: list, channel="
     except Exception:
         result = None
     if result:
+        con = _connect()
+        con.execute("UPDATE tickets SET jira_key = ? WHERE ref = ?", (result["key"], ref))
+        con.commit()
+        con.close()
         log_event(
             "-", "system", f"jira issue created: {result['key']} ({result['mode']})",
             action="jira_push",
         )
+
+
+def get_ticket(ref: str) -> dict | None:
+    """One ticket's type, channel, fields and Jira key (H2)."""
+    con = _connect()
+    row = con.execute(
+        "SELECT type, channel, fields, jira_key FROM tickets WHERE ref = ?", (ref,)
+    ).fetchone()
+    con.close()
+    if not row:
+        return None
+    return {"ref": ref, "type": row[0], "channel": row[1],
+            "fields": json.loads(row[2]) if row[2] else {}, "jira_key": row[3]}
 
 
 def purge_expired() -> dict:

@@ -17,7 +17,11 @@ phrase stops measuring anything.
 
 1. `python -m admin.export_utterances --days 30`: masked customer messages
    to `data/utterances.csv`, with the current prediction and what the bot did.
-   Anything that still looks personal is dropped.
+   Anything that still looks personal is dropped. This rewrites the file.
+   Then `python -m admin.export_bot_wrong --days 7` (H4) appends the customer
+   turns of conversations agents labelled `bot-wrong` in Chatwoot or Jira,
+   with `source=bot-wrong`, after the same PII check and skipping any text
+   already in the file.
 2. Two reviewers fill `label_a` and `label_b` independently, with an intent
    name or `oos`.
 3. `python -m admin.import_labels data/utterances.csv`: agreed rows are

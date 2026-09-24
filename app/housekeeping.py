@@ -24,6 +24,7 @@ import logging
 from . import audit, config, hours
 from . import inbox as inbox_mod
 from . import session as session_mod
+from .desk.links import links as desk_links
 
 log = logging.getLogger("abz.housekeeping")
 
@@ -33,6 +34,7 @@ def purge_all() -> dict:
     purged = audit.purge_expired()
     purged["sessions"] = session_mod.store.purge_expired()
     purged["inbox"] = inbox_mod.inbox.purge(config.TRANSCRIPT_RETENTION_DAYS)
+    purged["desk_links"] = desk_links.purge(config.TRANSCRIPT_RETENTION_DAYS)  # H2; no-op when off
     log.info("retention purge: %s", purged)
     return purged
 

@@ -5,11 +5,13 @@ Usage:  python -m admin.export_utterances --days 30 [--out data/utterances.csv]
 Writes one row per distinct customer message from the audit log, with what
 the CURRENT matcher predicts and what the bot did at the time:
 
-    text, predicted_intent, score, action, label_a, label_b
+    text, predicted_intent, score, action, label_a, label_b, source
 
 `label_a` / `label_b` are left empty for two reviewers to fill in (an intent
-name, or "oos" for out of scope). `python -m admin.import_labels` turns the
-reviewed file into tests/eval/golden.yaml.
+name, or "oos" for out of scope). `source` is "audit" here; H4's
+admin/export_bot_wrong.py appends the messages agents tagged, as
+"bot-wrong". `python -m admin.import_labels` turns the reviewed file into
+tests/eval/golden.yaml.
 
 The audit log is already masked (guards run before storage). As a SECOND
 check this drops anything that still looks personal: phone numbers, email
@@ -26,9 +28,10 @@ from pathlib import Path
 from app import audit, config, guards
 
 PERSONAL_RE = re.compile(
-    r"\d{6,}|\+?\d[\d \-]{8,}\d|[^@\s]+@[^@\s]+\.[a-z]{2,}|\[(?:CARD|NRC|ACCOUNT)? ?REDACTED\]",
+    r"\d{6,}|\+?\d[\d \-]{8,}\d|[^@\s]+@[^@\s]+\.[a-z]{2,}|\[(?:CARD|NRC|ACCOUNT|PHONE)? ?REDACTED\]",
     re.IGNORECASE,
 )
+FIELDS = ["text", "predicted_intent", "score", "action", "label_a", "label_b", "source"]
 
 
 def looks_personal(text: str) -> bool:
@@ -62,7 +65,7 @@ def export(days: int) -> list[dict]:
         ranked = matcher.match(text)
         top, score = ranked[0] if ranked else ("", 0.0)
         out.append({"text": text, "predicted_intent": top, "score": f"{score:.3f}",
-                    "action": (nxt[0] if nxt else "") or "", "label_a": "", "label_b": ""})
+                    "action": (nxt[0] if nxt else "") or "", "label_a": "", "label_b": "", "source": "audit"})
     con.close()
     return out
 
@@ -74,7 +77,7 @@ def main() -> None:
     args = parser.parse_args()
     rows = export(args.days)
     with args.out.open("w", encoding="utf-8", newline="") as fh:
-        writer = csv.DictWriter(fh, fieldnames=["text", "predicted_intent", "score", "action", "label_a", "label_b"])
+        writer = csv.DictWriter(fh, fieldnames=FIELDS)
         writer.writeheader()
         writer.writerows(rows)
     print(f"written: {args.out} ({len(rows)} messages)")

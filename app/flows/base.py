@@ -97,6 +97,7 @@ def store_contact(value: str) -> str:
     return clean_phone(value) if is_valid_zambian_phone(value) else value.strip()
 
 
+USE_HINT = "use_hint"
 SEND_BUTTON = button("send_it", "confirm_yes")
 CHANGE_BUTTON = button("change_something", "confirm_change")
 CHANGE_PREFIX = "change:"
@@ -154,15 +155,40 @@ class FormFlow:
         (a flow may pre-fill from it -- see FraudFlow)."""
         session.active_flow = self.name
         session.flow_state = {"step": 0, "data": {}, "kind": kind}
-        return self.opening(session, self.intro(session, kind), self._prompt(0)), False
+        return self.opening(session, self.intro(session, kind), self._prompt(0, session)), False
 
     def opening(self, session, intro, question):
         """The intro and the first question share ONE bubble (M1 budget)."""
         text = "\n\n".join([r["text"] for r in intro] + [question["text"]])
         return [dict(question, text=text)]
 
-    def _prompt(self, i):
-        return {"text": msg(f"{self.name}.step.{self.steps[i]}"), "buttons": [CANCEL_BUTTON]}
+    # Steps where the number the customer writes from (WhatsApp) can be
+    # offered as the answer -- the customer confirms it; it is never assumed.
+    hint_fields: frozenset[str] = frozenset({"phone", "contact"})
+
+    def _prompt(self, i, session=None):
+        field = self.steps[i]
+        prompt = {"text": msg(f"{self.name}.step.{field}"), "buttons": [CANCEL_BUTTON]}
+        hint = self._phone_hint(session)
+        if hint and field in self.hint_fields:
+            # Only the last 3 digits appear in the message (and so in the
+            # transcript and audit log); the full number goes on the ticket
+            # only if the customer taps the button.
+            prompt["text"] += "\n\n" + msg("use_this_number", last3=hint[-3:])
+            prompt["buttons"] = [button("use_this_number", f"{field}:{USE_HINT}"), CANCEL_BUTTON]
+        return prompt
+
+    @staticmethod
+    def _phone_hint(session):
+        ref = session.slots.get("phone_hint_ref") if session is not None else None
+        if not ref:
+            return None
+        from ..identity import unseal
+
+        try:
+            return clean_phone(unseal(ref))
+        except Exception:
+            return None
 
     def summary(self, session) -> str:
         """One line, values only: "Mary Banda · 0977 123 456 · a loan · Morning"."""
@@ -193,13 +219,13 @@ class FormFlow:
         """
         state = session.flow_state
         if state.get("editing"):
-            return [self._prompt(self.steps.index(state["editing"]))]
+            return [self._prompt(self.steps.index(state["editing"]), session)]
         if state.get("changing"):
             return [self._change_prompt(session)]
         if state.get("confirming"):
             return [self._confirmation_prompt(session)]
         i = min(state.get("step", 0), len(self.steps) - 1)
-        return [self._prompt(i)]
+        return [self._prompt(i, session)]
 
     def store_value(self, field, value):
         """Hook: the value stored for `field` (e.g. a canonical "skipped")."""
@@ -258,7 +284,7 @@ class FormFlow:
         if payload and payload.startswith(CHANGE_PREFIX) and payload[len(CHANGE_PREFIX):] in self.steps:
             state.pop("changing", None)
             state["editing"] = payload[len(CHANGE_PREFIX):]
-            return [self._prompt(self.steps.index(state["editing"]))], False
+            return [self._prompt(self.steps.index(state["editing"]), session)], False
         # Anything else: ask the same question again, no dead end.
         return self.resume(session), False
 
@@ -289,6 +315,9 @@ class FormFlow:
         field = self.steps[i]
         if payload and payload.startswith(field + ":"):
             payload = payload[len(field) + 1:]  # self-describing button id (P3)
+        if payload == USE_HINT:
+            hint = self._phone_hint(session)
+            payload = "0" + hint[3:] if hint and hint.startswith("260") else hint
         ok, value = self._validated(field, (text or payload or "").strip())
         if not ok:
             return self._retry(field)
@@ -303,7 +332,7 @@ class FormFlow:
         if i < len(self.steps):
             # Deterministic rotation by turn number, so tests stay stable.
             ack = ack or variant("ack", len(session.transcript))
-            return [_with_ack(ack, self._prompt(i))], False
+            return [_with_ack(ack, self._prompt(i, session))], False
         if self.require_confirmation:
             state["confirming"] = True
             return [_with_ack(ack, self._confirmation_prompt(session))], False

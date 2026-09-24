@@ -1,0 +1,6 @@
+{"object": "whatsapp_business_account", "entry": [{"id": "WABA_ID", "changes": [{"field": "messages", "value": {
+  "messaging_product": "whatsapp", "metadata": {"phone_number_id": "PHONE_ID"},
+  "contacts": [{"profile": {"name": "Test Customer"}, "wa_id": "260977123456"}],
+  "messages": [{"from": "260977123456", "id": "wamid.LIST1", "timestamp": "TS", "type": "interactive",
+    "interactive": {"type": "list_reply", "list_reply": {"id": "loc_city:Kitwe", "title": "Kitwe"}}}]
+}}]}]}

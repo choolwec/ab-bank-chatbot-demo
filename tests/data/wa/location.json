@@ -1,0 +1,6 @@
+{"object": "whatsapp_business_account", "entry": [{"id": "WABA_ID", "changes": [{"field": "messages", "value": {
+  "messaging_product": "whatsapp", "metadata": {"phone_number_id": "PHONE_ID"},
+  "contacts": [{"profile": {"name": "Test Customer"}, "wa_id": "260977123456"}],
+  "messages": [{"from": "260977123456", "id": "wamid.LOC1", "timestamp": "TS", "type": "location",
+    "location": {"latitude": -12.8090, "longitude": 28.2140}}]
+}}]}]}

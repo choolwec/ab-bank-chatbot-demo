@@ -21,6 +21,9 @@ messages:
     status: draft
     text: |
       Hello! I'm the AB Bank assistant — an automated helper, not a person. I can help with branches and agents, opening an account, eTumba, and loans, or connect you to our team. What can I help with?
+  disclosure:
+    status: draft
+    text: I'm the AB Bank assistant — an automated helper, not a person.
   resume:
     status: draft
     text: Welcome back! What can I help with?
@@ -89,6 +92,37 @@ messages:
     status: draft
     text: Here are the other options.
 
+  # --- Messaging channels (WhatsApp, Messenger) ------------------------------
+  media_not_accepted:
+    status: draft
+    text: For your safety I can't accept photos or files here — please never send pictures of your card, NRC or statements. Tell me in words what the problem is, or talk to a person.
+  voice_not_supported:
+    status: draft
+    text: I can't listen to voice notes yet. Please type your question, or talk to a person.
+  sorry_delay:
+    status: draft
+    text: Sorry for the slow reply — we had a delay receiving your messages. What can I help with now?
+  channel_off:
+    status: draft
+    text: Our automated assistant is not available on this channel right now. Please call our Contact Centre on {contact_phone} (Monday to Friday 08:00–17:00), or visit any branch. If your card is lost or money was taken without your permission, call {emergency_phone} straight away.
+  window_closed:
+    status: draft
+    text: This customer last wrote more than 24 hours ago, so WhatsApp only allows an approved template. Send the case_update template instead.
+
+  handoff_inbox:
+    status: draft
+    fills: [ref]
+    text: I've passed our conversation to our team, with everything you've told me so far — a person will reply to you right here. Your reference is {ref}. If your card is lost or money was taken, please also call {emergency_phone} now.
+  comment_private.fraud:
+    status: draft
+    text: Hello, this is AB Bank. We saw your comment and want to help privately. If your card is lost or money was taken without your permission, please call {emergency_phone} straight away. You can also reply here to report it — never share your PIN or full card number.
+  comment_private.complaint:
+    status: draft
+    text: Hello, this is AB Bank. We saw your comment and we're sorry about your experience. Please reply here and we'll log a formal complaint for you and give you a reference number.
+  comment_public:
+    status: draft
+    text: We've sent you a private message so we can help.
+
   # --- Guards -------------------------------------------------------------------
   pii_warning:
     status: draft
@@ -132,6 +166,10 @@ messages:
     status: draft
     fills: [name]
     text: Thanks, {name}.
+  use_this_number:
+    status: draft
+    fills: [last3]
+    text: Or tap below to use the number you're messaging from (ending {last3}).
   read_back:
     status: draft
     fills: [value]
@@ -280,6 +318,19 @@ messages:
     status: draft
     fills: [name, address, city, phone, hours]
     text: "- {name} — {address}, {city}. Phone: {phone}. Hours: {hours}"
+  locator.nearest:
+    status: draft
+    fills: [lines]
+    text: |-
+      These branches are closest to where you are:
+      {lines}
+  locator.nearest_line:
+    status: draft
+    fills: [name, address, km, phone, hours]
+    text: "- {name} (about {km} km) — {address}. Phone: {phone}. Hours: {hours}"
+  locator.share_location:
+    status: draft
+    text: Share your location and I'll find the branches closest to you, or pick your town below.
   locator.not_found:
     status: draft
     fills: [city]
@@ -319,3 +370,4 @@ messages:
   button.more: {status: draft, text: "More…"}
   button.choose_an_option: {status: draft, text: "Choose an option"}
   button.options: {status: draft, text: "Options"}
+  button.use_this_number: {status: draft, text: "Use this number"}

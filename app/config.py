@@ -150,6 +150,60 @@ def flag(name: str, default: bool = True) -> bool:
     return default
 
 
+# --- Messaging channels (W2-W8, M2-M5) ----------------------------------------
+# Secrets come from the environment ONLY (never flags.json or git). With them
+# unset, the adapters run in MOCK mode: sends are written to
+# data/<channel>_outbox_mock.jsonl (with a hashed recipient) instead of Meta.
+WA_GRAPH_VERSION = os.environ.get("WA_GRAPH_VERSION", "v23.0")  # [VERIFY] current version
+GRAPH_BASE_URL = os.environ.get("GRAPH_BASE_URL", "https://graph.facebook.com")
+# A message older than this (Meta retries after an outage) is answered with an
+# apology and the menu, never used to resume a flow (W8).
+STALE_MESSAGE_MINUTES = int(os.environ.get("STALE_MESSAGE_MINUTES", "10"))
+# WhatsApp and Messenger allow free-form replies for 24 h after the
+# customer's last message; after that only an approved template (W7/W8).
+CUSTOMER_WINDOW_HOURS = 24
+
+
+def wa_settings() -> dict:
+    return {
+        "token": os.environ.get("WA_ACCESS_TOKEN", ""),
+        "phone_number_id": os.environ.get("WA_PHONE_NUMBER_ID", ""),
+        "app_secret": os.environ.get("WA_APP_SECRET", ""),
+        "verify_token": os.environ.get("WA_VERIFY_TOKEN", ""),
+    }
+
+
+def ms_settings() -> dict:
+    return {
+        "page_token": os.environ.get("MS_PAGE_TOKEN", ""),
+        "page_id": os.environ.get("MS_PAGE_ID", ""),
+        "app_secret": os.environ.get("MS_APP_SECRET", ""),
+        "verify_token": os.environ.get("MS_VERIFY_TOKEN", ""),
+        "app_id": os.environ.get("MS_APP_ID", ""),
+    }
+
+
+def handoff_mode(channel: str) -> str:
+    """How "Talk to a person" works per channel: "callback" (the lead flow:
+    a person calls within a working day) or "inbox" (a person replies in the
+    same conversation: the Messenger Page Inbox, or the agent desk, H2).
+    Override with HANDOFF_MODE_<CHANNEL>."""
+    default = {"messenger": "inbox"}.get(channel, "callback")
+    if channel == "whatsapp" and os.environ.get("CHATWOOT_URL"):
+        default = "inbox"
+    return os.environ.get(f"HANDOFF_MODE_{channel.upper()}", default).strip().lower()
+
+
+def channel_enabled(channel: str) -> bool:
+    """Per-channel kill switches (P4). Off never means silence on a Meta
+    channel: the customer gets one static reply pointing to a person."""
+    if channel == "whatsapp":
+        return flag("WHATSAPP_ENABLED", True)
+    if channel == "messenger":
+        return flag("MESSENGER_ENABLED", True)
+    return widget_enabled()
+
+
 def free_text_enabled() -> bool:
     return flag("FREE_TEXT_ENABLED", True)
 

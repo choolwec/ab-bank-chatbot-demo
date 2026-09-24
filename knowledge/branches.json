@@ -11,7 +11,10 @@
       "sort_code": "210001",
       "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
       "source": "docs",
-      "verified": false
+      "verified": false,
+      "lat": -15.419,
+      "lng": 28.281,
+      "coords_verified": false
     },
     {
       "name": "Acacia Premium Branch / Head Office",
@@ -22,7 +25,10 @@
       "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
       "note": "Bank of Zambia's Nov 2025 filing lists 'Acacia Branch' and 'Head Office' as two separate register entries at this same address — likely one physical location serving both roles.",
       "source": "docs",
-      "verified": false
+      "verified": false,
+      "lat": -15.401,
+      "lng": 28.323,
+      "coords_verified": false
     },
     {
       "name": "Chilenje Branch",
@@ -32,7 +38,10 @@
       "sort_code": "210002",
       "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
       "source": "docs",
-      "verified": false
+      "verified": false,
+      "lat": -15.448,
+      "lng": 28.317,
+      "coords_verified": false
     },
     {
       "name": "Matero Branch",
@@ -43,7 +52,10 @@
       "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
       "note": "Bank of Zambia's Nov 2025 filing describes this address as 'B and J Building after Post Office, Commonwealth Road' rather than 'Matero Mall Shop No. 7' — possibly the same building described differently, or a relocation not yet reflected in one of the two sources. Confirm current address with ops.",
       "source": "docs",
-      "verified": false
+      "verified": false,
+      "lat": -15.378,
+      "lng": 28.246,
+      "coords_verified": false
     },
     {
       "name": "Kalingalinga Branch",
@@ -53,7 +65,10 @@
       "sort_code": "210004",
       "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
       "source": "docs",
-      "verified": false
+      "verified": false,
+      "lat": -15.406,
+      "lng": 28.338,
+      "coords_verified": false
     },
     {
       "name": "Chelston Branch",
@@ -63,7 +78,10 @@
       "sort_code": "210005",
       "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
       "source": "docs",
-      "verified": false
+      "verified": false,
+      "lat": -15.369,
+      "lng": 28.371,
+      "coords_verified": false
     },
     {
       "name": "Kitwe Branch",
@@ -73,7 +91,10 @@
       "sort_code": "210207",
       "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
       "source": "docs",
-      "verified": false
+      "verified": false,
+      "lat": -12.811,
+      "lng": 28.211,
+      "coords_verified": false
     },
     {
       "name": "Ndola Branch",
@@ -83,7 +104,10 @@
       "sort_code": "210108",
       "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
       "source": "docs",
-      "verified": false
+      "verified": false,
+      "lat": -12.965,
+      "lng": 28.635,
+      "coords_verified": false
     },
     {
       "name": "Chipata Branch",
@@ -93,7 +117,10 @@
       "sort_code": "211109",
       "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
       "source": "docs",
-      "verified": false
+      "verified": false,
+      "lat": -13.636,
+      "lng": 32.646,
+      "coords_verified": false
     },
     {
       "name": "Solwezi Branch",
@@ -103,7 +130,10 @@
       "sort_code": "212813",
       "hours": "Mon-Fri 08:00-15:00, Sat 09:00-12:30, closed Sun & public holidays",
       "source": "docs",
-      "verified": false
+      "verified": false,
+      "lat": -12.179,
+      "lng": 26.396,
+      "coords_verified": false
     },
     {
       "name": "Mumbwa Satellite Branch",
@@ -114,7 +144,10 @@
       "hours": "[CONFIRM: satellite offices may keep different hours than full branches]",
       "note": "Called a 'satellite branch' in the Branch Staff FAQ / Social Media Template; Bank of Zambia's filing labels it 'Promotional Offices'.",
       "source": "docs",
-      "verified": false
+      "verified": false,
+      "lat": -14.983,
+      "lng": 27.064,
+      "coords_verified": false
     },
     {
       "name": "Chongwe Promotional Office",
@@ -125,12 +158,25 @@
       "hours": "[CONFIRM]",
       "note": "NOT mentioned in either priority document (Branch Staff FAQ or Social Media Template). Found only in the Bank of Zambia's Nov 2025 branch-network filing, which post-dates both priority documents (Aug 2025). Flag for ops/branch-network sign-off before including in a live branch locator — may be a newly opened location the priority docs simply predate.",
       "source": "boz_only_unconfirmed",
-      "verified": false
+      "verified": false,
+      "lat": -15.331,
+      "lng": 28.683,
+      "coords_verified": false
     }
   ],
   "agent_networks": [
-    {"name": "Kazang", "note": "eTumba cash-in/cash-out at Kazang agents countrywide"},
-    {"name": "543 Konse Konse", "note": "eTumba cash-in/cash-out at 543 Konse Konse agents"},
-    {"name": "Zoona", "note": "eTumba cash-in/cash-out at Zoona agents"}
-  ]
+    {
+      "name": "Kazang",
+      "note": "eTumba cash-in/cash-out at Kazang agents countrywide"
+    },
+    {
+      "name": "543 Konse Konse",
+      "note": "eTumba cash-in/cash-out at 543 Konse Konse agents"
+    },
+    {
+      "name": "Zoona",
+      "note": "eTumba cash-in/cash-out at Zoona agents"
+    }
+  ],
+  "_coords_note": "lat/lng (W6) are APPROXIMATE area coordinates of each branch's named neighbourhood or mall, used only to rank the nearest branches when a customer shares their location on WhatsApp. coords_verified: false until Operations confirm each pin [CONFIRM: exact branch coordinates]."
 }

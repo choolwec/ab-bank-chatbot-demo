@@ -82,3 +82,83 @@ def isolated_data(tmp_path, monkeypatch):
 def bot(isolated_data):
     """A factory: bot() returns a fresh in-process conversation."""
     return Bot
+
+
+class MetaEnv:
+    """Helpers for the WhatsApp / Messenger webhook tests (isolated data)."""
+
+    APP_SECRET = "test-app-secret"
+    VERIFY_TOKEN = "test-verify-token"
+
+    def __init__(self, tmp_path, client):
+        self.tmp = tmp_path
+        self.client = client
+
+    def sign(self, raw: bytes) -> str:
+        import hashlib
+        import hmac
+
+        return "sha256=" + hmac.new(self.APP_SECRET.encode(), raw, hashlib.sha256).hexdigest()
+
+    def post(self, channel, body, signature=None):
+        import json
+
+        raw = json.dumps(body).encode() if not isinstance(body, bytes) else body
+        headers = {"Content-Type": "application/json"}
+        headers["X-Hub-Signature-256"] = signature if signature is not None else self.sign(raw)
+        return self.client.post(f"/webhooks/{channel}", content=raw, headers=headers)
+
+    def process(self):
+        from app import worker
+
+        return worker.process_now()
+
+    def outbox(self, channel):
+        import json
+
+        path = self.tmp / f"{channel}_outbox_mock.jsonl"
+        if not path.exists():
+            return []
+        return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+
+    def sent_texts(self, channel):
+        """The customer-visible text of every mock send (not read receipts)."""
+        out = []
+        for m in self.outbox(channel):
+            if channel == "whatsapp":
+                if m.get("type") == "text":
+                    out.append(m["text"]["body"])
+                elif m.get("type") == "interactive":
+                    out.append(m["interactive"]["body"]["text"])
+            elif "message" in m:
+                out.append(m["message"].get("text", ""))
+        return out
+
+
+@pytest.fixture
+def meta_env(tmp_path, monkeypatch, client, isolated_data):
+    from app import inbox as inbox_mod
+    from app import worker as worker_mod
+    from app.channels import messaging, messenger, whatsapp
+    from app.ratelimit import user_limiter
+    from app.session import SqliteSessionStore
+
+    box = inbox_mod.Inbox(tmp_path / "inbox.db")
+    store = SqliteSessionStore(tmp_path / "sessions.db")
+    for mod in (inbox_mod, worker_mod, whatsapp, messenger):
+        monkeypatch.setattr(mod, "inbox", box)
+    monkeypatch.setattr(messaging, "default_store", store)
+    monkeypatch.setattr("app.session.store", store)
+    for var in ("WA_ACCESS_TOKEN", "WA_PHONE_NUMBER_ID", "MS_PAGE_TOKEN"):
+        monkeypatch.delenv(var, raising=False)
+    monkeypatch.setenv("WA_APP_SECRET", MetaEnv.APP_SECRET)
+    monkeypatch.setenv("WA_VERIFY_TOKEN", MetaEnv.VERIFY_TOKEN)
+    monkeypatch.setenv("MS_APP_SECRET", MetaEnv.APP_SECRET)
+    monkeypatch.setenv("MS_VERIFY_TOKEN", MetaEnv.VERIFY_TOKEN)
+    monkeypatch.setenv("MS_APP_ID", "OUR_APP")
+    monkeypatch.setenv("MS_PAGE_ID", "PAGE_ID")
+    user_limiter.hits.clear()
+    env = MetaEnv(tmp_path, client)
+    env.inbox, env.store = box, store
+    yield env
+    user_limiter.hits.clear()

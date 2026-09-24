@@ -117,6 +117,10 @@ def whatsapp(reply: dict) -> list[dict]:
     return out
 
 
+def whatsapp_all(replies: list[dict]) -> list[dict]:
+    return [m for r in replies for m in whatsapp(r)]
+
+
 # --- Messenger Send API --------------------------------------------------------
 
 def messenger(reply: dict) -> list[dict]:

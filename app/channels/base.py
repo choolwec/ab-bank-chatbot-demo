@@ -24,6 +24,10 @@ class InboundMessage:
     # A phone number the platform tells us (WhatsApp). Used ONLY to offer a
     # prefill the customer confirms; never logged raw.
     phone_hint: str | None = None
+    # "message" (a conversation turn), "comment" (a public Page comment, M5)
+    # or "standby" (arrived while a person has the Messenger thread, M4).
+    kind: str = "message"
+    ref: str | None = None  # e.g. the comment id to reply to privately
 
     @property
     def session_key(self) -> str:

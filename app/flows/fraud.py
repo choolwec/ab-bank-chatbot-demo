@@ -79,7 +79,7 @@ class FraudFlow(FormFlow):
             state["prefill"] = prefill
             return self.opening(session, intro, self._prefill_prompt(prefill)), done
         state["step"] = self._next_step(state)
-        return self.opening(session, intro, self._prompt(state["step"])), done
+        return self.opening(session, intro, self._prompt(state["step"], session)), done
 
     def _prefill_prompt(self, prefill):
         when, channel = prefill.get("when"), prefill.get("channel")
@@ -118,14 +118,14 @@ class FraudFlow(FormFlow):
         if payload == PREFILL_YES:
             state.pop("prefill")
             state["step"] = self._next_step(state)
-            return [self._prompt(state["step"])], False
+            return [self._prompt(state["step"], session)], False
         if payload == PREFILL_NO:
             # Start over with the normal questions; the trigger stays in the
             # transcript that rides along with the ticket.
             state.pop("prefill")
             state["data"] = {}
             state["step"] = 0
-            return [self._prompt(0)], False
+            return [self._prompt(0, session)], False
         return [self._prefill_prompt(prefill)], False
 
     # --- contact read-back --------------------------------------------------

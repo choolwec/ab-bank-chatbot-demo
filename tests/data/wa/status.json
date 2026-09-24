@@ -1,0 +1,5 @@
+{"object": "whatsapp_business_account", "entry": [{"id": "WABA_ID", "changes": [{"field": "messages", "value": {
+  "messaging_product": "whatsapp", "metadata": {"phone_number_id": "PHONE_ID"},
+  "statuses": [{"id": "wamid.OUT1", "status": "failed", "timestamp": "TS", "recipient_id": "260977123456",
+    "errors": [{"code": 131047, "title": "Re-engagement message"}]}]
+}}]}]}

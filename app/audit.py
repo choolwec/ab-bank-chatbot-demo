@@ -16,7 +16,7 @@ from . import config, jira_export
 DB_FILE = config.DATA_DIR / "audit.db"
 JSONL_FILE = config.DATA_DIR / "audit.jsonl"
 
-_TICKET_PREFIX = {"fraud": "FRD", "complaint": "CMP", "callback": "CBK"}
+_TICKET_PREFIX = {"fraud": "FRD", "complaint": "CMP", "callback": "CBK", "handoff": "HND"}
 _init_done = False
 _lock = threading.Lock()
 

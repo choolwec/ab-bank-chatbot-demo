@@ -172,24 +172,48 @@ def _should_merge(session, merge):
     return session.channel in MERGE_REPLIES_CHANNELS if merge is None else merge
 
 
-def handle(session, text=None, payload=None, merge=None):
+def log_inbound(session, text):
+    """Record a customer turn (already masked) in the transcript and audit."""
+    session.add("user", text)
+    _log(session, "user", text)
+
+
+def handle(session, text=None, payload=None, merge=None, prior_findings=None,
+           first_contact=False):
     """Full pipeline for one inbound message. Returns (replies, meta).
-    `merge`: one bubble per turn (P5); default by channel."""
+
+    merge           one bubble per turn (P5); default by channel
+    prior_findings  what guards.mask() found when a webhook channel masked the
+                    text before storing it (inbox.py), so the warning still shows
+    first_contact   a messaging-channel customer's first message: prepend the
+                    automated-assistant disclosure (§3.4) unless it's a greeting,
+                    whose answer already discloses
+    """
     cleaned = guards.clean(text) if text else ""
     masked, findings = guards.mask(cleaned)
+    findings = list(findings) + list(prior_findings or [])
     inbound = masked if text else f"[button] {payload}"
-    session.add("user", inbound)
+    log_inbound(session, inbound)
     if session.slots.get("context"):
         session.slots["context"]["age"] += 1  # C9: context fades with each message
-    _log(session, "user", inbound)
 
     replies = []
+    if first_contact:
+        session.greeted = True
     if findings:
         replies.append({"text": msg("pii_warning"), "buttons": []})
 
     routed, meta = _route(session, masked if text else None, payload)
+    if first_contact and meta.get("intent") != "greeting":
+        replies.insert(0, {"text": msg("disclosure"), "buttons": []})
     replies.extend(routed)
+    return respond(session, replies, meta, merge)
 
+
+def respond(session, replies, meta, merge=None):
+    """Finish a turn: the button guarantee, merging, contact placeholders,
+    transcript, audit, and what the reply expects next. Every reply on every
+    channel goes through here."""
     # No dead ends, ever (§1 rule 1)
     if not replies:
         replies = [{"text": msg("fallback"), "buttons": list(MENU_BUTTONS)}]
@@ -304,6 +328,8 @@ def _route(session, text, payload):
     if payload == CANCEL_NO:
         return _continue_flow(session)
     # "Talk to a person" always works, even mid-flow (§1 rule 1)
+    if payload == "human_handoff" and config.handoff_mode(session.channel) == "inbox":
+        return _handoff_to_inbox(session)
     if payload == "human_handoff":
         session.strikes = 0
         replies, done = FLOWS["lead"].start(session)
@@ -690,6 +716,26 @@ def _more_options(session):
     if not rest:
         return [{"text": msg("menu"), "buttons": list(MENU_BUTTONS)}], {"action": "more_options"}
     return [{"text": msg("more_options"), "buttons": rest}], {"action": "more_options"}
+
+
+def _handoff_to_inbox(session):
+    """M4/H2: a person answers in the same conversation (the Page Inbox, or
+    the agent desk). A handoff ticket carries the transcript so the customer
+    never repeats themselves; the adapter passes control and pauses the bot.
+    A fraud report or complaint in progress is NOT dropped: its data rides on
+    the ticket."""
+    session.strikes = 0
+    data = {"reason": "customer asked for a person"}
+    if session.active_flow in ("fraud", "complaint") and session.flow_state.get("data"):
+        data["unfinished_" + session.active_flow] = dict(session.flow_state["data"])
+    session.active_flow = None
+    session.flow_state = {}
+    ref = FLOWS["lead"].create_ticket(session, "handoff", data)
+    session.slots["handoff_requested"] = ref
+    return (
+        [{"text": msg("handoff_inbox", ref=ref), "buttons": [button("main_menu", "menu")]}],
+        {"intent": "human_handoff", "action": "handoff_inbox"},
+    )
 
 
 def _typed_command(session, text):

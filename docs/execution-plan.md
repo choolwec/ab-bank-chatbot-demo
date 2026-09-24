@@ -1413,19 +1413,19 @@ that finishes the ticket.
 | P1 | Persistent session store | 3a | W07 | 3 | — | Dev 2 | ☑ |
 | P2 | Channel interface; move `/chat` | 3a | W10 | 2 | P1 | Dev 2 | ☑ |
 | P3 | Renderer and per-channel limit tests | 3a | W10–11 | 4 | P2, K1 | Dev 2 | ☑ |
-| P4 | Per-channel kill switches, per-user limits | 3a | W11 | 1.5 | P2 | Dev 2 | ☐ |
+| P4 | Per-channel kill switches, per-user limits | 3a | W11 | 1.5 | P2 | Dev 2 | ☑ |
 | P5 | Fewer message bubbles | 3a | W11 | 1 | — | Dev 2 | ☑ |
 | P6 | Audit channel column and HMAC identities | 3a | W08 | 2 | P1 | Dev 2 | ☑ |
 | P7 | Lusaka production hosting and runbook | 3a | W09–10 | 3 | Procurement | Dev 2 | ☐ |
 | P9 | Load and soak test | 3a | W10, W20 | 1 | P1, P7 | Dev | ☐ |
 | W1 | Meta onboarding | 3b | W01–12 | — | — | PO | ☐ |
-| W2 | WhatsApp webhook (signature, inbox, worker) | 3b | W11 | 3 | P2, P6 | Dev | ☐ |
-| W3 | WhatsApp inbound parser | 3b | W12 | 2 | W2 | Dev | ☐ |
-| W4 | WhatsApp sender | 3b | W12 | 3 | P3, W3 | Dev | ☐ |
-| W5 | Media and voice-note policy | 3b | W13 | 1 | W3 | Dev | ☐ |
-| W6 | Location-based branch finder | 3b | W13 | 1.5 | W4 | Dev + Ops | ☐ |
+| W2 | WhatsApp webhook (signature, inbox, worker) | 3b | W11 | 3 | P2, P6 | Dev | ☑ |
+| W3 | WhatsApp inbound parser | 3b | W12 | 2 | W2 | Dev | ☑ |
+| W4 | WhatsApp sender | 3b | W12 | 3 | P3, W3 | Dev | ☑ |
+| W5 | Media and voice-note policy | 3b | W13 | 1 | W3 | Dev | ☑ |
+| W6 | Location-based branch finder | 3b | W13 | 1.5 | W4 | Dev + Ops | ☑ |
 | W7 | Utility templates | 3b | W14 | 1 | W4, L6 | Dev + Legal | ☐ |
-| W8 | 24-h window and stale messages | 3b | W12 | 1.5 | W2, P1 | Dev 2 | ☐ |
+| W8 | 24-h window and stale messages | 3b | W12 | 1.5 | W2, P1 | Dev 2 | ☑ |
 | W9 | WhatsApp content variants | 3b | W12 | 0.5 | P3 | Dev 2 + CO | ☐ |
 | W10 | Pilot runbook | 3b | W14–17 | — | — | PO + CC | ☐ |
 | M1 | Messenger App Review pack | 3c | W15 | 1 | M2 | PO + Legal | ☐ |

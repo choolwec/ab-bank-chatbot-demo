@@ -46,3 +46,40 @@ def _secret() -> bytes:
 
 def user_hash(key: str) -> str:
     return hmac.new(_secret(), key.encode(), hashlib.sha256).hexdigest()[:32]
+
+
+# --- Sealed reply addresses (W2, H1) ------------------------------------------
+# To answer a WhatsApp or Messenger customer we need their raw platform id,
+# including later (an agent's reply, a case_update template). It is stored
+# only ENCRYPTED ("sealed"), never in the audit log. REPLY_KEY is a Fernet key
+# from the environment in production; otherwise one is generated into data/.
+_REPLY_KEY_FILE = "reply_key"
+_fernet = None
+
+
+def _cipher():
+    global _fernet
+    from cryptography.fernet import Fernet
+
+    env = os.environ.get("REPLY_KEY")
+    if env:
+        return Fernet(env.encode())
+    with _lock:
+        if _fernet is None:
+            path = config.DATA_DIR / _REPLY_KEY_FILE
+            if not path.exists():
+                path.write_bytes(Fernet.generate_key())
+                try:
+                    os.chmod(path, 0o600)
+                except OSError:
+                    pass
+            _fernet = Fernet(path.read_bytes().strip())
+        return _fernet
+
+
+def seal(value: str) -> str:
+    return _cipher().encrypt(value.encode()).decode()
+
+
+def unseal(token: str) -> str:
+    return _cipher().decrypt(token.encode()).decode()

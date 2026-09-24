@@ -41,8 +41,8 @@ class LeadFlow(FormFlow):
                 return msg("thanks_name", name=first.capitalize())
         return None
 
-    def _prompt(self, i):
-        prompt = super()._prompt(i)
+    def _prompt(self, i, session=None):
+        prompt = super()._prompt(i, session)
         if self.steps[i] == "time":
             prompt["buttons"] = [
                 button("morning", "time:Morning"),

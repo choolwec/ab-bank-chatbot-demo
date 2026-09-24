@@ -1,0 +1,6 @@
+{"object": "whatsapp_business_account", "entry": [{"id": "WABA_ID", "changes": [{"field": "messages", "value": {
+  "messaging_product": "whatsapp",
+  "metadata": {"display_phone_number": "260769651262", "phone_number_id": "PHONE_ID"},
+  "contacts": [{"profile": {"name": "Test Customer"}, "wa_id": "260977123456"}],
+  "messages": [{"from": "260977123456", "id": "wamid.TEXT1", "timestamp": "TS", "type": "text", "text": {"body": "what is etumba"}}]
+}}]}]}

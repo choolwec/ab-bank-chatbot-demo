@@ -6,3 +6,4 @@ scikit-learn>=1.5
 pytest>=8.2
 httpx>=0.27
 dateparser>=1.2   # C8: dates in fraud reports (BSD-3)
+cryptography>=42   # W2/H1: sealed reply addresses (Apache-2.0/BSD)

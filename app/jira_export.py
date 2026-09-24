@@ -19,13 +19,15 @@ import httpx
 
 from . import config
 
-_PRIORITY = {"fraud": "Highest", "complaint": "Medium", "callback": "Low"}
+_PRIORITY = {"fraud": "Highest", "complaint": "Medium", "callback": "Low", "handoff": "Medium"}
 _LABELS = {
     "fraud": ["chatbot", "fraud"],
     "complaint": ["chatbot", "complaint"],
     "callback": ["chatbot", "callback"],
+    "handoff": ["chatbot", "handoff"],
 }
-_TITLE = {"fraud": "Fraud / lost card report", "complaint": "Complaint", "callback": "Callback request"}
+_TITLE = {"fraud": "Fraud / lost card report", "complaint": "Complaint", "callback": "Callback request",
+          "handoff": "Conversation handed to a person"}
 
 MOCK_FILE_NAME = "jira_mock.jsonl"
 

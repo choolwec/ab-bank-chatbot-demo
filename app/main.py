@@ -19,10 +19,11 @@ from fastapi.staticfiles import StaticFiles
 
 from . import audit, config, jira_export
 from .adminauth import require_admin
-from .channels import web
+from .channels import messenger, web, whatsapp
 from .ratelimit import client_ip as _client_ip  # noqa: F401  (tests, docs)
 from .ratelimit import ip_limiter
 from .session import store
+from .worker import worker
 
 WIDGET_DIR = config.BASE_DIR / "widget"
 _hits = ip_limiter.hits  # the per-IP buckets for /chat (tests clear them)
@@ -33,7 +34,9 @@ async def lifespan(app):
     audit.init_db()
     audit.purge_expired()
     store.purge_expired()  # same retention schedule as the audit log (P1)
+    worker.start()  # webhook channels: processes the durable inbox (W2)
     yield
+    await worker.stop()
 
 
 app = FastAPI(title="AB Bank Zambia Assistant", version="0.1.0", lifespan=lifespan)
@@ -45,6 +48,8 @@ app.add_middleware(
 )
 app.mount("/widget", StaticFiles(directory=WIDGET_DIR), name="widget")
 app.include_router(web.api)
+app.include_router(whatsapp.api)
+app.include_router(messenger.api)
 
 
 @app.get("/health")

@@ -1,0 +1,4 @@
+{"object": "page", "entry": [{"id": "PAGE_ID", "time": 0, "changes": [{"field": "feed", "value": {
+  "item": "comment", "verb": "add", "comment_id": "POST_1_COMMENT_10", "post_id": "PAGE_ID_POST_1",
+  "from": {"id": "FB_USER_778", "name": "Test Customer"}, "message": "nice promotion, well done",
+  "created_time": "TS"}}]}]}

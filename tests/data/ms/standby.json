@@ -1,0 +1,3 @@
+{"object": "page", "entry": [{"id": "PAGE_ID", "time": 0, "standby": [
+  {"sender": {"id": "PSID_1234567"}, "recipient": {"id": "PAGE_ID"}, "timestamp": "TSMS",
+   "message": {"mid": "m_SB1", "text": "thanks mary"}}]}]}

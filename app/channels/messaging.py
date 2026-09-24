@@ -90,6 +90,8 @@ def _respond(session, message, findings, created, now, adapter):
     # 4. A person has taken over this conversation: log, don't answer.
     if session.bot_paused_until > now or message.kind == "standby":
         router.log_inbound(session, _inbound_text(message))
+        audit.log_event(session.id, "system", "bot paused: a person has this conversation",
+                        action="paused", channel=session.channel, user_hash=session.user_hash)
         return [], {"action": "paused"}
 
     adapter.mark_read(message)

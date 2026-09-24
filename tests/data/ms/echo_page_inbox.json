@@ -1,0 +1,3 @@
+{"object": "page", "entry": [{"id": "PAGE_ID", "time": 0, "messaging": [
+  {"sender": {"id": "PAGE_ID"}, "recipient": {"id": "PSID_1234567"}, "timestamp": "TSMS",
+   "message": {"mid": "m_ECHO1", "is_echo": true, "app_id": 263902037430900, "text": "Hi, this is Mary from AB Bank"}}]}]}

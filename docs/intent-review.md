@@ -926,7 +926,7 @@ Submitted to Meta under these names; `{{1}}` is the case reference.
 > Hello, this is AB Bank. Your callback request {{1}} is booked, and our team will call you within one working day.
 
 
-## System messages (125 texts)
+## System messages (130 texts)
 
 Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts, retries, confirmations. Source: `knowledge/system_messages.yaml`. `{placeholders}` are filled in by the bot (contact details from `app/config.py`, or the values listed).
 
@@ -1143,6 +1143,36 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Status: **draft**
 
 > We've sent you a private message so we can help.
+
+### `messenger.greeting`
+
+- Status: **draft**
+
+> Hi! I'm AB Bank's automated assistant, not a person. I can help with branches, accounts, eTumba and loans, or connect you to our team.
+
+### `messenger.ice_breaker.1`
+
+- Status: **draft**
+
+> What is eTumba?
+
+### `messenger.ice_breaker.2`
+
+- Status: **draft**
+
+> Where is my nearest branch?
+
+### `messenger.ice_breaker.3`
+
+- Status: **draft**
+
+> I want to report fraud
+
+### `messenger.ice_breaker.4`
+
+- Status: **draft**
+
+> I'd like to talk to a person
 
 ### `pii_warning`
 

@@ -1428,11 +1428,11 @@ that finishes the ticket.
 | W8 | 24-h window and stale messages | 3b | W12 | 1.5 | W2, P1 | Dev 2 | ☑ |
 | W9 | WhatsApp content variants | 3b | W12 | 0.5 | P3 | Dev 2 + CO | ☑ |
 | W10 | Pilot runbook | 3b | W14–17 | — | — | PO + CC | ☐ |
-| M1 | Messenger App Review pack | 3c | W15 | 1 | M2 | PO + Legal | ☐ |
-| M2 | Messenger adapter | 3c | W15 | 3 | P2, P3 | Dev | ☐ |
-| M3 | Page profile (Get Started, menu, ice breakers) | 3c | W15 | 1 | M2 | Dev | ☐ |
-| M4 | Handover to the Page Inbox | 3c | W18 | 2.5 | M2, H1 | Dev | ☐ |
-| M5 | Private replies to urgent comments | 3c | W17 | 2 | M2, S1 | Dev + SM | ☐ |
+| M1 | Messenger App Review pack | 3c | W15 | 1 | M2 | PO + Legal | ☑ |
+| M2 | Messenger adapter | 3c | W15 | 3 | P2, P3 | Dev | ☑ |
+| M3 | Page profile (Get Started, menu, ice breakers) | 3c | W15 | 1 | M2 | Dev | ☑ |
+| M4 | Handover to the Page Inbox | 3c | W18 | 2.5 | M2, H1 | Dev | ☑ |
+| M5 | Private replies to urgent comments | 3c | W17 | 2 | M2, S1 | Dev + SM | ☑ |
 | H1 | Tickets carry channel and reply address | 4 | W15 | 1 | P6 | Dev 2 | ☑ |
 | H2 | Chatwoot agent desk | 4 | W17–19 | 6 | H1, W4, M2 | Dev 2 | ☐ |
 | H3 | Opening hours and out-of-hours promises | 4 | W16 | 1 | O1 | Dev 2 | ☐ |

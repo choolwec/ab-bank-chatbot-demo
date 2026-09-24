@@ -123,6 +123,15 @@ messages:
     status: draft
     text: We've sent you a private message so we can help.
 
+  # Messenger Page profile (M3): python -m admin.messenger_profile
+  messenger.greeting:
+    status: draft
+    text: Hi! I'm AB Bank's automated assistant, not a person. I can help with branches, accounts, eTumba and loans, or connect you to our team.
+  messenger.ice_breaker.1: {status: draft, text: "What is eTumba?"}
+  messenger.ice_breaker.2: {status: draft, text: "Where is my nearest branch?"}
+  messenger.ice_breaker.3: {status: draft, text: "I want to report fraud"}
+  messenger.ice_breaker.4: {status: draft, text: "I'd like to talk to a person"}
+
   # --- Guards -------------------------------------------------------------------
   pii_warning:
     status: draft

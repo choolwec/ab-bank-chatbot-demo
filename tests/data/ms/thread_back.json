@@ -1,0 +1,3 @@
+{"object": "page", "entry": [{"id": "PAGE_ID", "time": 0, "messaging": [
+  {"sender": {"id": "PSID_1234567"}, "recipient": {"id": "PAGE_ID"}, "timestamp": "TSMS",
+   "pass_thread_control": {"new_owner_app_id": "OUR_APP", "previous_owner_app_id": "263902037430900", "metadata": "done"}}]}]}

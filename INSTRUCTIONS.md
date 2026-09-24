@@ -75,6 +75,58 @@ git commit -m "describe what you changed"
 That git step is important — it's our audit trail of every wording change,
 which is what we show a regulator or auditor.
 
+### 4a. Other content files
+
+- **`knowledge\templates.yaml`** — the WhatsApp messages staff can send
+  after the customer's 24-hour window has closed. Meta must approve each one
+  under the **same name**, and Legal must approve the wording. Keep them
+  neutral (no offers, so Meta does not treat them as marketing), with **no
+  links** and never asking for details. Leave `{{1}}` as it is: it is the
+  case reference.
+- **`knowledge\urgent_exemplars.yaml`** — example fraud and lost-card
+  reports. A customer message that reads like one of these gets asked "is
+  this a fraud report?" even if the keyword rules missed it. Add real
+  reports the bot missed, in your own words. Never paste in sentences from
+  the test sets under `tests\eval\`. After a change, a developer re-runs
+  `python -m admin.calibrate_urgent`.
+- **Out-of-scope phrases** (`out_of_scope` intent): short topical sentences
+  about other services ("how do I reset my facebook password") and bare
+  platform names work best.
+- **Workshop and test phrasings:** phrases collected in the staff workshop
+  or in the test sets are used to *measure* the bot. Never paste them into
+  `phrases:` — you may reuse their words, not whole sentences. A test fails
+  if a test sentence is copied into an intent.
+- **Product answers must keep a way to a person:** every answer about
+  accounts, loans, fees or eTumba keeps a "Request a callback" or "Talk to a
+  person" button. A test (`tests\test_marketing.py`) checks this.
+
+### 4b. Marketing consent, opt-out and feedback wording
+
+All in `knowledge\system_messages.yaml`, all `status: draft` until Legal
+signs them off:
+
+- `lead.step.marketing_consent` — the optional last question in the
+  callback request: may AB Bank send news and offers? The callback goes
+  ahead either way. Also `lead.retry.marketing_consent`,
+  `lead.summary.marketing_consent_yes` / `_no`, `field.marketing_consent`,
+  and the buttons `button.yes_send_offers` / `button.no_thanks`.
+- `marketing.opt_out` — the reply when a customer types "unsubscribe", "opt
+  out", "stop offers" or "stop marketing".
+- `csat.ask`, `csat.thanks`, `csat.thanks_down` and the buttons
+  `button.csat_up` / `button.csat_down` — the short "how did we do?"
+  question some customers get after a conversation is resolved.
+- `desk.*` — notes that agents see in Chatwoot (not customers); the
+  contact-centre lead reviews these.
+
+Some entries have a `legal_note:` line. That is a question for Legal, not
+text the customer sees; it appears as "For Legal:" in
+`docs\intent-review.md`. Keep it when you edit the `text:`. The question
+must never pre-assume a yes: a customer who is not asked is recorded as
+"not asked", never as consenting.
+
+To stop asking the consent question altogether, set
+`"MARKETING_CONSENT_ENABLED": false` in `flags.json` (step 6).
+
 ## 5. Update branches, phone numbers, opening hours
 
 - **Branches**: edit `knowledge\branches.json` — the entries in there now
@@ -90,8 +142,18 @@ Open `flags.json` in the main folder:
 
 - `"FREE_TEXT_ENABLED": false` → bot becomes buttons-only (typing is ignored)
 - `"WIDGET_ENABLED": false` → chat disappears from the website entirely
+- `"MARKETING_CONSENT_ENABLED": false` → the callback flow stops asking about news and offers
+- `"WA_LINK_ENABLED": true` → shows "Continue on WhatsApp" in the chat (keep it
+  `false` until the official WhatsApp number is confirmed)
 
 Save the file — it takes effect immediately. Set back to `true` to restore.
+
+**Write `true` or `false` exactly, with no quotation marks.** `"false"` in
+quotes is ignored and the switch stays **on**. The full list of switches,
+and how to use them during an incident, is in `docs\runbook-incidents.md`
+section 4. On the live server, a setting in the server's environment file
+overrides `flags.json`, so ask the developer if a change seems to have no
+effect.
 
 ## 7. Weekly report (for the improvement loop)
 
@@ -100,9 +162,20 @@ cd C:\Users\hp\Downloads\AB\ab-chatbot
 .venv\Scripts\python -m admin.report --days 7
 ```
 
-Shows sessions, fallback rate, tickets, and the **top unmatched questions**
-— add those as new `phrases:` in the intent files each week (step 4).
-Add `--out report.md` to save it as a file instead.
+This **writes the report to `data\report.md`** (open it in any text
+editor or VS Code); it no longer prints it in the window. Add `--stdout` to
+print it instead, or `--out somewhere.md` to save it elsewhere.
+
+It shows conversations per channel, the launch targets (PASS / FAIL, or
+n/a when there is not enough data yet), tickets, the "how did we do?"
+answers, leads and campaigns (counts only, no names or numbers), and the
+**top unmatched questions** — add those as new `phrases:` in the intent
+files each week (step 4).
+
+The report is a draft: a qualified person must check the figures before
+they go into any management or board report. The WhatsApp cost line uses
+illustrative rates, in US dollars, that still need checking against Meta's
+price list.
 
 ## 8. The document for legal
 

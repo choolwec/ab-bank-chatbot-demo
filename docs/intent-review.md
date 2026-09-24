@@ -25,7 +25,7 @@ Also confirm the contact values in `app/config.py` CONTACTS: emergency_phone=[CO
 ### Types of accounts  `account_types_overview`
 
 - Status: **draft**
-- Trigger phrases (11): "what types of accounts do you have", "which accounts do you offer", "tell me about your accounts", "accounts available", "types of acounts", "kinds of accounts", "what account can i open", "do you have personal accounts", "compare your accounts", "account options", "banking accounts you offer"
+- Trigger phrases (18): "what types of accounts do you have", "which accounts do you offer", "tell me about your accounts", "accounts available", "types of acounts", "kinds of accounts", "what account can i open", "do you have personal accounts", "compare your accounts", "account options", "banking accounts you offer", "what accounts do you have", "which account is best for me", "list of your accounts", "types of bank accounts", "which account should i open", "account types", "what kind of accounts are there"
 
 Customer-facing answer:
 
@@ -44,12 +44,12 @@ Plainer version (sent for "what do you mean?"):
 
 > We have everyday accounts (Tamanga and Tamanga Plus), a business account (Mukula Plus), and savings accounts for adults and for children. Tell me which one you'd like to know about.
 
-Follow-up buttons: Savings account · Current account (Tamanga) · Business account · How to open an account
+Follow-up buttons: Savings account · Current account (Tamanga) · Business account · How to open an account · Request a callback
 
 ### Savings account  `savings_account`
 
 - Status: **draft**
-- Trigger phrases (10): "savings account", "tell me about savings", "savngs account", "savings acount", "i want to save money", "saving account details", "interest on savings", "how does the savings account work", "open a savings account", "is my money safe in savings"
+- Trigger phrases (17): "savings account", "tell me about savings", "savngs account", "savings acount", "i want to save money", "saving account details", "interest on savings", "how does the savings account work", "open a savings account", "is my money safe in savings", "savings acc", "how much interest do i get on savings", "minimum balance for savings account", "savings account interest rate", "i want to start saving", "account to keep my money and earn interest", "can i withdraw anytime from savings"
 
 Customer-facing answer:
 
@@ -64,12 +64,12 @@ Plainer version (sent for "what do you mean?"):
 
 > A Savings account keeps your money safe and pays you 5% interest a year. You need at least ZMW 100 in it. There is no monthly fee.
 
-Follow-up buttons: What you need to open · Savings Plan account · Find a branch · Fees & charges
+Follow-up buttons: What you need to open · Savings Plan account · Find a branch · Fees & charges · Request a callback
 
 ### Current account (Tamanga)  `current_account`
 
 - Status: **draft**
-- Trigger phrases (12): "current account", "curent account", "cheque account", "everyday account", "transactional account", "account for daily use", "current acount details", "how does a current account work", "open a current account", "account for salary", "tamanga", "what is tamanga"
+- Trigger phrases (21): "current account", "curent account", "cheque account", "everyday account", "transactional account", "account for daily use", "current acount details", "how does a current account work", "open a current account", "account for salary", "tamanga", "what is tamanga", "tamanga account", "tamanga acc", "what is a tamanga account", "current acc", "can i open a dollar account", "usd account", "euro account", "account to receive my salary", "salary account"
 
 Customer-facing answer:
 
@@ -91,7 +91,7 @@ Follow-up buttons: Tamanga Plus (premium) · What you need to open · Fees & cha
 ### Tamanga Plus (premium current account)  `tamanga_plus_account`
 
 - Status: **draft**
-- Trigger phrases (10): "tamanga plus", "premium current account", "difference between tamanga and tamanga plus", "cheque book account", "online banking account", "upgrade my account", "premium account with online banking", "account with cheque book", "myabz account", "which account gets online banking"
+- Trigger phrases (16): "tamanga plus", "premium current account", "difference between tamanga and tamanga plus", "cheque book account", "online banking account", "upgrade my account", "premium account with online banking", "account with cheque book", "myabz account", "which account gets online banking", "tamanga plus account", "i want a cheque book", "how do i get a cheque book", "upgrade to tamanga plus", "tamanga plus benefits", "account with internet banking"
 
 Customer-facing answer:
 
@@ -106,7 +106,7 @@ Follow-up buttons: Tamanga (standard) · Bank statements · Find a branch · Tal
 ### Business account (Mukula Plus)  `business_account`
 
 - Status: **draft**
-- Trigger phrases (12): "business account", "busness account", "account for my business", "msme account", "company account", "account for my shop", "sme account", "business banking", "open account for business", "corporate account", "mukula plus", "what is mukula plus"
+- Trigger phrases (21): "business account", "busness account", "account for my business", "msme account", "company account", "account for my shop", "sme account", "business banking", "open account for business", "corporate account", "mukula plus", "what is mukula plus", "mukula plus account", "account for my company", "open a company account", "bank account for my ngo", "church bank account", "account for a sole trader", "business acc", "account for my small business", "account for a club or association"
 
 Customer-facing answer:
 
@@ -125,7 +125,7 @@ Follow-up buttons: Documents needed by entity type · Business loans · Find a b
 ### Business account documents by entity type  `business_account_requirements`
 
 - Status: **draft**
-- Trigger phrases (10): "documents to open a company account", "requirements for business account", "pacra requirements", "ngo account requirements", "church account requirements", "documents for limited company account", "sole trader account requirements", "what does my club need to open an account", "requirements for a corporate account", "documents for opening a business account"
+- Trigger phrases (17): "documents to open a company account", "requirements for business account", "pacra requirements", "ngo account requirements", "church account requirements", "documents for limited company account", "sole trader account requirements", "what does my club need to open an account", "requirements for a corporate account", "documents for opening a business account", "what documents does a company need to open an account", "pacra documents for account opening", "what do i need to open a business account", "requirements for mukula plus", "business account documents", "board resolution for opening an account", "what does a sole trader need to open an account"
 
 Customer-facing answer:
 
@@ -148,7 +148,7 @@ Follow-up buttons: Business account overview · Find a branch · Talk to a perso
 ### Savings Plan account  `savings_plan_account`
 
 - Status: **draft**
-- Trigger phrases (10): "savings plan account", "blocked savings", "savings plan", "locked savings account", "savings account i cant withdraw from", "fixed savings for goal", "savings plan interest", "what is a savings plan", "restricted withdrawal savings", "savings plan requirements"
+- Trigger phrases (14): "savings plan account", "blocked savings", "savings plan", "locked savings account", "savings account i cant withdraw from", "fixed savings for goal", "savings plan interest", "what is a savings plan", "restricted withdrawal savings", "savings plan requirements", "savings plan acc", "save for a goal", "goal savings account", "savings plan minimum deposit"
 
 Customer-facing answer:
 
@@ -165,7 +165,7 @@ Follow-up buttons: Savings account (flexible) · Kids Savings account · Find a 
 ### Kids Savings account  `kids_savings_account`
 
 - Status: **draft**
-- Trigger phrases (10): "kids savings", "childrens account", "savings account for my child", "minor account", "account for my kid", "savings for my son", "savings for my daughter", "under 16 bank account", "guardian savings account", "child savings account requirements"
+- Trigger phrases (17): "kids savings", "childrens account", "savings account for my child", "minor account", "account for my kid", "savings for my son", "savings for my daughter", "under 16 bank account", "guardian savings account", "child savings account requirements", "account for children", "kids account", "open an account for my baby", "child account", "bank account for my kids", "junior savings account", "kids savings interest"
 
 Customer-facing answer:
 
@@ -183,7 +183,7 @@ Follow-up buttons: Savings account (adult) · Find a branch · Talk to a person
 ### Term Deposit Account (TDA)  `term_deposit_account`
 
 - Status: **draft**
-- Trigger phrases (10): "term deposit", "fixed deposit", "tda", "investment account", "fix my money", "fixed term deposit", "how do i invest with ab bank", "lock my money for interest", "term deposit interest rate", "investment account requirements"
+- Trigger phrases (17): "term deposit", "fixed deposit", "tda", "investment account", "fix my money", "fixed term deposit", "how do i invest with ab bank", "lock my money for interest", "term deposit interest rate", "investment account requirements", "fixed deposit account", "fixed deposit rates", "invest my money", "term deposit rates", "fix money for 90 days", "where can i invest money", "minimum amount for a fixed deposit"
 
 Customer-facing answer:
 
@@ -201,7 +201,7 @@ Follow-up buttons: What you need to open · Types of accounts · Talk to a perso
 ### Joint accounts  `joint_account`
 
 - Status: **draft**
-- Trigger phrases (10): "joint account", "joint and account", "joint or account", "open account with my spouse", "account with two signatories", "shared bank account", "account with my husband", "account with my wife", "joint account types", "open a joint account"
+- Trigger phrases (16): "joint account", "joint and account", "joint or account", "open account with my spouse", "account with two signatories", "shared bank account", "account with my husband", "account with my wife", "joint account types", "open a joint account", "joint acc", "open account with my partner", "account for husband and wife", "couple account", "two people one account", "joint account requirements"
 
 Customer-facing answer:
 
@@ -217,7 +217,7 @@ Follow-up buttons: What you need to open · Find a branch · Talk to a person
 ### Account opening for foreign nationals  `foreign_national_account`
 
 - Status: **draft**
-- Trigger phrases (10): "can a foreigner open an account", "foreign national account", "im not zambian can i open an account", "expat bank account", "account for foreigners", "i have a work permit can i open an account", "non zambian account opening", "account for expats", "im a foreigner", "can i open an account without an nrc"
+- Trigger phrases (16): "can a foreigner open an account", "foreign national account", "im not zambian can i open an account", "expat bank account", "account for foreigners", "i have a work permit can i open an account", "non zambian account opening", "account for expats", "im a foreigner", "can i open an account without an nrc", "can foreigners open accounts", "i am a foreigner can i open an account", "account for non zambians", "expatriate account", "what does a foreigner need to open an account", "can i open an account with a passport"
 
 Customer-facing answer:
 
@@ -232,7 +232,7 @@ Follow-up buttons: Types of accounts · Find a branch · Talk to a person
 ### What you need to open an account  `account_opening_requirements`
 
 - Status: **draft**
-- Trigger phrases (10): "what do i need to open an account", "requirements to open account", "documents for opening account", "requirements for opening acount", "what documents do i need", "do i need my nrc", "kyc requirements", "what should i bring to open account", "papers needed to open account", "requirements to open a bank account"
+- Trigger phrases (16): "what do i need to open an account", "requirements to open account", "documents for opening account", "requirements for opening acount", "what documents do i need", "do i need my nrc", "kyc requirements", "what should i bring to open account", "papers needed to open account", "requirements to open a bank account", "requirements for opening an account", "which documents are required to open an account", "account opening requirements", "reference form for account opening", "do i need a tpin to open an account", "do i need proof of residence"
 
 Customer-facing answer:
 
@@ -256,7 +256,7 @@ Follow-up buttons: Find a branch · Types of accounts · Business account docume
 ### How to open an account  `account_opening_how`
 
 - Status: **draft**
-- Trigger phrases (10): "how do i open an account", "i want to open an account", "open account", "how to open acount", "can i open an account online", "where can i open an account", "account opening process", "i want a bank account", "help me open an account", "how long does it take to open an account"
+- Trigger phrases (17): "how do i open an account", "i want to open an account", "open account", "how to open acount", "can i open an account online", "where can i open an account", "account opening process", "i want a bank account", "help me open an account", "how long does it take to open an account", "how can i open an account", "steps to open an account", "i would like to open an account", "open acc", "opening an account", "can i open an account on my phone", "how do i become a customer"
 
 Customer-facing answer:
 
@@ -274,7 +274,7 @@ Follow-up buttons: What to bring · Find a branch · Talk to a person
 ### Getting a bank statement  `bank_statement_request`
 
 - Status: **draft**
-- Trigger phrases (10): "how do i get a bank statement", "bank statement", "account statement", "print my statement", "statement request", "i need my statement", "download my statement", "how to get statement online", "statement for tamanga account", "get my transaction history"
+- Trigger phrases (16): "how do i get a bank statement", "bank statement", "account statement", "print my statement", "statement request", "i need my statement", "download my statement", "how to get statement online", "statement for tamanga account", "get my transaction history", "how can i get my statement", "bank statement for a visa application", "6 months bank statement", "statement of account", "i need a stamped bank statement", "get statement"
 
 Customer-facing answer:
 
@@ -290,7 +290,7 @@ Follow-up buttons: Upgrade to Tamanga Plus · Find a branch · Talk to a person
 ### Reactivating a dormant account  `account_reactivation`
 
 - Status: **draft**
-- Trigger phrases (10): "reactivate my account", "dormant account", "my account is dormant", "activate my old account", "reopen my account", "my account has been inactive", "how do i reactivate my bank account", "account reactivation requirements", "wake up my dormant account", "restart my inactive account"
+- Trigger phrases (15): "reactivate my account", "dormant account", "my account is dormant", "activate my old account", "reopen my account", "my account has been inactive", "how do i reactivate my bank account", "account reactivation requirements", "wake up my dormant account", "restart my inactive account", "my account is inactive", "my account was closed because i did not use it", "account not used for a long time", "reactivate dormant acc", "activate my dormant account"
 
 Customer-facing answer:
 
@@ -302,7 +302,7 @@ Follow-up buttons: Find a branch · Talk to a person
 ### Sort code / SWIFT code  `sort_swift_code`
 
 - Status: **draft**
-- Trigger phrases (10): "swift code", "sort code", "bank swift code", "what is your swift code", "branch sort code", "swift code for international transfer", "ab bank swift code", "sort code for my branch", "routing code", "bic code"
+- Trigger phrases (15): "swift code", "sort code", "bank swift code", "what is your swift code", "branch sort code", "swift code for international transfer", "ab bank swift code", "sort code for my branch", "routing code", "bic code", "swift", "bank code", "branch code", "swift number", "bank details for international transfer"
 
 Customer-facing answer:
 
@@ -318,7 +318,7 @@ Follow-up buttons: Find a branch · Talk to a person
 ### What is eTumba?  `etumba_what_is`
 
 - Status: **draft**
-- Trigger phrases (11): "what is etumba", "wat is etumba", "tell me about etumba", "e tumba", "etumba wallet", "mobile wallet", "etumba account", "do you have mobile money", "what is e-tumba", "explain etumba", "etumba meaning"
+- Trigger phrases (16): "what is etumba", "wat is etumba", "tell me about etumba", "e tumba", "etumba wallet", "mobile wallet", "etumba account", "do you have mobile money", "what is e-tumba", "explain etumba", "etumba meaning", "what is etumba all about", "is etumba mobile money", "ab bank mobile money", "what can i do with etumba", "tell me about the etumba wallet"
 
 Customer-facing answer:
 
@@ -338,7 +338,7 @@ Follow-up buttons: Register for eTumba · eTumba fees · Find an agent · Talk t
 ### Register for eTumba  `etumba_register`
 
 - Status: **draft**
-- Trigger phrases (10): "how do i register for etumba", "sign up for etumba", "get etumba", "join etumba", "activate etumba", "etumba registration", "register etumba", "how to get etumba wallet", "open etumba account", "etumba sign up"
+- Trigger phrases (15): "how do i register for etumba", "sign up for etumba", "get etumba", "join etumba", "activate etumba", "etumba registration", "register etumba", "how to get etumba wallet", "open etumba account", "etumba sign up", "how to register etumba", "register on etumba", "create etumba account", "download etumba app", "can i register etumba without a bank account"
 
 Customer-facing answer:
 
@@ -357,7 +357,7 @@ Follow-up buttons: What is eTumba? · eTumba fees · Find an agent · Talk to a 
 ### Using *888#  `etumba_ussd`
 
 - Status: **draft**
-- Trigger phrases (10): "how do i use *888#", "*888#", "888", "dial 888", "what is the ussd code", "etumba code", "ussd menu", "etumba menu", "how to check etumba balance", "send money on etumba"
+- Trigger phrases (14): "how do i use *888#", "*888#", "888", "dial 888", "what is the ussd code", "etumba code", "ussd menu", "etumba menu", "how to check etumba balance", "send money on etumba", "ussd code for etumba", "star 888", "etumba shortcode", "how to use etumba without internet"
 
 Customer-facing answer:
 
@@ -375,7 +375,7 @@ Follow-up buttons: Register for eTumba · Transfers to mobile money · Cash in /
 ### eTumba fees  `etumba_fees`
 
 - Status: **draft**
-- Trigger phrases (10): "etumba charges", "etumba fees", "how much does etumba cost", "is etumba free", "cost of sending money on etumba", "etumba withdrawal charges", "charges for etumba", "etumba tariffs", "what does etumba charge", "etumba transaction fees"
+- Trigger phrases (16): "etumba charges", "etumba fees", "how much does etumba cost", "is etumba free", "cost of sending money on etumba", "etumba withdrawal charges", "charges for etumba", "etumba tariffs", "what does etumba charge", "etumba transaction fees", "etumba transfer charges", "how much to send money on etumba", "etumba levy", "mobile money levy", "etumba cost", "etumba withdrawal fee"
 
 Customer-facing answer:
 
@@ -394,7 +394,7 @@ Follow-up buttons: What is eTumba? · Register for eTumba · Talk to a person
 ### eTumba cash in / cash out  `etumba_cash_in_out`
 
 - Status: **draft**
-- Trigger phrases (10): "deposit into etumba", "withdraw from etumba", "cash in etumba", "cash out etumba", "top up my etumba", "put money on etumba", "withdraw etumba at atm", "cardless withdrawal", "deposit cash at kazang", "withdraw cash at agent"
+- Trigger phrases (15): "deposit into etumba", "withdraw from etumba", "cash in etumba", "cash out etumba", "top up my etumba", "put money on etumba", "withdraw etumba at atm", "cardless withdrawal", "deposit cash at kazang", "withdraw cash at agent", "how do i deposit money on etumba", "how to withdraw from etumba", "load money on etumba", "atm withdrawal without a card", "withdraw etumba money at the bank"
 
 Customer-facing answer:
 
@@ -411,7 +411,7 @@ Follow-up buttons: Find an agent · Pull / push funds · Talk to a person
 ### Move money between eTumba and my bank account  `etumba_pull_push_funds`
 
 - Status: **draft**
-- Trigger phrases (10): "move money from my bank account to etumba", "pull money to etumba", "push money to my bank account", "transfer from bank account to etumba", "transfer from etumba to my bank account", "link etumba to bank account", "get money into etumba from my account", "send etumba balance to my account", "pull funds", "push funds"
+- Trigger phrases (15): "move money from my bank account to etumba", "pull money to etumba", "push money to my bank account", "transfer from bank account to etumba", "transfer from etumba to my bank account", "link etumba to bank account", "get money into etumba from my account", "send etumba balance to my account", "pull funds", "push funds", "move money from etumba to bank", "transfer money from my account to etumba", "send money from bank to wallet", "pull from ab bank account", "move funds from etumba to my tamanga account"
 
 Customer-facing answer:
 
@@ -428,7 +428,7 @@ Follow-up buttons: Register for eTumba · Find a branch · Talk to a person
 ### Transfer between eTumba and Airtel/MTN/Zamtel  `etumba_transfer_mobile_money`
 
 - Status: **draft**
-- Trigger phrases (10): "transfer to airtel money", "transfer to mtn momo", "send money to airtel from etumba", "send money to mtn from etumba", "zamtel to etumba", "airtel to etumba", "mtn to etumba", "how do i send etumba to mobile money", "receive money from airtel money", "transfer between etumba and mobile money"
+- Trigger phrases (16): "transfer to airtel money", "transfer to mtn momo", "send money to airtel from etumba", "send money to mtn from etumba", "zamtel to etumba", "airtel to etumba", "mtn to etumba", "how do i send etumba to mobile money", "receive money from airtel money", "transfer between etumba and mobile money", "send money to airtel money", "etumba to mtn", "etumba to airtel", "send to zamtel money", "receive money from mtn into etumba", "mobile money to etumba"
 
 Customer-facing answer:
 
@@ -446,7 +446,7 @@ Follow-up buttons: Pull / push funds (bank account) · eTumba fees · Talk to a 
 ### Yaka savings  `yaka_savings`
 
 - Status: **draft**
-- Trigger phrases (10): "yaka", "yaka savings", "what is yaka", "etumba savings", "save money on etumba", "how do i open yaka", "yaka interest rate", "yaka savings account", "save with etumba", "yaka pa tumba"
+- Trigger phrases (15): "yaka", "yaka savings", "what is yaka", "etumba savings", "save money on etumba", "how do i open yaka", "yaka interest rate", "yaka savings account", "save with etumba", "yaka pa tumba", "yaka account", "how does yaka work", "open yaka", "yaka interest", "savings on etumba"
 
 Customer-facing answer:
 
@@ -461,7 +461,7 @@ Follow-up buttons: What is eTumba? · Savings account (bank) · Talk to a person
 ### Retrieving a ZESCO token  `zesco_token`
 
 - Status: **draft**
-- Trigger phrases (10): "zesco token", "how do i get my zesco token", "retrieve zesco token", "prepaid electricity token", "i cant find my zesco token", "zesco payment token", "where is my electricity token", "lost my zesco token", "view my zesco transaction", "zesco token etumba"
+- Trigger phrases (15): "zesco token", "how do i get my zesco token", "retrieve zesco token", "prepaid electricity token", "i cant find my zesco token", "zesco payment token", "where is my electricity token", "lost my zesco token", "view my zesco transaction", "zesco token etumba", "zesco units token", "i paid zesco but no token", "token not received", "i bought units but did not get the token", "resend zesco token"
 
 Customer-facing answer:
 
@@ -476,7 +476,7 @@ Follow-up buttons: What is eTumba? · Talk to a person
 ### Reverse a wrongly sent eTumba transfer  `etumba_reversal`
 
 - Status: **draft**
-- Trigger phrases (10): "reverse etumba transaction", "sent money to wrong number", "cancel etumba transfer", "wrong number etumba", "i sent money to the wrong person", "undo etumba payment", "etumba send money mistake", "cancel pending etumba transaction", "reversal of etumba payment", "recall etumba money"
+- Trigger phrases (15): "reverse etumba transaction", "sent money to wrong number", "cancel etumba transfer", "wrong number etumba", "i sent money to the wrong person", "undo etumba payment", "etumba send money mistake", "cancel pending etumba transaction", "reversal of etumba payment", "recall etumba money", "i sent money to a wrong number", "wrong transfer on etumba", "how do i reverse money sent by mistake", "i made a mistake sending money", "money sent to the wrong number"
 
 Customer-facing answer:
 
@@ -493,7 +493,7 @@ Follow-up buttons: Talk to a person · Contact details
 ### Check eTumba balance  `etumba_balance_check`
 
 - Status: **draft**
-- Trigger phrases (10): "check etumba balance", "how much is in my etumba", "etumba balance", "how do i see my etumba balance", "my etumba wallet balance", "view etumba balance", "etumba account balance", "balance enquiry etumba", "check my wallet balance", "how much money do i have on etumba"
+- Trigger phrases (13): "check etumba balance", "how much is in my etumba", "etumba balance", "how do i see my etumba balance", "my etumba wallet balance", "view etumba balance", "etumba account balance", "balance enquiry etumba", "check my wallet balance", "how much money do i have on etumba", "etumba bal", "check my etumba bal", "balance inquiry"
 
 Customer-facing answer:
 
@@ -513,7 +513,7 @@ Follow-up buttons: Using *888# · Talk to a person
 ### Tamanga fees  `fees_tamanga`
 
 - Status: **draft**
-- Trigger phrases (7): "tamanga fees", "how much is tamanga", "tamanga monthly fee", "cost of a tamanga account", "tamanga charges", "how much does tamanga cost", "tamanga account maintenance fee"
+- Trigger phrases (10): "tamanga fees", "how much is tamanga", "tamanga monthly fee", "cost of a tamanga account", "tamanga charges", "how much does tamanga cost", "tamanga account maintenance fee", "tamanga fee", "monthly charge on tamanga", "how much is the tamanga account"
 
 Customer-facing answer:
 
@@ -532,7 +532,7 @@ Follow-up buttons: Open a Tamanga account · All fees · Talk to a person
 ### Fees & charges  `fees_charges`
 
 - Status: **draft**
-- Trigger phrases (11): "fees", "charges", "bank charges", "how much are your charges", "monthly fees", "account charges", "withdrawal fees", "what are your fees", "tariff guide", "how much does it cost", "ledger fees"
+- Trigger phrases (18): "fees", "charges", "bank charges", "how much are your charges", "monthly fees", "account charges", "withdrawal fees", "what are your fees", "tariff guide", "how much does it cost", "ledger fees", "atm withdrawal charges", "how much do you charge", "bank fees", "what are the charges", "cash withdrawal fee", "transfer charges", "service fees"
 
 Customer-facing answer:
 
@@ -555,7 +555,7 @@ Follow-up buttons: eTumba fees · Types of accounts · Talk to a person
 ### Business (MSME) loans  `msme_loan`
 
 - Status: **draft**
-- Trigger phrases (11): "business loan", "busines loan", "loan for my business", "msme loan", "sme loan", "i need money for my shop", "working capital loan", "loan for stock", "borrow money for business", "do you give business loans", "capital for my business"
+- Trigger phrases (19): "business loan", "busines loan", "loan for my business", "msme loan", "sme loan", "i need money for my shop", "working capital loan", "loan for stock", "borrow money for business", "do you give business loans", "capital for my business", "loan for my small business", "sme loans", "micro loan for business", "loan to grow my business", "business loan interest rate", "how much can i borrow for my business", "loan to buy stock for my shop", "small business loan"
 
 Customer-facing answer:
 
@@ -578,7 +578,7 @@ Follow-up buttons: Loan requirements · How to apply · SME overdraft · Talk to
 ### Loans for farming businesses  `agri_loan`
 
 - Status: **draft**
-- Trigger phrases (11): "agriculture loan", "agri loan", "farming loan", "loan for farming", "loan for my farm", "loan for fertiliser", "farmers loan", "agro loan", "loan for seeds", "do you have loans for farmers", "livestock loan"
+- Trigger phrases (18): "agriculture loan", "agri loan", "farming loan", "loan for farming", "loan for my farm", "loan for fertiliser", "farmers loan", "agro loan", "loan for seeds", "do you have loans for farmers", "livestock loan", "loan for farmers", "farm loan", "agricultural loan", "loan to buy fertilizer", "loan for my poultry", "loan for crops", "loan for cattle"
 
 Customer-facing answer:
 
@@ -593,7 +593,7 @@ Follow-up buttons: Business loan details · Loan requirements · Talk to a perso
 ### Personal loans (government employees)  `personal_loan`
 
 - Status: **draft**
-- Trigger phrases (10): "personal loan", "consumer loan", "loan for government employees", "civil servant loan", "salary loan", "personal loan interest rate", "how much personal loan can i get", "personal loan requirements", "loan for public service worker", "government worker loan"
+- Trigger phrases (17): "personal loan", "consumer loan", "loan for government employees", "civil servant loan", "salary loan", "personal loan interest rate", "how much personal loan can i get", "personal loan requirements", "loan for public service worker", "government worker loan", "loan for civil servants", "i am a teacher can i get a loan", "government employee loan", "payslip loan", "loan against my salary", "personal loans", "personal loan without collateral"
 
 Customer-facing answer:
 
@@ -612,7 +612,7 @@ Follow-up buttons: How to apply · Find a branch · Talk to a person
 ### SME overdraft  `sme_overdraft`
 
 - Status: **draft**
-- Trigger phrases (10): "sme overdraft", "business overdraft", "overdraft requirements", "how do i get an overdraft", "overdraft for my business", "overdraft arrangement fee", "overdraft amount", "does ab bank offer overdrafts", "overdraft collateral", "overdraft on my business account"
+- Trigger phrases (15): "sme overdraft", "business overdraft", "overdraft requirements", "how do i get an overdraft", "overdraft for my business", "overdraft arrangement fee", "overdraft amount", "does ab bank offer overdrafts", "overdraft collateral", "overdraft on my business account", "overdraft", "overdraft facility", "can i get an overdraft", "overdraft for my company", "overdraft limit"
 
 Customer-facing answer:
 
@@ -629,7 +629,7 @@ Follow-up buttons: Business loans · Talk to a person
 ### Loan requirements  `loan_requirements`
 
 - Status: **draft**
-- Trigger phrases (10): "what do i need for a loan", "loan requirements", "requirments for loan", "requirements for a loan", "do i need collateral", "documents for loan application", "what do you need to give me a loan", "loan qualification", "who qualifies for a loan", "can i get a loan without collateral"
+- Trigger phrases (16): "what do i need for a loan", "loan requirements", "requirments for loan", "requirements for a loan", "do i need collateral", "documents for loan application", "what do you need to give me a loan", "loan qualification", "who qualifies for a loan", "can i get a loan without collateral", "requirements for a business loan", "loan documents", "what are the loan requirements", "how do i qualify for a loan", "am i eligible for a loan", "loan eligibility"
 
 Customer-facing answer:
 
@@ -651,7 +651,7 @@ Follow-up buttons: How to apply · Personal loan details · Find a branch · Tal
 ### What is a guarantor?  `guarantor_definition`
 
 - Status: **draft**
-- Trigger phrases (10): "what is a guarantor", "who can be my guarantor", "guarantor requirements", "do i need a guarantor", "who qualifies as a guarantor", "can my friend be my guarantor", "guarantor for a loan", "what does a guarantor do", "explain guarantor", "guarantor meaning"
+- Trigger phrases (14): "what is a guarantor", "who can be my guarantor", "guarantor requirements", "do i need a guarantor", "who qualifies as a guarantor", "can my friend be my guarantor", "guarantor for a loan", "what does a guarantor do", "explain guarantor", "guarantor meaning", "who is a guarantor", "guarantor", "can my wife be my guarantor", "what is guarantor"
 
 Customer-facing answer:
 
@@ -663,7 +663,7 @@ Follow-up buttons: Loan requirements · Collateral · Talk to a person
 ### What counts as collateral?  `collateral_definition`
 
 - Status: **draft**
-- Trigger phrases (10): "what is collateral", "what can i use as collateral", "collateral requirements", "do i need collateral for a loan", "what counts as collateral", "can i use my car as collateral", "can i use my house as collateral", "collateral assessment", "explain collateral", "collateral meaning"
+- Trigger phrases (13): "what is collateral", "what can i use as collateral", "collateral requirements", "do i need collateral for a loan", "what counts as collateral", "can i use my car as collateral", "can i use my house as collateral", "collateral assessment", "explain collateral", "collateral meaning", "collateral", "can i use land as collateral", "can i use household goods as collateral"
 
 Customer-facing answer:
 
@@ -677,7 +677,7 @@ Follow-up buttons: Guarantor · Loan requirements · Talk to a person
 ### How to apply for a loan  `loan_apply_how`
 
 - Status: **draft**
-- Trigger phrases (11): "how do i apply for a loan", "i want a loan", "i want loan", "apply for a loan", "apply loan", "loan application", "loan aplication process", "get a loan", "how can i borrow money", "i need a loan", "how long does a loan take"
+- Trigger phrases (19): "how do i apply for a loan", "i want a loan", "i want loan", "apply for a loan", "apply loan", "loan application", "loan aplication process", "get a loan", "how can i borrow money", "i need a loan", "how long does a loan take", "how to apply for a loan", "i want to borrow money", "how can i get a loan", "loan process", "steps to get a loan", "i would like a loan", "ndifuna loan", "ndefwaya loan"
 
 Customer-facing answer:
 
@@ -702,18 +702,18 @@ Follow-up buttons: Loan requirements · Find a branch · Request a callback
 
 - Status: **draft**
 - Starts the structured `locator` flow — its prompts are the `locator.*` entries under System messages below (review those too)
-- Trigger phrases (11): "where are your branches", "nearest branch", "branch in lusaka", "branch in kitwe", "where are you located", "your address", "find a branch", "branches", "where is ab bank", "ab bank location", "which towns are you in"
+- Trigger phrases (19): "where are your branches", "nearest branch", "branch in lusaka", "branch in kitwe", "where are you located in zambia", "your address", "find a branch", "branches", "where is ab bank", "ab bank location", "which towns are you in", "branch near me", "where is your branch", "branch in ndola", "branch in chipata", "branch in solwezi", "where is your head office", "ab bank branches", "where can i find ab bank"
 
 ### Find an eTumba agent  `agent_locator`
 
 - Status: **draft**
 - Starts the structured `locator` flow — its prompts are the `locator.*` entries under System messages below (review those too)
-- Trigger phrases (11): "where can i find an agent", "etumba agent near me", "where do i cash out", "kazang agent", "konse konse agent", "543 agent", "zoona agent", "where can i deposit money on etumba", "cash out etumba", "where to withdraw etumba money", "agents"
+- Trigger phrases (16): "where can i find an agent", "etumba agent near me", "where do i cash out", "kazang agent", "konse konse agent", "543 agent", "zoona agent", "where can i deposit money on etumba", "cash out etumba", "where to withdraw etumba money", "agents", "nearest agent", "agent near me", "etumba agents in lusaka", "where are your agents", "find an agent"
 
 ### Opening hours  `opening_hours`
 
 - Status: **draft**
-- Trigger phrases (10): "what time do you open", "opening hours", "working hours", "what time do you close", "are you open on saturday", "are you open on weekends", "banking hours", "business hours", "opening times", "are you open now"
+- Trigger phrases (12): "what time do you open", "opening hours", "working hours", "what time do you close", "are you open on saturday", "are you open on weekends", "banking hours", "business hours", "opening times", "are you open now", "are you open on public holidays", "working hours on saturday"
 
 Customer-facing answer:
 
@@ -734,7 +734,7 @@ Follow-up buttons: Find a branch · Contact details · Talk to a person
 ### Contact details  `contact_details`
 
 - Status: **draft**
-- Trigger phrases (10): "phone number", "contact details", "how do i contact you", "customer care number", "call centre number", "email address", "whatsapp number", "how can i reach you", "contact number", "your contacts"
+- Trigger phrases (15): "phone number", "contact details", "how do i contact you", "customer care number", "call centre number", "email address", "whatsapp number", "how can i reach you", "contact number", "your contacts", "your phone number", "contact centre number", "what is your email", "whatsapp contact", "telephone number"
 
 Customer-facing answer:
 
@@ -765,7 +765,7 @@ Follow-up buttons: Request a callback · Find a branch · Opening hours
 ### Something else  `out_of_scope`
 
 - Status: **draft**
-- Trigger phrases (40): "passport office application", "renew national registration card at the registration office", "rtsa driving licence and road tax", "zra tax return and tpin", "pacra company registration", "police station report", "i need legal advice about my landlord", "hospital or clinic appointment", "ecz exam results", "unza admission and university fees", "job vacancies and recruitment", "airtel data bundles", "mtn sim card registration", "zamtel line problem", "zesco power outage in my area", "lusaka water and sewerage bill", "dstv or gotv subscription", "my facebook or instagram account problem", "gmail or email password", "wifi router and internet at home", "laptop or phone repair", "supermarket or mall opening times", "bus or flight tickets", "weather forecast", "football scores and fixtures", "kwacha exchange rate", "bitcoin and cryptocurrency", "shares on the stock exchange", "napsa pension contributions", "nhima health insurance", "car or life insurance claim", "an account with zanaco stanbic absa or fnb", "western union or moneygram transfers", "farming advice and fertiliser prices", "cooking recipes", "can you tell jokes", "news and politics", "church or school savings group rules", "government bursaries and student loans", "birth marriage or death certificates"
+- Trigger phrases (74): "passport office application", "renew national registration card at the registration office", "rtsa driving licence and road tax", "zra tax return and tpin", "pacra company registration", "police station report", "i need legal advice about my landlord", "hospital or clinic appointment", "ecz exam results", "unza admission and university fees", "job vacancies and recruitment", "airtel data bundles", "mtn sim card registration", "zamtel line problem", "zesco power outage in my area", "lusaka water and sewerage bill", "dstv or gotv subscription", "my facebook or instagram account problem", "gmail or email password", "wifi router and internet at home", "laptop or phone repair", "supermarket or mall opening times", "bus or flight tickets", "weather forecast", "football scores and fixtures", "kwacha exchange rate", "bitcoin and cryptocurrency", "shares on the stock exchange", "napsa pension contributions", "nhima health insurance", "car or life insurance claim", "an account with zanaco stanbic absa or fnb", "western union or moneygram transfers", "farming advice and fertiliser prices", "cooking recipes", "can you tell jokes", "news and politics", "church or school savings group rules", "government bursaries and student loans", "birth marriage or death certificates", "creating a new facebook or tiktok profile", "getting back into my whatsapp or instagram", "changing the password on my social media app", "twitter or snapchat account settings", "youtube channel or google account login", "whatsapp verification code for a new phone", "my account at a different bank", "customer service for another bank", "indo zambia bank or access bank branches", "airtel money pin and wallet support", "mtn mobile money customer care", "zamtel mobile money line problem", "social cash transfer payments from government", "applying for a visa at an embassy", "land title deeds and plots from the council", "voters card registration", "police clearance certificate", "buying or renting a house", "taxi or yango ride", "write my cv or cover letter", "translate something into english", "betting and lotto results", "music and movie downloads", "medical advice about my symptoms", "general knowledge quiz questions", "shoprite or pick n pay specials", "facebook account", "facebook password", "instagram account", "tiktok account", "whatsapp account", "gmail account password", "sign up on facebook", "social media login problem"
 
 Customer-facing answer:
 
@@ -784,7 +784,7 @@ Follow-up buttons: Open an account · eTumba · Loans · Branches & agents · Ta
 ### Say hello  `greeting`
 
 - Status: **draft**
-- Trigger phrases (12): "hi", "hello", "hey", "hie", "helo", "hallo", "good morning", "good afternoon", "good evening", "muli bwanji", "how are you", "hi there"
+- Trigger phrases (18): "hi", "hello", "hey", "hie", "helo", "hallo", "good morning", "good afternoon", "good evening", "muli bwanji", "how are you", "hi there", "good morning ba", "hi good afternoon", "morning", "hello ab bank", "mwabuka shani", "mulishani"
 
 Customer-facing answer:
 
@@ -797,7 +797,7 @@ Follow-up buttons: Branches & agents · Open an account · eTumba · Loans · Ta
 ### Thanks / goodbye  `thanks_goodbye`
 
 - Status: **draft**
-- Trigger phrases (27): "thanks", "thank you", "thank u", "thanx", "zikomo", "natotela", "twalumba", "bye", "goodbye", "ok thanks", "that is all", "cheers", "no", "nope", "no thanks", "no thank you", "nothing else", "that's all", "thats all", "no that's all", "im done", "i'm done", "no im good", "im good thanks", "all good thanks", "no more questions", "nothing more"
+- Trigger phrases (32): "thanks", "thank you", "thank u", "thanx", "zikomo", "natotela", "twalumba", "bye", "goodbye", "ok thanks", "that is all", "cheers", "no", "nope", "no thanks", "no thank you", "nothing else", "that's all", "thats all", "no that's all", "im done", "i'm done", "no im good", "im good thanks", "all good thanks", "no more questions", "nothing more", "thanks a lot", "okay thank you", "have a nice day", "noted thanks", "thanks for the help"
 
 Customer-facing answer:
 
@@ -809,7 +809,7 @@ Follow-up buttons: Main menu · Talk to a person
 ### What can you do?  `bot_capabilities`
 
 - Status: **draft**
-- Trigger phrases (13): "what can you do", "help", "help me", "what is this", "who are you", "are you a robot", "are you a real person", "are you human", "what do you do", "how does this work", "menu", "options", "start over"
+- Trigger phrases (19): "what can you do", "help", "help me", "what is this", "who are you", "are you a robot", "are you a real person", "are you human", "what do you do", "how does this work", "menu", "options", "start over", "what can i ask you", "how can you help me", "am i chatting with a bot", "is this an automated chat", "show me the menu", "what services can you help with"
 
 Customer-facing answer:
 
@@ -827,7 +827,7 @@ Follow-up buttons: Branches & agents · Open an account · eTumba · Loans · Ta
 ### About AB Bank  `about_ab_bank`
 
 - Status: **draft**
-- Trigger phrases (10): "who is ab bank", "what is ab bank", "tell me about ab bank", "is ab bank licensed", "is ab bank regulated", "how long has ab bank been operating", "how many branches do you have", "what services does ab bank offer", "is ab bank a real bank", "about your bank"
+- Trigger phrases (14): "who is ab bank", "what is ab bank", "tell me about ab bank", "is ab bank licensed", "is ab bank regulated", "how long has ab bank been operating", "how many branches do you have", "what services does ab bank offer", "is ab bank a real bank", "about your bank", "is ab bank safe", "is ab bank registered with bank of zambia", "what does ab bank do", "tell me more about your bank"
 
 Customer-facing answer:
 
@@ -844,7 +844,7 @@ Follow-up buttons: Types of accounts · Find a branch · Loans · Talk to a pers
 
 - Status: **draft**
 - Starts the structured `lead` flow — its prompts are the `lead.*` entries under System messages below (review those too)
-- Trigger phrases (12): "talk to a person", "speak to someone", "talk to a human", "customer care", "customer service", "call me", "can someone call me", "i want to talk to an agent", "speak to a consultant", "operator", "real person please", "talk to staff"
+- Trigger phrases (21): "talk to a person", "speak to someone", "talk to a human", "customer care", "customer service", "call me", "can someone call me", "i want to talk to an agent", "speak to a consultant", "operator", "real person please", "talk to staff", "i want to speak to a real person", "connect me to someone at the bank", "i need to speak to customer care", "transfer me to a human", "please call me back", "request a callback", "i want a callback", "talk to a bank officer", "can i chat with a person"
 
 
 ## technical (1 intents)
@@ -852,7 +852,7 @@ Follow-up buttons: Types of accounts · Find a branch · Loans · Talk to a pers
 ### App or online banking not working  `technical_issue`
 
 - Status: **draft**
-- Trigger phrases (20): "the app is not working", "app is not working", "app not working", "the app is down", "etumba app not working", "etumba is not working", "etumba is down", "myabz not working", "myabz is down", "mymbs is down", "cant access my account online", "online banking not working", "app keeps crashing", "the system is down", "cant use the app", "network error on the app", "page not loading", "app is offline", "having trouble with the app", "app wont open"
+- Trigger phrases (27): "the app is not working", "app is not working", "app not working", "the app is down", "etumba app not working", "etumba is not working", "etumba is down", "myabz not working", "myabz is down", "mymbs is down", "cant access my account online", "online banking not working", "app keeps crashing", "the system is down", "cant use the app", "network error on the app", "page not loading", "app is offline", "having trouble with the app", "app wont open", "app not opening", "etumba app not opening", "online banking is down", "error on the app", "the app is slow", "internet banking not working", "app failing to load"
 
 Customer-facing answer:
 
@@ -872,24 +872,24 @@ Follow-up buttons: Try eTumba via USSD · Talk to a person · Find a branch
 
 - Status: **draft**
 - Starts the structured `fraud` flow — its prompts are the `fraud.*` entries under System messages below (review those too)
-- Trigger phrases (13): "i have been scammed", "i think i was scammed", "scamed", "fraud on my account", "frawd", "someone hacked my account", "money missing from my account", "unauthorised transaction", "transaction i did not make", "someone took my money", "i was conned", "report fraud", "my money is gone"
+- Trigger phrases (19): "i have been scammed", "i think i was scammed", "scamed", "fraud on my account", "frawd", "someone hacked my account", "money missing from my account", "unauthorised transaction", "transaction i did not make", "someone took my money", "i was conned", "report fraud", "my money is gone", "unknown transaction on my account", "someone withdrew money from my account", "money deducted without my permission", "strange transaction on my card", "fraudulent transaction", "suspicious transaction"
 
 ### Lost or stolen card  `lost_stolen_card`
 
 - Status: **draft**
 - Starts the structured `fraud` flow — its prompts are the `fraud.*` entries under System messages below (review those too)
-- Trigger phrases (10): "i lost my card", "my card was stolen", "stollen card", "lost my atm card", "card missing", "block my card", "someone stole my card", "i cant find my card", "my card is gone", "cancel my card"
+- Trigger phrases (16): "i lost my card", "my card was stolen", "stollen card", "lost my atm card", "card missing", "block my card", "someone stole my card", "i cant find my card", "my card is gone", "cancel my card", "i misplaced my card", "my atm card is lost", "lost debit card", "my card got stolen", "i left my card at the atm", "lost my visa card"
 
 ### Make a complaint  `complaint`
 
 - Status: **draft**
 - Starts the structured `complaint` flow — its prompts are the `complaint.*` entries under System messages below (review those too)
-- Trigger phrases (12): "i want to complain", "i have a complaint", "make a complaint", "compliant", "complain about service", "poor service", "i am not happy with your service", "your staff was rude", "this is unacceptable", "i want to report bad service", "dispute a charge", "raise a dispute"
+- Trigger phrases (17): "i want to complain", "i have a complaint", "make a complaint", "compliant", "complain about service", "poor service", "i am not happy with your service", "your staff was rude", "this is unacceptable", "i want to report bad service", "dispute a charge", "raise a dispute", "i want to lodge a complaint", "i am not satisfied", "bad customer service", "i want to report a staff member", "i was overcharged"
 
 ### Emergency number  `emergency_line`
 
 - Status: **draft**
-- Trigger phrases (10): "what is the emergency number", "emergency number", "emergency line", "emergency contact", "fraud hotline", "fraud line number", "24 hour number", "who do i call in an emergency", "urgent number to call", "number to report fraud"
+- Trigger phrases (14): "what is the emergency number", "emergency number", "emergency line", "emergency contact", "fraud hotline", "fraud line number", "24 hour number", "who do i call in an emergency", "urgent number to call", "number to report fraud", "emergency phone number", "fraud number", "after hours number", "24/7 number"
 
 Customer-facing answer:
 
@@ -907,7 +907,7 @@ Follow-up buttons: Report fraud · Lost or stolen card · Contact details
 ### Forgot PIN or password  `credential_trouble`
 
 - Status: **draft**
-- Trigger phrases (11): "i forgot my pin", "forgot my password", "reset my pin", "reset password", "pin blocked", "my pin is not working", "locked out of my account", "forgot my etumba pin", "reset my etumba pin", "cant log in to myabz", "i forgot my internet banking password"
+- Trigger phrases (17): "i forgot my pin", "forgot my password", "reset my pin", "reset password", "pin blocked", "my pin is not working", "locked out of my account", "forgot my etumba pin", "reset my etumba pin", "cant log in to myabz", "i forgot my internet banking password", "change my pin", "how do i change my pin", "i forgot my passcode", "wrong pin too many times", "forgot etumba password", "change password"
 
 Customer-facing answer:
 
@@ -945,7 +945,7 @@ Submitted to Meta under these names; `{{1}}` is the case reference.
 > Hello, this is AB Bank. Your callback request {{1}} is booked, and our team will call you within one working day.
 
 
-## System messages (132 texts)
+## System messages (151 texts)
 
 Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts, retries, confirmations. Source: `knowledge/system_messages.yaml`. `{placeholders}` are filled in by the bot (contact details from `app/config.py`, or the values listed).
 
@@ -1136,7 +1136,7 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 
 - Status: **draft**
 
-> This customer last wrote more than 24 hours ago, so WhatsApp only allows an approved template. Send the case_update template instead.
+> Not sent. This customer last wrote more than 24 hours ago, so WhatsApp only allows an approved template. Send the case_update template from /admin/cases instead.
 
 ### `handoff_inbox`
 
@@ -1199,6 +1199,44 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Filled in by the bot: `{when}`
 
 > Our team is away right now and will pick this up {when}.
+
+### `desk.note.handoff`
+
+- Status: **draft**
+- Filled in by the bot: `{channel}`, `{ref}`, `{jira}`, `{until}`
+
+> Handed over by the assistant on {channel}. Case {ref}, Jira {jira}. You can reply here until {until} (Lusaka time); after that WhatsApp only allows the case_update template from /admin/cases. Resolve this conversation when you have finished, and the assistant takes over again. The conversation so far, with personal details masked:
+
+### `desk.jira_pending`
+
+- Status: **draft**
+
+> not created yet
+
+### `desk.note.bot_resumed_idle`
+
+- Status: **draft**
+- Filled in by the bot: `{hours}`
+
+> No agent reply for {hours} hours, so the assistant is answering this customer again. Reply here to take the conversation back (possible only while the customer's 24-hour window is open).
+
+### `desk.note.send_failed`
+
+- Status: **draft**
+
+> Not sent. The message could not be delivered to the customer. Try again in a few minutes; if it keeps failing, follow up through the Jira ticket.
+
+### `desk.note.attachment_not_sent`
+
+- Status: **draft**
+
+> Attachments are not sent to customers from the desk. Please type your reply as text.
+
+### `desk.note.unlinked`
+
+- Status: **draft**
+
+> Not sent. This conversation is no longer linked to a customer chat (it may be older than the retention period). Follow up through the Jira ticket.
 
 ### `pii_warning`
 
@@ -1340,6 +1378,12 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Status: **draft**
 
 > Time
+
+### `field.marketing_consent`
+
+- Status: **draft**
+
+> News and offers
 
 ### `fraud.topic_label`
 
@@ -1514,6 +1558,31 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 
 > That doesn't look like a valid number — please send it as 09XXXXXXX (10 digits), 260XXXXXXXXX (12 digits), or +260XXXXXXXXX, so our team can actually reach you.
 
+### `lead.step.marketing_consent`
+
+- Status: **draft**
+- For Legal: Opt-in must be freely given and separate from the callback (the callback goes ahead either way). Check the opt-out statement and purpose wording against the ECT Act 2021 and the Data Protection Act 2021 [VERIFY with Legal].
+
+> One last, optional question: may AB Bank send you news and offers about our products and services? Your callback goes ahead either way. You can stop these messages at any time by typing "unsubscribe".
+
+### `lead.retry.marketing_consent`
+
+- Status: **draft**
+
+> Sorry, I didn't catch that. Would you like to receive news and offers from AB Bank? Please tap Yes or No.
+
+### `lead.summary.marketing_consent_yes`
+
+- Status: **draft**
+
+> News and offers: yes
+
+### `lead.summary.marketing_consent_no`
+
+- Status: **draft**
+
+> News and offers: no
+
 ### `lead.finish`
 
 - Status: **draft**
@@ -1521,6 +1590,13 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 
 > Done — that's everything I need. Our team will call you within one working day. Your reference is {ref}.
 > Is there anything else I can help with in the meantime?
+
+### `marketing.opt_out`
+
+- Status: **draft**
+- For Legal: Confirms an opt-out typed as "unsubscribe", "opt out", "stop offers" or "stop marketing". Check it states the effect correctly [VERIFY with Legal].
+
+> Done. I've noted that you don't want news and offers from AB Bank, and I won't ask you about them again in this chat. Any request you've already made still goes ahead.
 
 ### `locator.topic_label`
 
@@ -1602,6 +1678,24 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Filled in by the bot: `{cities}`
 
 > I couldn't find a listed branch there. We currently list branches in: {cities}. Our team can help you find the nearest service point.
+
+### `csat.ask`
+
+- Status: **draft**
+
+> If you have a moment, please tap below to tell us how I did today.
+
+### `csat.thanks`
+
+- Status: **draft**
+
+> Thank you for your feedback. It helps us improve.
+
+### `csat.thanks_down`
+
+- Status: **draft**
+
+> Thank you for telling us, and I'm sorry I didn't help more. A person from our team can help you directly — tap "Talk to a person", or choose another option below.
 
 ### `button.a_branch`
 
@@ -1705,6 +1799,12 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 
 > No, that's all
 
+### `button.no_thanks`
+
+- Status: **draft**
+
+> No thanks
+
 ### `button.open_an_account`
 
 - Status: **draft**
@@ -1747,6 +1847,12 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 
 > Yes, report it
 
+### `button.yes_send_offers`
+
+- Status: **draft**
+
+> Yes, send offers
+
 ### `button.yes_stop`
 
 - Status: **draft**
@@ -1782,4 +1888,16 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Status: **draft**
 
 > Use this number
+
+### `button.csat_up`
+
+- Status: **draft**
+
+> 👍 Good
+
+### `button.csat_down`
+
+- Status: **draft**
+
+> 👎 Not good
 

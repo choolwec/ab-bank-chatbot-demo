@@ -271,10 +271,10 @@ env file overrides `flags.json` and needs a restart to change.
 | `MS_APP_SECRET`, `MS_VERIFY_TOKEN` | for Messenger | Webhook signature and subscription check. |
 | `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` | for real Jira | Mock mode until all four are set. |
 | `JIRA_MOCK_PROJECT_KEY` | no | Mock-mode key prefix, default `CC`. |
-| `CHATWOOT_URL` | with H2 | Agent desk; WhatsApp handoff then defaults to "inbox". Other `CHATWOOT_*` arrive with H2. |
+| `CHATWOOT_URL`, `CHATWOOT_ACCOUNT_ID`, `CHATWOOT_INBOX_ID`, `CHATWOOT_API_TOKEN`, `CHATWOOT_WEBHOOK_SECRET` | with H2 | Agent desk (`docs/chatwoot-setup.md`); on only when the first four are set. `CHATWOOT_ENABLED` is its kill switch; `DESK_IDLE_HOURS` default 24. |
 | `HANDOFF_MODE_WEB`, `_WHATSAPP`, `_MESSENGER` | no | `callback` or `inbox` per channel. |
-| `ALERT_WEBHOOK_URL` | with R1 | Where `admin.alerts` posts. |
-| `FREE_TEXT_ENABLED`, `WIDGET_ENABLED`, `WHATSAPP_ENABLED`, `MESSENGER_ENABLED`, `MESSENGER_PUBLIC_REPLIES`, `JIRA_ENABLED`, `EMBEDDINGS_ENABLED`, `SHADOW_MATCHER`, `URGENT_MODEL_ENABLED` | no | Kill switches: keep them in `flags.json`. |
+| `ALERT_TEAMS_WEBHOOK_URL` | with R1 | Teams Workflow webhook where `admin.alerts` posts (secret; unset = mock). Also `ALERT_HEALTH_URL`, `ALERT_ENV_NAME`, `ALERT_JIRA_PROJECT_KEY`, `ALERT_TEAMS_REPEAT_MINUTES`, `ALERT_JIRA_REPEAT_HOURS`, the `ALERT_*` thresholds and `PURGE_HOUR`: see `docs/runbook-incidents.md`. |
+| `FREE_TEXT_ENABLED`, `WIDGET_ENABLED`, `WHATSAPP_ENABLED`, `MESSENGER_ENABLED`, `MESSENGER_PUBLIC_REPLIES`, `JIRA_ENABLED`, `CHATWOOT_ENABLED`, `EMBEDDINGS_ENABLED`, `SHADOW_MATCHER`, `URGENT_MODEL_ENABLED`, `MARKETING_CONSENT_ENABLED`, `WA_LINK_ENABLED` | no | Kill switches: keep them in `flags.json`. |
 | `EMB_HIGH`, `EMB_MEDIUM`, `EMB_URGENT` | no | Thresholds from calibration; leave unset. |
 | `IDLE_REGREET_MINUTES`, `FLOW_EXPIRY_HOURS`, `FLOW_EXPIRY_HOURS_URGENT`, `STALE_MESSAGE_MINUTES` | no | Session timings (defaults 30 min, 24 h, 72 h, 10 min). |
 | `TRANSCRIPT_RETENTION_DAYS`, `TICKET_RETENTION_DAYS` | no | Defaults 90 and 0 (never). [CONFIRM: Legal] Keep `logrotate.conf`'s 90 days in step. |

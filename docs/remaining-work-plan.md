@@ -17,6 +17,102 @@ corrupted `\n` and `\b` escapes several times.
 
 ---
 
+## Update 24/09/2026
+
+Draft for review by the PO. This section supersedes sections 1-2 below where
+they differ; the ticket plans in section 3 are kept as the design record.
+
+### What is now built
+
+| Ticket | Built | Where to read more |
+|---|---|---|
+| R1 | `/health` `checks` (counts only), `admin/alerts.py` posting to a Teams group chat (Power Automate Workflow, `ALERT_TEAMS_WEBHOOK_URL`) and Jira (`chatbot-alert`), nightly retention purges including `inbox.db` (`app/housekeeping.py`), extra checks `flags_file` (Sev 1) and `webhook_rejected` (Sev 2) | `runbook-incidents.md` |
+| P7 | `deploy/` (systemd, nginx, deploy/rollback/backup/restore, `admin.sh`, `env.example`, crontab, logrotate), `ABZ_DATA_DIR` / `ABZ_FLAGS_FILE`, rotatable `REPLY_KEY` (`admin.rotate_reply_key`), hermetic suite, shellcheck in CI | `runbook-production.md` |
+| P9 | `research/load/load.py`, `/admin/timing`, real Jira push moved off the request path; local 5-minute run: `/chat` p95 18.9 ms, no errors | `load-test-results.md` |
+| H5 | Sampled one-tap CSAT (20% by `user_hash`, never after fraud, once per session) | CLAUDE.md, request pipeline |
+| H6 | Weekly report v2 written to `data/report.md`: per channel, launch targets PASS/FAIL/n/a, WhatsApp cost estimate (US$, [VERIFY]), leads, campaigns | `admin/report.py` |
+| H2 | Chatwoot desk for WhatsApp handoffs (`app/desk/`), masked and phone-redacted, `CHATWOOT_ENABLED` kill switch | `chatwoot-setup.md` |
+| H4 | `admin/export_bot_wrong.py`: `bot-wrong` labels from Chatwoot and Jira into `data/utterances.csv` | `chatwoot-setup.md` |
+| Matcher | Negation handled in both modes, `out_of_scope` phrases, broader phrases, recalibration (`EMB_MEDIUM` 0.435), gates tightened. Character: right 0.670 / wrong 0.044 / OOS 0.067. Hybrid: right 0.835 / wrong 0.022 / OOS 0.067 (targets 0.85 / 0.02 / 0.03) | `metrics-matcher-2026-09-24.md` |
+| MK2 | Marketing-consent step in the callback flow (`MARKETING_CONSENT_ENABLED`), opt-out commands, Jira label `marketing-consent` | `marketing-launch-kit.md` |
+| MK3 | Campaign source (widget `data-campaign`/utm, WhatsApp `ref:`), "Continue on WhatsApp" link (`WA_LINK_ENABLED`, off), a callback button on every product answer | `marketing-launch-kit.md` |
+| Launch docs | `go-no-go.md` (R2), `pilot-runbook-whatsapp.md` (W10), `hosting-requirements-it.md`, `meta-onboarding-guide.md` (W1), `legal-compliance-pack.md`, `dpia-draft.md`, `phrase-workshop-kit.md`, `decisions-log.md` | branch `wip/launch-docs-review`, **not yet merged** into this branch |
+
+Section 4 loose ends now closed: the inbox purge is scheduled (R1); backups
+cover `user_key_secret` and `reply_key`, and `REPLY_KEY` can be rotated (P7);
+`render.yaml` fetches the model and runs shadow mode (P7); the suite no
+longer writes to `data/` (P7); README and INSTRUCTIONS list the admin
+commands and content files (this update). The "Hybrid matcher switch-over"
+items 1-3 are done; the shadow reviews and the flag flip remain.
+
+Being fixed in parallel, not in this branch yet: CSAT keeping "Talk to a
+person", a distinct `request_callback` payload, email masking before
+Chatwoot, the desk-failure message, start-up purge resilience, the crontab
+and nginx changes, and the WhatsApp coexistence pause (W11,
+`COEXISTENCE_ENABLED`).
+
+### What remains, by owner
+
+| Owner | What |
+|---|---|
+| IT | Lusaka VM (2 vCPU / 4 GB / 40 GB), DMZ HTTPS endpoint, TLS certificate (bank or Let's Encrypt), outbound HTTPS to `graph.facebook.com` and to `huggingface.co` during deploys, an off-VM backup destination in Zambia, the second VM for Chatwoot, and access logs that do not record the Chatwoot webhook path |
+| PO | Create the Teams Workflow and hand over its URL (runbook-incidents section 5); decide the items in the concerns table below; Meta onboarding (W1); confirm the public WhatsApp number before `WA_LINK_ENABLED` goes on; run the weekly shadow reviews, then decide on `EMBEDDINGS_ENABLED`; a paid Render disk if a week of staging shadow data is wanted; sign the go/no-go tables |
+| Legal / Compliance / DPO | Sign off `intent-review.md` (new consent, opt-out, CSAT and desk wording); consent and opt-out rules under the ECT Act 2021 and Data Protection Act 2021; retention periods (including whether the JSONL audit copy may be deleted after 90 days while tickets are kept); whether Jira on Atlassian Cloud is a cross-border transfer; the DPIA; the [CONFIRM] items in both runbooks and the marketing kit. Every statutory reference must be checked against the official text |
+| Contact-centre lead | Review the `desk.*` staff notes; Chatwoot agent training (W19); pilot roles and testers |
+| Marketing | MK1 launch communications; name an owner for opt-out suppression (opt-outs exist only as `marketing_opt_out` audit events keyed by `user_hash`); campaign codes |
+| Content owner + staff | N1 phrase workshop and two-person labelling; N8 native-speaker check of the draft Bemba/Nyanja phrases (`mwabuka shani`, `mulishani`, `ndifuna loan`, `ndefwaya loan`) |
+| Dev | P7 acceptance on the VM (two deploys, two rollbacks, one restore; a dry run of `deploy.sh` as the non-root user); P9 30-minute staging and VM runs; switch on the alerts cron line; W11; the [VERIFY] checks against a live Chatwoot, Meta and the bank's Jira; the parallel fixes above; a decision on the serial WhatsApp send worker (about 1.6 messages/s at 250 ms per Graph call) before volume grows |
+
+### Decision recorded: env file mode 640
+
+`/etc/abz-chatbot/env` is `root:abz`, mode `640`, with single-quoted values.
+Reason: the alert cron job in `runbook-incidents.md` section 6 runs as the
+service user `abz` and sources the env file, and the files it writes in
+`data/` must stay writable by the app. The extra exposure is small, because
+the app process, running as `abz`, already holds these secrets in its
+environment.
+
+**Not yet reconciled in code:** `deploy/lib.sh` `check_env` still refuses
+any mode but `600`, and `deploy/env.example`, `deploy/abz-chatbot.service`
+and `runbook-production.md` still say `600`. `deploy/crontab.example`
+instead runs alerts as root through `admin.sh`, which works with `600`.
+Either change `check_env` and those files to `640`, or keep `600` with the
+`admin.sh` cron line (or a systemd timer). Settle this before the first
+deploy, or `deploy.sh` will refuse a `640` file.
+
+### Reviewer concerns that need a human decision
+
+| # | Concern | Who decides | Status |
+|---|---|---|---|
+| 1 | After a Teams "Resolved" post, a re-firing issue waits out the 15-minute limit. In a crash-restart loop the chat can show "Resolved" for up to about 14 minutes while the bot is down. Options: repost a re-firing Sev 1 at once, or hold "Resolved" posts for 15 minutes | PO | Open |
+| 2 | `inbox.py` stores the handler's exception text in failed rows; raw PII could land in `inbox.db` if an exception ever includes it. Suggest storing the exception type only | Dev + PO | Open |
+| 3 | A `/health` 503 (app up, store unreadable) raises "The chatbot is not responding" (Sev 1); the wording could mislead the responder | PO | Open |
+| 4 | A locked or corrupt database stops start-up (the start-up purge is not wrapped); an invalid `PURGE_HOUR` silently ends the nightly task | Dev | In progress (parallel fix) |
+| 5 | `/health` is public and shows operational counts and invalid flag names (no ids or text). IT may want nginx to limit the detail to internal addresses | IT | Open |
+| 6 | A real Jira push runs in a daemon thread; a restart mid-push loses it (the local ticket is safe). Needs a retry or outbox before real Jira credentials go live | PO + Dev | Open |
+| 7 | nginx sets X-Frame-Options/frame-ancestors on every path, `/widget/` included. Harmless while the widget is a script; it would break an iframe widget | Dev | Noted |
+| 8 | `backup.sh` runs `sqlite3` as root on WAL-mode databases; consider running the backup step as `abz` | Dev | Open |
+| 9 | CSAT on WhatsApp and Messenger merges into the resolving bubble and drops its "Talk to a person" and "Done" buttons | PO | In progress (parallel fix) |
+| 10 | Web rate-limit hits are never logged, so the report's "Rate limited" line always shows 0 for the web | Dev | Open |
+| 11 | The report's "Topics as typed (masked)" table gives Marketing free text; personal names inside it would not be caught. Free text, or topic groups only? | PO + DPO | Open |
+| 12 | The lead section counts `marketing_consent` values `true`/`"true"` as yes, as well as `"yes"`. The flow writes `yes`/`no`/`not_asked`; confirm and tighten | Dev | Open |
+| 13 | If opening the Chatwoot conversation fails, the customer has already been told a person will reply there, but the bot is not paused | PO + CC | In progress (parallel fix) |
+| 14 | Email addresses are not masked before reaching Chatwoot | DPO | In progress (parallel fix) |
+| 15 | The Chatwoot webhook secret sits in the URL path, so access logs that record paths would hold it | IT | In progress (nginx) |
+| 16 | While the desk has a conversation, urgent messages (fraud, lost card) are only forwarded to the agent and do not start the fraud flow (same as Messenger M4) | PO + Ops | Open |
+| 17 | Launch in hybrid mode although neither mode meets all the section 1 targets (hybrid right 0.835, wrong 0.022, OOS 0.067). Hybrid BANKING77 wrong answers are 0.031 (mostly fraud reports routed as lost card; both reach the fraud flow) | PO | Open |
+| 18 | The matcher builder read a doc quoting 12 held-out items and removed 8 phrases that exactly matched eval items: a mild fit to the eval sets. The N1 golden set and shadow reviews are the independent check | PO | Noted |
+| 19 | "Request a callback" on product answers uses `human_handoff`; on Messenger, and on WhatsApp with Chatwoot, it opens a live handoff, so no consent is asked and no source is recorded | PO | In progress (parallel fix: `request_callback`) |
+| 20 | Campaign source is logged as a separate `session_source` event rather than on the session-start event | PO | Open |
+| 21 | `guards.yes_no` counts loose replies such as "sure" as marketing consent. Does that meet the ECT Act 2021 opt-in standard? | Legal | Open |
+| 22 | The Contact Centre number 888 appears in the marketing kit's anti-scam copy without a [CONFIRM] marker at every use | Marketing + Legal | Open |
+| 23 | The WhatsApp coexistence pause (bot stops when staff reply from the Business app) was not built; needed before the staff pilot if decision D5 (coexistence) stands | Dev | In progress (W11) |
+| 24 | Tickets with names and phone numbers go to Jira; if Jira is Atlassian Cloud this is likely a cross-border transfer. Real Jira stays in mock mode until Legal rules | Legal | Open |
+| 25 | The single WhatsApp send worker is serial (about 1.6 messages/s) | PO + Dev | Open |
+| 26 | Env file mode 600 or 640 (see above) | Dev | Decided 640; code not yet aligned |
+
+---
+
 ## 1. Where things stand
 
 | Area | State |
@@ -143,9 +239,10 @@ in the report.
 - A small middleware counts webhook 4xx/5xx in memory.
 - `admin/alerts.py`: run by cron every minute on the VM. It compares the
   checks with thresholds (`/health` down; webhook 5xx > 1%; send failures
-  > 2%; queue older than 2 minutes) and posts to `ALERT_WEBHOOK_URL` (email
-  relay or Teams, decided by the PO), rate-limited to one alert per issue
-  per 15 minutes.
+  > 2%; queue older than 2 minutes) and posts to `ALERT_TEAMS_WEBHOOK_URL`
+  (a Teams group chat, through a Power Automate Workflow) and to Jira via
+  `jira_export.push_alert`. Teams is limited to one post per issue per 15
+  minutes plus one "Resolved" post; Jira to one issue per issue per 24 h.
 - **Schedule the missing purges:** `inbox.purge()` exists but nothing calls
   it. Call it from lifespan and the nightly job, alongside
   `audit.purge_expired()` and `store.purge_expired()`.
@@ -165,8 +262,9 @@ failures; alert thresholds and rate-limiting with a mocked transport.
 
 **Build now, in `deploy/`:**
 - `abz-chatbot.service`: systemd, **one** uvicorn worker, `Restart=always`,
-  `EnvironmentFile=/etc/abz-chatbot/env` (root-only, `chmod 600`), and a
-  non-root user.
+  `EnvironmentFile=/etc/abz-chatbot/env`, and a non-root user. (This plan
+  first said root-only `chmod 600`; the decision is now `root:abz` mode
+  `640`, see "Update 24/09/2026" below.)
 - `nginx.conf`: TLS (Let's Encrypt or the bank certificate), and
   `proxy_set_header X-Forwarded-For`, with `PROXY_HOPS=1` in the env file.
   Pass `/webhooks/*` through with the **raw body untouched**, since the
@@ -185,7 +283,8 @@ failures; alert thresholds and rate-limiting with a mocked transport.
   restore a backup, rotate each secret, and the full env-var list:
   - `WA_*`, `MS_*`, `JIRA_*`, `ADMIN_*`, `USER_KEY_SECRET`, `REPLY_KEY`;
   - `ALLOWED_ORIGINS`, `PROXY_HOPS`, the retention days;
-  - `EMB_*`, `CHATWOOT_*`, `ALERT_WEBHOOK_URL`.
+  - `EMB_*`, `CHATWOOT_*`, `ALERT_TEAMS_WEBHOOK_URL` and the other
+    `ALERT_*` settings, `PURGE_HOUR`.
 
 **On the VM (acceptance):** two deploys, two rollbacks, one successful
 restore, and `/health` green from outside the network.
@@ -390,7 +489,7 @@ Also resolve the **[VERIFY]** items in code before go-live:
 
 ## 4. Loose ends found during the build
 
-- **Inbox purge is never scheduled.** Covered in R1.
+- **Inbox purge is never scheduled.** Done in R1 (`app/housekeeping.py`).
 - **Keys in `data/`** (`user_key_secret`, `reply_key`) are production
   secrets. Covered in P7's backups. Rotating `REPLY_KEY` needs a
   re-encryption step (a `MultiFernet` with the old and new keys); add that

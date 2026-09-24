@@ -154,3 +154,43 @@ def test_every_conversation_script_passes_in_hybrid_mode(hybrid, bot, monkeypatc
     new = {k: v for k, v in failures.items() if k not in known}
     fixed = known - set(failures)
     assert not new and not fixed, f"new: {new}; fixed (remove from the list): {fixed}"
+
+
+
+# --- N4: shadow mode ------------------------------------------------------------
+
+
+def test_shadow_mode_logs_both_decisions_and_never_changes_the_reply(bot, monkeypatch, hybrid):
+    import json
+
+    from app import audit, shadow
+    from admin.shadow_report import build, disagreements
+
+    monkeypatch.setattr(shadow, "_matcher", hybrid)
+    monkeypatch.setattr(shadow, "_tried", True)
+    live = bot()
+    live.say("what is this etumba thing")
+    live_reply = live.text
+    monkeypatch.setenv("SHADOW_MATCHER", "1")
+    b = bot()
+    b.say("what is this etumba thing")
+    assert b.text == live_reply  # the customer sees exactly the live answer
+    b.say("tell me about tamanga")
+    rows = [json.loads(l) for l in audit.JSONL_FILE.read_text(encoding="utf-8").splitlines()]
+    shadows = [json.loads(r["text"]) for r in rows if r["action"] == "shadow"]
+    assert len(shadows) == 2 and all({"live", "shadow", "agree"} <= set(s) for s in shadows)
+    items, total = disagreements(days=1)
+    assert total == 2 and items and items[0]["text"]
+    assert "disagreements" in build(days=1)
+
+
+def test_shadow_mode_without_a_model_is_silent(bot, monkeypatch):
+    from app import audit, shadow
+
+    monkeypatch.setenv("SHADOW_MATCHER", "1")
+    monkeypatch.setattr(shadow, "_matcher", None)
+    monkeypatch.setattr(shadow, "_tried", True)
+    b = bot()
+    b.say("what is etumba")
+    assert "shadow" not in audit.JSONL_FILE.read_text(encoding="utf-8")
+    assert b.action == "answer"

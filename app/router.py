@@ -10,7 +10,7 @@ import re
 
 from rapidfuzz import fuzz
 
-from . import audit, config, guards
+from . import audit, config, guards, shadow
 from .messages import button, has, msg
 from .flows import FLOWS
 from .flows.locator import CITY_PREFIX, branches_mentioned
@@ -589,6 +589,7 @@ def _free_text(session, text, urgent_flows=True):
             (n, s) for n, s in ranked
             if matcher.get(n).get("flow") not in ("fraud", "complaint")
         ]
+    shadow.observe(session, text, ranked)  # N4: logs only, never changes the reply
     boosted = _context_follow_up(session, text, ranked)
     if boosted:
         return boosted

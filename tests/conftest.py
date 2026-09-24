@@ -1,8 +1,22 @@
+import atexit
 import os
+import shutil
+import tempfile
 
 # Raise the per-IP rate limit before the app imports config — the whole test
 # suite arrives from one client IP.
 os.environ.setdefault("RATE_LIMIT_PER_MINUTE", "100000")
+
+# P7: the suite never touches real data or real services, even when run on
+# the production VM (deploy.sh) with its environment loaded: a fresh data dir
+# per run, the repo's own flags.json, and no integration credentials.
+_TEST_DATA = tempfile.mkdtemp(prefix="abz-test-data-")
+atexit.register(shutil.rmtree, _TEST_DATA, ignore_errors=True)
+os.environ["ABZ_DATA_DIR"] = _TEST_DATA
+for _var in ("ABZ_FLAGS_FILE", "JIRA_BASE_URL", "JIRA_EMAIL", "JIRA_API_TOKEN", "JIRA_PROJECT_KEY",
+             "WA_ACCESS_TOKEN", "WA_PHONE_NUMBER_ID", "MS_PAGE_TOKEN", "CHATWOOT_URL",
+             "REPLY_KEY", "USER_KEY_SECRET"):
+    os.environ.pop(_var, None)
 
 import pytest
 from fastapi.testclient import TestClient

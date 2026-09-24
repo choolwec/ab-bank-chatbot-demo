@@ -13,10 +13,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 KNOWLEDGE_DIR = BASE_DIR / "knowledge"
 INTENTS_DIR = KNOWLEDGE_DIR / "intents"
 BRANCHES_FILE = KNOWLEDGE_DIR / "branches.json"
-DATA_DIR = BASE_DIR / "data"
-FLAGS_FILE = BASE_DIR / "flags.json"
+# P7: on the production VM the code is a read-only release directory, so the
+# databases, keys and kill switches live outside it (deploy/env.example) and
+# survive a deploy or a rollback. Unset, both stay in the repo as before.
+DATA_DIR = Path(os.environ.get("ABZ_DATA_DIR") or BASE_DIR / "data")
+FLAGS_FILE = Path(os.environ.get("ABZ_FLAGS_FILE") or BASE_DIR / "flags.json")
 
-DATA_DIR.mkdir(exist_ok=True)
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 # --- Free-text matching thresholds (§3.1B) ---
 HIGH_CONFIDENCE = 0.70    # answer directly

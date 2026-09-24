@@ -175,6 +175,33 @@ def test_nginx_forwards_the_client_address_and_leaves_webhook_bodies_alone():
     assert "deny all;" in admin
 
 
+def test_the_desk_webhook_secret_never_reaches_an_nginx_log():
+    """/webhooks/chatwoot/<secret>: the secret is in the path, so that
+    location logs nothing (and the body still passes through untouched)."""
+    site = (DEPLOY / "nginx.conf").read_text(encoding="utf-8")
+    site = "\n".join(line for line in site.splitlines() if not line.lstrip().startswith("#"))
+    desk = re.search(r"location /webhooks/chatwoot/ \{(.*?)\n    \}", site, re.S).group(1)
+    assert re.search(r"^\s*access_log off;", desk, re.M)
+    assert re.search(r"^\s*error_log \S+ crit;", desk, re.M)
+    assert "proxy_pass http://abz_chatbot;" in desk and "proxy_request_buffering on;" in desk
+    unit = (DEPLOY / "abz-chatbot.service").read_text(encoding="utf-8")
+    assert "--no-access-log" in unit  # nor uvicorn's own access log
+
+
+def test_crontab_runs_alerts_and_the_weekly_jobs_through_admin_sh():
+    cron = (DEPLOY / "crontab.example").read_text(encoding="utf-8")
+    jobs = [line for line in cron.splitlines() if line.strip() and not line.startswith("#")
+            and re.match(r"^[\d*]", line)]
+    commands = {}
+    for line in jobs:
+        m = re.search(r"deploy/admin\.sh (\w+)", line)
+        if m:
+            commands[m.group(1)] = line.split()[:5]
+            assert (ROOT / "admin" / f"{m.group(1)}.py").exists(), line
+    assert commands["alerts"] == ["*"] * 5
+    assert commands["report"][4] == commands["export_bot_wrong"][4] == "1"  # weekly
+
+
 def test_staging_fetches_the_model_and_shadows_without_switching_over():
     import yaml
 

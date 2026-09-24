@@ -1,0 +1,190 @@
+{
+  "config": {
+    "rate": 20.0,
+    "minutes": 5.0,
+    "seed": 7,
+    "fake_latency_ms": 0,
+    "shadow": false,
+    "target": "spawned uvicorn, one worker"
+  },
+  "achieved_rate": 20.0,
+  "client": {
+    "chat": {
+      "count": 4215,
+      "p50_ms": 10.3,
+      "p95_ms": 22.1,
+      "p99_ms": 37.1,
+      "max_ms": 548.5
+    },
+    "webhook": {
+      "count": 1785,
+      "p50_ms": 5.0,
+      "p95_ms": 7.8,
+      "p99_ms": 16.1,
+      "max_ms": 242.8
+    }
+  },
+  "client_over_150ms": {
+    "chat": {
+      "count": 4,
+      "in_first_30s": 3,
+      "first": [
+        [
+          0.7,
+          157
+        ],
+        [
+          0.5,
+          549
+        ],
+        [
+          2.9,
+          430
+        ],
+        [
+          160.5,
+          211
+        ]
+      ]
+    },
+    "webhook": {
+      "count": 2,
+      "in_first_30s": 2,
+      "first": [
+        [
+          0.6,
+          243
+        ],
+        [
+          0.7,
+          195
+        ]
+      ]
+    }
+  },
+  "status": {
+    "chat:200": 4215,
+    "webhook:200": 1785
+  },
+  "errors": {},
+  "flows": {
+    "callback:started": 182,
+    "callback:ticket": 182,
+    "faq:started": 568,
+    "fraud:started": 168,
+    "fraud:ticket": 168
+  },
+  "wa_sent": {
+    "wa:location": 97,
+    "wa:text": 1072,
+    "wa:status": 170,
+    "wa:button_reply": 175,
+    "wa:list_reply": 178,
+    "wa:image": 93
+  },
+  "server": {
+    "/admin": {
+      "count": 62,
+      "window": 62,
+      "p50_ms": 2.5,
+      "p95_ms": 6.8,
+      "p99_ms": 7.9,
+      "max_ms": 7.9
+    },
+    "/chat": {
+      "count": 4215,
+      "window": 4215,
+      "p50_ms": 7.5,
+      "p95_ms": 18.9,
+      "p99_ms": 29.1,
+      "max_ms": 546.2
+    },
+    "/webhooks/whatsapp": {
+      "count": 1785,
+      "window": 1785,
+      "p50_ms": 2.4,
+      "p95_ms": 4.3,
+      "p99_ms": 7.6,
+      "max_ms": 149.2
+    },
+    "worker:whatsapp": {
+      "count": 1615,
+      "window": 1615,
+      "p50_ms": 13.4,
+      "p95_ms": 20.1,
+      "p99_ms": 31.9,
+      "max_ms": 582.5
+    }
+  },
+  "inbox_final": {
+    "oldest_pending_age_s": 0.0,
+    "counts": {
+      "done": 1615
+    }
+  },
+  "process_final": {
+    "rss_mb": 354.4,
+    "session_locks": 1118,
+    "rate_limit_buckets": 201
+  },
+  "queue_age_max_s": 0.03,
+  "queue_depth_max": 1,
+  "drain_seconds": 0.0,
+  "rss_series": [
+    [
+      0.0,
+      149.5,
+      1
+    ],
+    [
+      30.0,
+      348.5,
+      197
+    ],
+    [
+      60.1,
+      350.5,
+      335
+    ],
+    [
+      95.1,
+      350.9,
+      465
+    ],
+    [
+      125.2,
+      351.1,
+      573
+    ],
+    [
+      160.2,
+      351.5,
+      687
+    ],
+    [
+      190.3,
+      352.1,
+      778
+    ],
+    [
+      220.3,
+      352.2,
+      869
+    ],
+    [
+      250.4,
+      352.9,
+      962
+    ],
+    [
+      285.4,
+      353.5,
+      1069
+    ]
+  ],
+  "rss_first_last_mb": [
+    149.5,
+    353.5
+  ],
+  "rss_trend_mb_per_min_after_warmup": 0.78
+}

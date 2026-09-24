@@ -137,7 +137,15 @@ def create_ticket(kind: str, fields: dict, transcript: list, channel: str = "web
     con.commit()
     con.close()
     log_event("-", "system", f"ticket created: {ref}", action=f"ticket:{kind}", channel=channel)
-    _push_to_jira(kind, ref, fields, transcript, channel, reply_to)
+    if config.jira_enabled() and config.jira_configured():
+        # P9: a real Jira round trip must not hold up the customer's reply
+        # (a 250 ms Jira put /chat p95 at 322 ms). The ticket is already
+        # stored above, so the push stays best-effort, as before. Mock mode
+        # is a local file write and stays inline.
+        threading.Thread(target=_push_to_jira, args=(kind, ref, fields, transcript, channel, reply_to),
+                         name=f"jira-push-{ref}", daemon=True).start()
+    else:
+        _push_to_jira(kind, ref, fields, transcript, channel, reply_to)
     return ref
 
 

@@ -12,7 +12,9 @@ their gate. Neither mode meets all the excellence-plan §1 targets yet.
 **Recommendation: launch in hybrid mode**, provided that:
 1. `SHADOW_MATCHER=true` runs through the staff pilot;
 2. at least one weekly `admin.shadow_report` review agrees with the switch;
-3. `deploy.sh` has run `admin.fetch_model`.
+3. the deployment has fetched and verified the model with `admin.fetch_model`
+   (the production deploy script is planned in another work stream; without
+   a verified model the matcher silently stays in character mode).
 
 `EMBEDDINGS_ENABLED` stays off by default until then. Turning it on is a
 `flags.json` edit: no deploy is needed, and it can be turned off again at once.
@@ -57,6 +59,11 @@ written by and for a UK app bank.
   the S1 negator words.
   - Only a clause about wanting or asking is dropped. A problem report such
     as "my card is not working" is kept.
+  - Past-tense negation is never dropped: "I didn't want insurance but they
+    charged me" and "I didn't mean to send it" describe what happened. A
+    leading "not" counts only before what it rules out ("not a loan"), so
+    "not sure which account to open" is kept. (Added in review; the metrics
+    above are unchanged by it.)
   - If less than three words would be left, the text is scored unchanged.
   - C10 no longer answers a negated clause as a second question.
 - **Out of scope.** There are 34 new `out_of_scope` phrases:

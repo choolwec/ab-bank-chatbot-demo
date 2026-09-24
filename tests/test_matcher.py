@@ -173,6 +173,12 @@ def test_negated_clause_is_dropped_before_scoring(text, kept):
         "i don't want it, cancel",                 # what is left is under 3 words
         "i need a loan but i don't have collateral",
         "why don't you want to give me a loan, my business is good",
+        # past tense describes what happened: the topic must stay
+        "i didn't want insurance but they charged me, how do i cancel it",
+        "I didn't mean to send money to the wrong number, how do I reverse it",
+        "i did not need this debit order, please reverse it",
+        # "not sure" is a question, not a ruled-out topic
+        "not sure which account to open, can you help me choose",
     ],
 )
 def test_text_without_a_droppable_negated_clause_is_unchanged(text):

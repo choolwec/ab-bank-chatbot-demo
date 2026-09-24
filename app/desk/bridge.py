@@ -56,12 +56,16 @@ PHONE_MASK = "[PHONE REDACTED]"
 # 9-15 digits, single spaces or dashes allowed between them. Not preceded by a
 # letter, digit or dash, so a reference like FRD-20260924-1234 is left alone.
 PHONE_RE = re.compile(r"(?<![\w\-+])\+?\d(?:[ \-]?\d){8,14}(?!\d)")
+# Zambian numbers written with dots, slashes or brackets ("0977.123.456",
+# "(0977) 123456", "+260 (97) 7123456"): 0 or 260 plus 9 digits. Not when
+# the digits run on, or go on into a time or decimals, so dates stay.
+ZM_PHONE_RE = re.compile(r"(?<![\w\-+.,/])(?:\+?\(?260\)?|\(?0)(?:[ .\-/()]{0,2}\d){9}(?!\d|[.,:/]\d)")
 
 
 def desk_text(text: str) -> str:
     """Text bound for Chatwoot: masked by guards (again), phone numbers too."""
     masked, _ = guards.mask(guards.clean(text or ""))
-    return PHONE_RE.sub(PHONE_MASK, masked)
+    return ZM_PHONE_RE.sub(PHONE_MASK, PHONE_RE.sub(PHONE_MASK, masked))
 
 
 def _log(session, text, action):

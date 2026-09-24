@@ -162,10 +162,13 @@ def _push_to_jira(kind: str, ref: str, fields: dict, transcript: list, channel="
     except Exception:
         result = None
     if result:
-        con = _connect()
-        con.execute("UPDATE tickets SET jira_key = ? WHERE ref = ?", (result["key"], ref))
-        con.commit()
-        con.close()
+        try:  # H2: the desk links to the key; never let this block the ticket
+            con = _connect()
+            con.execute("UPDATE tickets SET jira_key = ? WHERE ref = ?", (result["key"], ref))
+            con.commit()
+            con.close()
+        except Exception:
+            pass
         log_event(
             "-", "system", f"jira issue created: {result['key']} ({result['mode']})",
             action="jira_push",

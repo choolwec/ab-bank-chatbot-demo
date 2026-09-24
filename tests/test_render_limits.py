@@ -37,7 +37,31 @@ def _replies_for_every_path(bot):
         for kind, value in steps:
             replies, _ = b.say(value) if kind == "say" else b.tap(value)
         out += [(label, r) for r in replies]
+    # H5: the feedback question on its own bubble (web) and merged into the
+    # resolving one (WhatsApp, P5), plus both thanks replies.
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setenv("CSAT_SAMPLE_RATE", "1")
+        for channel in ("web", "whatsapp"):
+            for label, steps in CSAT_PATHS.items():
+                b = bot(channel=channel)
+                for kind, value in steps:
+                    replies, _ = b.say(value) if kind == "say" else b.tap(value)
+                out += [(f"{label}:{channel}", r) for r in replies]
+    asked = [n for n, r in out if n.startswith("csat") and any(x["payload"] == "csat:up" for x in r["buttons"])]
+    assert len(asked) == 6, asked  # 3 resolving paths x 2 channels
     return out
+
+
+_GOODBYE = [("say", "what is etumba"), ("say", "thanks")]
+CSAT_PATHS = {
+    "csat_after_goodbye": _GOODBYE,
+    "csat_after_callback": [("tap", "human_handoff"), ("say", "Mary"), ("say", "0977123456"),
+                            ("say", "a loan"), ("tap", "time:Morning"), ("tap", "confirm_yes")],
+    "csat_after_complaint": [("say", "I want to complain"), ("say", "a branch"), ("say", "slow service"),
+                             ("say", "skip"), ("tap", "confirm_yes")],
+    "csat_thanks_up": _GOODBYE + [("tap", "csat:up")],
+    "csat_thanks_down": _GOODBYE + [("tap", "csat:down")],
+}
 
 
 def _wa_titles(message):

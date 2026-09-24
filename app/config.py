@@ -181,6 +181,36 @@ def public_holidays() -> set[str]:
     return {d.strip() for d in raw.split(",") if d.strip()}
 
 
+# --- Sampled one-tap CSAT (H5) ----------------------------------------------
+# Share of customers asked "how did I do?" after a resolved conversation. The
+# sample is deterministic per customer (from user_hash). On WhatsApp the
+# question is merged into the resolving reply, so it costs no extra message,
+# but the tap's reply does: Ops can lower this, or set 0 to stop asking, with
+# no restart (env var > flags.json > default, like the kill switches).
+CSAT_SAMPLE_RATE_DEFAULT = 0.2
+
+
+def csat_sample_rate() -> float:
+    raw = os.environ.get("CSAT_SAMPLE_RATE")
+    if raw is None:
+        raw = _flags_from_file().get("CSAT_SAMPLE_RATE", CSAT_SAMPLE_RATE_DEFAULT)
+    try:
+        rate = float(raw)
+    except (TypeError, ValueError):
+        return CSAT_SAMPLE_RATE_DEFAULT
+    return min(max(rate, 0.0), 1.0)
+
+
+# --- Estimated WhatsApp cost in the weekly report (H6) -----------------------
+# [VERIFY] US$ per service message at Meta's Rest-of-Africa utility rate, which
+# applies to bot replies from 1 Oct 2026. 0.004 is the ILLUSTRATIVE figure from
+# docs/multi-platform-research.md §8, not a published rate: replace it (env var)
+# with the current Meta rate card before the estimate goes into a budget.
+WA_UTILITY_RATE = float(os.environ.get("WA_UTILITY_RATE", "0.004"))
+# [VERIFY] free service messages per WhatsApp number per calendar month.
+WA_FREE_SERVICE_MESSAGES = int(os.environ.get("WA_FREE_SERVICE_MESSAGES", "1000"))
+
+
 def _flags_from_file() -> dict:
     try:
         return json.loads(FLAGS_FILE.read_text(encoding="utf-8"))

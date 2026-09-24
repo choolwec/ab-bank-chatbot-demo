@@ -64,5 +64,7 @@ class LeadFlow(FormFlow):
                 # "Is there anything else?" -- typed yes/no answer it (C3).
                 "yes": "menu",
                 "no": "thanks_goodbye",
+                # H5: a resolved conversation; the router may ask for feedback.
+                "resolved": "callback",
             }
         ]

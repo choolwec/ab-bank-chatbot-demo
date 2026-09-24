@@ -3,6 +3,10 @@ import os
 # Raise the per-IP rate limit before the app imports config — the whole test
 # suite arrives from one client IP.
 os.environ.setdefault("RATE_LIMIT_PER_MINUTE", "100000")
+# H5: the CSAT sample depends on each session's random user_hash, so it is
+# OFF for the suite unless a test turns it on (monkeypatch.setenv) -- no test
+# may get an extra feedback reply by chance.
+os.environ["CSAT_SAMPLE_RATE"] = "0"
 
 import pytest
 from fastapi.testclient import TestClient

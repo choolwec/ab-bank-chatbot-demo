@@ -16,7 +16,8 @@ The WhatsApp bot goes live in two stages, each with its own go/no-go:
 There is **no mass marketing** during either stage. If anything goes badly
 wrong, the PO or CC lead turns WhatsApp off in under 15 minutes (§8).
 
-Before stage 1 starts, `go-no-go.md` M4 rows 4.1–4.12 must be signed.
+Before stage 1 starts, `go-no-go.md` M4 rows 4.1–4.12, 4.15 and 4.16 must
+be signed.
 
 ## 1. Roles
 
@@ -53,7 +54,12 @@ some rarely use WhatsApp for work. The CC lead keeps the list of names
 
 **Channel setup.** Coexistence (option B, see `decisions-log.md`): the bot
 answers on the Cloud API; staff who handle WhatsApp today keep the Business
-app. A reply from the app pauses the bot for that customer.
+app. A reply from the app must pause the bot for that customer.
+**Not built yet (24/09/2026):** the WhatsApp adapter does not yet act on
+Meta's coexistence echo events (`smb_message_echoes` in the research,
+**[VERIFY]** the name), so today the bot would keep answering while a person
+replies from the app. It needs a ticket and a test before the staff pilot
+(`go-no-go.md` row 4.16).
 
 **Daily triage.** 15 minutes at 09:30 on working days (template in §6):
 
@@ -186,6 +192,11 @@ never left without an answer.
    `"WHATSAPP_ENABLED": false`. Flags are re-read on every message: **no
    restart**. (Setting the `WHATSAPP_ENABLED` environment variable instead
    also works but needs a service restart and wins over the file.)
+   **Check before the pilot:** the production env file must **not** set
+   `WHATSAPP_ENABLED` (or `FREE_TEXT_ENABLED`, `EMBEDDINGS_ENABLED`,
+   `URGENT_MODEL_ENABLED`). An environment variable wins over `flags.json`
+   (`app/config.py::flag`), so if one is set, editing `flags.json` silently
+   does nothing. The rehearsal (`go-no-go.md` row 4.11) proves this.
 2. Send a test message from a staff phone and check you get the static
    reply.
 3. Post in the pilot Teams chat: time, who, why.

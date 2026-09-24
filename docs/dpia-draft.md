@@ -127,7 +127,7 @@ behind HTTP Basic auth and return 404 until credentials are set.
 |---|---|---|---|---|
 | Hosting (bank IT, or a Lusaka data centre: Paratus, Infratel or MTN) | Processor if external | Zambia | Everything on the VM | Decision pending (`hosting-requirements-it.md`) |
 | Meta Platforms (WhatsApp, Messenger) | Processor (research view) **[DPO/Legal, L2]** | Outside Zambia [VERIFY] | Every WhatsApp/Messenger message in both directions, platform ids, phone numbers (WhatsApp) | Needs L2 ruling |
-| Atlassian (Jira), if Cloud | Processor | **Outside Zambia** if Atlassian Cloud [CONFIRM which Jira; VERIFY Atlassian's data-residency options] | Ticket fields (name, contact), masked transcript, channel, `user_hash` | Mock mode today; **cross-border question for Legal** (`legal-compliance-pack.md` §2.9) |
+| Atlassian (Jira), if Cloud | Processor | **Outside Zambia** if Atlassian Cloud [CONFIRM which Jira; VERIFY Atlassian's data-residency options] | Ticket reference, channel, the flow's fields (name, contact in clear), the last 40 masked transcript turns, the reply-window closing time (`app/jira_export.py`). Not the `user_hash` or the sealed address | Mock mode today; **cross-border question for Legal** (`legal-compliance-pack.md` §2.9) |
 | Chatwoot (self-hosted, Community edition) | Software run by the bank; no vendor access | Zambia | `user_hash`, name if given, masked transcript, forwarded masked messages | Planned (H2) |
 | Render (staging) | Processor | Outside Zambia | **Synthetic data only**; staff told not to use real data | In use for demos |
 | Model files (Hugging Face download) | Not a recipient | — | Nothing: the model is downloaded once and runs locally | — |

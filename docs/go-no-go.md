@@ -90,11 +90,12 @@ this release), plus:
 | 4.8 | `WA_*` secrets set in the production env file only; webhook subscribed; signature check passing | `/health`; a signed test message from the test number | Dev | Not started | |
 | 4.9 | `WA_GRAPH_VERSION` and the BSUID field names checked against Meta's current docs **[VERIFY]** | Dev note with date | Dev | Not started | |
 | 4.10 | Handoff owner, hours and SLA agreed for WhatsApp (O1; coexistence means staff reply from the Business app during the pilot) | CC memo | CC | Not started | |
-| 4.11 | Kill switch `WHATSAPP_ENABLED=false` rehearsed on staging: one static reply, never silence | Rehearsal note | PO + CC | Not started | |
+| 4.11 | Kill switch `WHATSAPP_ENABLED=false` rehearsed on staging by editing `flags.json`: one static reply, never silence. The env file sets none of the kill-switch variables (an env var wins over `flags.json`) | Rehearsal note; env file checked | PO + CC | Not started | |
 | 4.12 | Meta webhook-failure emails go to a shared inbox watched by the CC lead | Inbox name | Dev + CC | Not started | |
 | 4.13 | **Staff pilot go/no-go passed** (`docs/pilot-runbook-whatsapp.md` §5, stage 1): §1 targets on pilot data, no Sev 1 in the last 7 days, handoff SLA ≥ 95% | Final staff-pilot triage note; `python -m admin.report --days 14` | PO + CC | Not started | |
 | 4.14 | For the **public** stage only: branch QR codes printed and the website "Continue on WhatsApp" link ready to switch on; no mass marketing | MK1 note | Mkt | Not started | |
 | 4.15 | Budget for WhatsApp message fees approved (rate from Meta's current rate card **[VERIFY]**) | Finance approval reference | PO | Not started | |
+| 4.16 | Coexistence (option B) only: the bot pauses for a customer when staff reply from the WhatsApp Business app (Meta's echo event, **[VERIFY]** name). **Not built as of 24/09/2026**: needs a ticket, a test, and a staging demo | Test name; staging demo note | Dev + CC | Not started | |
 
 **Go decision (M4 staff pilot):** ☐ Go ☐ No-go · PO: __________ · Date: __/__/____
 

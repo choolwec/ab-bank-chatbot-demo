@@ -169,9 +169,12 @@ which has a hard stop in W14 (by 01/01/2027).
 
 - **Question.** May fraud, complaint and callback tickets be copied into the
   contact centre's Jira if Jira is Atlassian Cloud (hosted outside Zambia)?
-- **Why it matters.** Each ticket carries the customer's name and phone
-  number or email (if given), the channel, a hashed id, and the full
-  **masked** transcript (`app/jira_export.py`). That is a cross-border
+- **Why it matters.** Each Jira issue carries the ticket reference, the
+  channel, every field the flow collected (so the customer's name and phone
+  number or email, if given, in clear), the last 40 turns of the **masked**
+  transcript, and for WhatsApp/Messenger the time the 24-hour reply window
+  closes (`app/jira_export.py`). The hashed id and the sealed reply address
+  stay on the bank's server and are not sent. That is a cross-border
   transfer under s.71 unless Jira is hosted in Zambia. The deployment guide's
   example address (`abbank.atlassian.net`) suggests Atlassian Cloud
   **[CONFIRM with the contact centre which Jira they use]**.

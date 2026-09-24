@@ -112,7 +112,7 @@ The bank already publishes **0769651262** as its WhatsApp number.
 | Option | What it means | Main trade-off |
 |---|---|---|
 | **A. Migrate** | The number moves fully to the Cloud API; the bot and (later) Chatwoot handle everything | Business-app chat history is lost (back it up first); eligible for the free blue badge |
-| **B. Coexistence** | Staff keep the WhatsApp Business app on the same number; the bot runs alongside and pauses when a person replies | No free blue badge; the app must be opened at least every 13 days [VERIFY] |
+| **B. Coexistence** | Staff keep the WhatsApp Business app on the same number; the bot runs alongside and must pause when a person replies (not built yet: `go-no-go.md` row 4.16) | No free blue badge; the app must be opened at least every 13 days [VERIFY] |
 | **C. New number** | A separate number for the bot | Confuses customers and gives scammers a second "official" number |
 
 **Recommendation:** **B for the pilot, then A** once the agent desk (H2) is

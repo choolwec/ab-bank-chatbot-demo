@@ -128,7 +128,7 @@ def welcome(session):
     return replies
 
 
-def resume(session):
+def resume(session, merge=None):
     """A returning page load (widget reopened with a live session).
 
     Never resets state: a half-finished fraud/complaint/callback flow is
@@ -143,6 +143,8 @@ def resume(session):
         meta = {"action": "resume"}
     if not replies[-1].get("buttons"):
         replies[-1]["buttons"] = list(DEFAULT_BUTTONS)
+    if _should_merge(session, merge):
+        replies = merge_replies(replies)
     for reply in replies:
         reply["text"] = _render(reply["text"])
         session.add("bot", reply["text"])
@@ -151,8 +153,27 @@ def resume(session):
     return replies, meta
 
 
-def handle(session, text=None, payload=None):
-    """Full pipeline for one inbound message. Returns (replies, meta)."""
+# P5: channels where every bubble is a billable message get ONE bubble per
+# turn. The web keeps separate bubbles (the content owner may switch it).
+MERGE_REPLIES_CHANNELS = frozenset({"whatsapp", "messenger"})
+
+
+def merge_replies(replies):
+    """Join consecutive replies into one, keeping the LAST reply's buttons
+    (and its yes/no meaning) -- e.g. the PII warning plus the answer."""
+    if len(replies) <= 1:
+        return replies
+    text = "\n\n".join(r["text"] for r in replies if r.get("text"))
+    return [dict(replies[-1], text=text)]
+
+
+def _should_merge(session, merge):
+    return session.channel in MERGE_REPLIES_CHANNELS if merge is None else merge
+
+
+def handle(session, text=None, payload=None, merge=None):
+    """Full pipeline for one inbound message. Returns (replies, meta).
+    `merge`: one bubble per turn (P5); default by channel."""
     cleaned = guards.clean(text) if text else ""
     masked, findings = guards.mask(cleaned)
     inbound = masked if text else f"[button] {payload}"
@@ -173,6 +194,8 @@ def handle(session, text=None, payload=None):
         replies = [{"text": msg("fallback"), "buttons": list(MENU_BUTTONS)}]
     if not replies[-1].get("buttons"):
         replies[-1]["buttons"] = list(DEFAULT_BUTTONS)
+    if _should_merge(session, merge):
+        replies = merge_replies(replies)
 
     for reply in replies:
         reply["text"] = _render(reply["text"])

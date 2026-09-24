@@ -1,0 +1,11 @@
+id: p5-whatsapp-one-bubble-per-turn
+# On WhatsApp every bubble is a billable message: one per turn (P5).
+channel: whatsapp
+turns:
+  - say: my card number is 4111 1111 1111 1111 what is etumba
+    expect: {replies_max: 1, text_contains: ["never need them", "did you mean"]}
+  - say: i think i was scammed
+    expect: {replies_max: 1, text_contains: ["treating it as urgent", "tell me briefly what happened"]}
+  - say: stop
+  - payload: cancel_no
+    expect: {replies_max: 1, text_contains: ["carry on", "tell me briefly what happened"]}

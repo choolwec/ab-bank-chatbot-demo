@@ -30,12 +30,18 @@ def chat(client, session_id=None, message=None, payload=None):
 class Bot:
     """Drives router.handle() in-process for one conversation (no HTTP)."""
 
-    def __init__(self):
+    def __init__(self, channel="web"):
+        import uuid
+
         from app import router
         from app.session import SessionStore
 
         self.router = router
-        self.session, _ = SessionStore().get_or_create()
+        if channel == "web":
+            self.session, _ = SessionStore().get_or_create()
+        else:
+            store = SessionStore()
+            self.session, _ = store._open(f"{channel}:test-{uuid.uuid4().hex}", channel)[1:]
         self.router.welcome(self.session)
         self.last = None
 

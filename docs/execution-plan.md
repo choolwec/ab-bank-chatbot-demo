@@ -1414,7 +1414,7 @@ that finishes the ticket.
 | P2 | Channel interface; move `/chat` | 3a | W10 | 2 | P1 | Dev 2 | ☑ |
 | P3 | Renderer and per-channel limit tests | 3a | W10–11 | 4 | P2, K1 | Dev 2 | ☐ |
 | P4 | Per-channel kill switches, per-user limits | 3a | W11 | 1.5 | P2 | Dev 2 | ☐ |
-| P5 | Fewer message bubbles | 3a | W11 | 1 | — | Dev 2 | ☐ |
+| P5 | Fewer message bubbles | 3a | W11 | 1 | — | Dev 2 | ☑ |
 | P6 | Audit channel column and HMAC identities | 3a | W08 | 2 | P1 | Dev 2 | ☑ |
 | P7 | Lusaka production hosting and runbook | 3a | W09–10 | 3 | Procurement | Dev 2 | ☐ |
 | P9 | Load and soak test | 3a | W10, W20 | 1 | P1, P7 | Dev | ☐ |

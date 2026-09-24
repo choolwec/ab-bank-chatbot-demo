@@ -462,3 +462,21 @@ def test_two_answers_share_at_most_five_buttons(bot):
     payloads = b.buttons
     assert len(payloads) <= 5 and len(set(payloads)) == len(payloads)
     assert b.last[1]["intents"] == ["opening_hours", "branch_locator"]
+
+
+
+def test_merge_keeps_the_last_buttons_and_its_yes_no(bot):
+    """P5: merging never drops the button guarantee or the C3 meaning."""
+    from app.router import merge_replies
+
+    merged = merge_replies([
+        {"text": "A", "buttons": []},
+        {"text": "B", "buttons": [{"label": "Yes", "payload": "y"}], "yes": "y"},
+    ])
+    assert merged == [{"text": "A\n\nB", "buttons": [{"label": "Yes", "payload": "y"}], "yes": "y"}]
+
+
+def test_web_pii_warning_is_its_own_bubble(bot):
+    b = bot()
+    b.say("my card number is 4111 1111 1111 1111 what is etumba")
+    assert len(b.last[0]) == 2

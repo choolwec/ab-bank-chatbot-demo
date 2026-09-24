@@ -4,6 +4,7 @@ Each file is one conversation driven through router.handle() in-process, with
 a fresh session and a temporary data directory (never touches data/).
 
     id: probe-06-typed-cancel
+    channel: whatsapp  # optional; default web (P5 merges bubbles on Meta channels)
     fixes: C2          # the ticket that makes this pass
     xfail: true        # strict: an unexpected pass fails the build
     turns:
@@ -123,7 +124,7 @@ def check_turn(b, exp, before_tickets, bot_messages, where):
 
 @pytest.mark.parametrize("script", _scripts())
 def test_conversation(bot, script):
-    b = bot()
+    b = bot(channel=script.get("channel", "web"))
     bot_messages = 0
     for n, turn in enumerate(script["turns"], 1):
         before = {k: _ticket_count(k) for k in ("fraud", "complaint", "callback")}

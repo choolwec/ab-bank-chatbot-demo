@@ -366,3 +366,26 @@ def alert_env_name() -> str:
     import socket
 
     return os.environ.get("ALERT_ENV_NAME", "").strip() or socket.gethostname()
+
+
+# --- Marketing and lead generation (MK2) -------------------------------------
+# The callback flow asks one optional question: may we send news and offers?
+# Kill switch like the others. Off: the question is skipped and the ticket
+# says marketing_consent "not_asked" (never "yes").
+def marketing_consent_enabled() -> bool:
+    return flag("MARKETING_CONSENT_ENABLED", True)
+
+
+# The widget's "Continue on WhatsApp" link (W10 limited public pilot). Off
+# until WhatsApp is live; /health tells the widget whether to show it. The
+# link carries a campaign token at most, never session data.
+# [CONFIRM: the official WhatsApp number for public use -- PO decision]
+WA_LINK_NUMBER = os.environ.get("WA_LINK_NUMBER", "260769651262")
+
+
+def wa_link_enabled() -> bool:
+    return flag("WA_LINK_ENABLED", False)
+
+
+def wa_link_url() -> str:
+    return f"https://wa.me/{WA_LINK_NUMBER}"

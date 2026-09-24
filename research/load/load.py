@@ -60,7 +60,8 @@ SPAWN_ADMIN = ("load", "load-test-password")
 FRAUD = [{"message": "I lost my card yesterday at cairo branch"}, {"message": "yes"},
          {"message": "0977123456", "expect_ticket": True}]
 CALLBACK = [{"payload": "human_handoff"}, {"message": "Mary Banda"}, {"message": "0977123456"},
-            {"message": "a loan"}, {"message": "2"}, {"message": "yes please", "expect_ticket": True}]
+            {"message": "a loan"}, {"message": "2"}, {"payload": "marketing_consent:no"},
+            {"message": "yes please", "expect_ticket": True}]
 
 
 def phrasings():

@@ -96,6 +96,25 @@
   padding: 0.25rem 0.5rem;
 }
 
+/* "Continue on WhatsApp" (W10). #0b5d1e on #ffffff is 7.9:1; underlined so
+   the link never relies on colour alone. */
+.abz-wabar {
+  padding: 0.4rem 1rem;
+  border-bottom: 1px solid #d0d4da;
+  font-size: 0.875rem;
+}
+
+.abz-walink {
+  color: #0b5d1e;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.abz-walink:focus-visible {
+  outline: 3px solid #1a56b0;
+  outline-offset: 2px;
+}
+
 .abz-log {
   flex: 1;
   overflow-y: auto;

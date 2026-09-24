@@ -573,6 +573,7 @@ def build_report(days: int = 7, offline: dict | None = None, run_offline: bool =
         t = collect(con, since)
         tickets = load_tickets(con, since)
         unmatched, withheld = top_unmatched(con, since)
+        campaigns = _campaigns(con, since)
     finally:
         con.close()
     if offline is None:
@@ -614,6 +615,7 @@ def build_report(days: int = 7, offline: dict | None = None, run_offline: bool =
     lines += [""] + _ticket_lines(tickets, channels)
     lines += [""] + _whatsapp_cost_lines(t, days)
     lines += [""] + _lead_lines(tickets, channels)
+    lines += campaigns
     lines += ["", "## Top unmatched utterances (feed these back into intents/*.yaml)", ""]
     if unmatched:
         lines += _table(["Utterance (masked)", "Count"], [[_cell(text), str(n)] for text, n in unmatched])
@@ -630,6 +632,48 @@ def build_report(days: int = 7, offline: dict | None = None, run_offline: bool =
     lines += _table(["Action", "Count"], [[a, str(c)] for a, c in turns]) if turns else ["None."]
     lines.append("")
     return "\n".join(lines)
+
+
+def _campaigns(con, since) -> list[str]:
+    """MK3: sessions and callbacks per campaign source, marketing consent and
+    opt-outs. Counts only -- names and numbers stay in Jira."""
+    sessions = dict(
+        con.execute(
+            "SELECT substr(text, 9), COUNT(DISTINCT session_id) FROM events "
+            "WHERE action='session_source' AND ts >= ? GROUP BY text",
+            (since,),
+        ).fetchall()
+    )
+    callbacks, consent = {}, {}
+    for (raw,) in con.execute(
+        "SELECT fields FROM tickets WHERE type='callback' AND created >= ?", (since,)
+    ):
+        try:
+            fields = json.loads(raw or "{}")
+        except ValueError:
+            fields = {}
+        source = fields.get("source") or "unknown"
+        callbacks[source] = callbacks.get(source, 0) + 1
+        if fields.get("marketing_consent") == "yes":
+            consent[source] = consent.get(source, 0) + 1
+    opt_outs = con.execute(
+        "SELECT COUNT(*) FROM events WHERE action='marketing_opt_out' AND role='system' AND ts >= ?",
+        (since,),
+    ).fetchone()[0]
+    lines = [
+        "",
+        "## Campaigns (source from data-campaign, utm_* or a wa.me ref: token)",
+        "",
+        f"Marketing opt-outs: {opt_outs}",
+        "",
+        "| Source | Sessions | Callbacks | Callbacks with marketing consent |",
+        "|---|---|---|---|",
+    ]
+    for source in sorted(set(sessions) | set(callbacks), key=lambda s: (-callbacks.get(s, 0), s)):
+        lines.append(
+            f"| {source} | {sessions.get(source, 0)} | {callbacks.get(source, 0)} | {consent.get(source, 0)} |"
+        )
+    return lines
 
 
 def main(argv=None) -> None:

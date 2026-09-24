@@ -12,12 +12,17 @@ P4, research §7.4). The worker calls process() for each inbox row:
   7. a shared location (W6): the nearest branches
   8. everything else: the unchanged router pipeline, one bubble per turn
 then the adapter renders (render.py) and sends.
+
+Before any of that, a campaign token in the text ("ref:cairo01", from a
+prefilled wa.me link, MK3) is recorded on the session and removed, so it
+never reaches the matcher. A message that was ONLY the token is a greeting.
 """
 
+import dataclasses
 import math
 import time
 
-from .. import audit, config, router
+from .. import audit, campaign, config, router
 from ..desk import bridge
 from ..flows.locator import _load as load_branches
 from ..identity import seal, user_hash
@@ -49,6 +54,7 @@ def process(message: InboundMessage, findings, adapter, store=None):
     with store.session(session_key(message), message.channel) as (session, created):
         now = time.time()
         session.slots["reply_ref"] = seal(message.user_key)
+        message = _take_campaign_token(session, message)
         replies, meta = _respond(session, message, findings, created, now, adapter)
         if message.ts:
             session.last_inbound_at = max(session.last_inbound_at, message.ts)
@@ -57,6 +63,24 @@ def process(message: InboundMessage, findings, adapter, store=None):
         if replies:
             adapter.send(message.user_key, replies, session=session)
         return replies, meta
+
+
+GREETING_PAYLOAD = "greeting"
+
+
+def _take_campaign_token(session, message: InboundMessage) -> InboundMessage:
+    """MK3: record and strip "ref:<code>" (the text is already masked)."""
+    if not message.text:
+        return message
+    source, rest = campaign.extract(message.text)
+    if rest == message.text:
+        return message
+    if source:
+        campaign.record(session, source)
+    if rest:
+        return dataclasses.replace(message, text=rest)
+    # "ref:cairo01" and nothing else (an edited prefill): answer as a hello.
+    return dataclasses.replace(message, text=None, payload=message.payload or GREETING_PAYLOAD)
 
 
 def _inbound_text(message: InboundMessage) -> str:

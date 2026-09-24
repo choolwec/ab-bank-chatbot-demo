@@ -17,7 +17,8 @@ SAMPLED = "0" * 32
 NOT_SAMPLED = "f" * 32
 
 CALLBACK = [("tap", "human_handoff"), ("say", "Mary Banda"), ("say", "0977123456"),
-            ("say", "a loan"), ("tap", "time:Morning"), ("tap", "confirm_yes")]
+            ("say", "a loan"), ("tap", "time:Morning"), ("tap", "marketing_consent:no"),
+            ("tap", "confirm_yes")]
 COMPLAINT = [("say", "I want to complain"), ("say", "Service at a branch"),
              ("say", "I waited two hours and nobody helped me"), ("say", "skip"),
              ("tap", "confirm_yes")]

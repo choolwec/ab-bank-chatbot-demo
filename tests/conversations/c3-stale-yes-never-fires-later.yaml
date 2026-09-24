@@ -5,6 +5,7 @@ turns:
   - say: "0977123456"
   - say: a loan
   - say: morning
+  - say: "no"                   # MK2: news and offers? (not the summary's yes)
   - say: "yes"
     expect: {ticket_created: callback, text_contains: [anything else]}
   - say: what is etumba          # moves on; the "anything else?" is gone

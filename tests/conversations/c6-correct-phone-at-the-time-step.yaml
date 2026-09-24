@@ -10,4 +10,6 @@ turns:
       flow_data_has: {phone: "0966123456", topic: business loan}
       text_contains: ["updated your phone to 0966 123 456", morning or afternoon]
   - payload: Morning
-    expect: {text_contains: ["Mary Banda · 0966 123 456 · a business loan · Morning"]}
+    expect: {text_contains: [news and offers]}
+  - payload: "marketing_consent:no"
+    expect: {text_contains: ["Mary Banda · 0966 123 456 · a business loan · Morning · News and offers: no"]}

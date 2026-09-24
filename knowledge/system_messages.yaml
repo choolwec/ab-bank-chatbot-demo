@@ -228,6 +228,7 @@ messages:
   field.name: {status: draft, text: Name}
   field.phone: {status: draft, text: Phone}
   field.time: {status: draft, text: Time}
+  field.marketing_consent: {status: draft, text: News and offers}
 
   # --- Fraud flow -------------------------------------------------------------------
   fraud.topic_label: {status: draft, text: fraud report}
@@ -330,12 +331,41 @@ messages:
   lead.retry.phone:
     status: draft
     text: That doesn't look like a valid number — please send it as 09XXXXXXX (10 digits), 260XXXXXXXXX (12 digits), or +260XXXXXXXXX, so our team can actually reach you.
+  # MK2: marketing consent, the optional last question. For Legal before
+  # launch: opt-in wording and the opt-out route under the Electronic
+  # Communications and Transactions Act 2021, and the purpose statement under
+  # the Data Protection Act 2021 [VERIFY with Legal].
+  lead.step.marketing_consent:
+    status: draft
+    legal_note: >-
+      Opt-in must be freely given and separate from the callback (the callback
+      goes ahead either way). Check the opt-out statement and purpose wording
+      against the ECT Act 2021 and the Data Protection Act 2021 [VERIFY with Legal].
+    text: |-
+      One last, optional question: may AB Bank send you news and offers about our products and services? Your callback goes ahead either way. You can stop these messages at any time by typing "unsubscribe".
+  lead.retry.marketing_consent:
+    status: draft
+    text: Sorry, I didn't catch that. Would you like to receive news and offers from AB Bank? Please tap Yes or No.
+  lead.summary.marketing_consent_yes:
+    status: draft
+    text: "News and offers: yes"
+  lead.summary.marketing_consent_no:
+    status: draft
+    text: "News and offers: no"
   lead.finish:
     status: draft
     fills: [ref]
     text: |-
       Done — that's everything I need. Our team will call you within one working day. Your reference is {ref}.
       Is there anything else I can help with in the meantime?
+
+  # --- Marketing opt-out (MK2) ------------------------------------------------------------
+  marketing.opt_out:
+    status: draft
+    legal_note: >-
+      Confirms an opt-out typed as "unsubscribe", "opt out", "stop offers" or
+      "stop marketing". Check it states the effect correctly [VERIFY with Legal].
+    text: Done. I've noted that you don't want news and offers from AB Bank, and I won't ask you about them again in this chat. Any request you've already made still goes ahead.
 
   # --- Branch & agent locator ----------------------------------------------------------
   locator.topic_label: {status: draft, text: branch search}
@@ -417,6 +447,7 @@ messages:
   button.no_i_have_a_question: {status: draft, text: "No, just a question"}
   button.no_let_me_explain: {status: draft, text: "No, let me explain"}
   button.no_that_s_all: {status: draft, text: "No, that's all"}
+  button.no_thanks: {status: draft, text: "No thanks"}
   button.open_an_account: {status: draft, text: "Open an account"}
   button.opening_hours: {status: draft, text: "Opening hours"}
   button.request_a_callback: {status: draft, text: "Request a callback"}
@@ -424,6 +455,7 @@ messages:
   button.talk_to_a_person: {status: draft, text: "Talk to a person"}
   button.yes_complain: {status: draft, text: "Yes, complain"}
   button.yes_report_it: {status: draft, text: "Yes, report it"}
+  button.yes_send_offers: {status: draft, text: "Yes, send offers"}
   button.yes_stop: {status: draft, text: "Yes, stop"}
   button.yes_that_s_right: {status: draft, text: "Yes, that's right"}
   button.more: {status: draft, text: "More…"}

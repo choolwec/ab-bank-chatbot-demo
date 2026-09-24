@@ -10,6 +10,13 @@
  *
  * Kill switch: if /health reports widget_enabled=false (or is unreachable),
  * the widget never renders — the page is untouched.
+ *
+ * Campaigns (MK3): data-campaign="cairo01" on the script tag, else
+ * utm_campaign / utm_source from the page URL, is sent with /chat as
+ * `source` (letters, digits, "_" and "-" only, at most 40 characters; the
+ * server sanitises it again). "Continue on WhatsApp" (W10) shows only when
+ * /health reports wa_link_enabled; its link carries that campaign code and
+ * nothing about the conversation.
  */
 (function () {
   "use strict";
@@ -19,6 +26,25 @@
     (script && script.getAttribute("data-endpoint")) ||
     (script && script.src ? script.src.replace(/\/widget\/widget\.js.*$/, "") : "");
 
+  function sanitiseSource(raw) {
+    if (!raw) return null;
+    var code = String(raw).replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40).toLowerCase();
+    if (/\d{7,}/.test(code)) return null; // could be a phone or account number
+    return code || null;
+  }
+
+  function campaignSource() {
+    var code = sanitiseSource(script && script.getAttribute("data-campaign"));
+    if (code) return code;
+    try {
+      var params = new URLSearchParams(window.location.search);
+      return sanitiseSource(params.get("utm_campaign")) || sanitiseSource(params.get("utm_source"));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  var SOURCE = campaignSource();
   var sessionId = null;
   try {
     sessionId = sessionStorage.getItem("abz_chat_session"); // no cookies (§3.3)
@@ -36,7 +62,13 @@
     return el;
   }
 
-  function build() {
+  // "Continue on WhatsApp": the official number plus a campaign token only.
+  function waHref(base) {
+    if (!/^https:\/\/wa\.me\/\d+$/.test(base || "")) return null;
+    return base + "?text=" + encodeURIComponent("Hi ref:" + (SOURCE || "website"));
+  }
+
+  function build(health) {
     var link = h("link", null, { rel: "stylesheet", href: BASE + "/widget/widget.css" });
     document.head.appendChild(link);
 
@@ -89,6 +121,21 @@
     form.appendChild(els.send);
 
     els.panel.appendChild(header);
+    var wa = health && health.wa_link_enabled ? waHref(health.wa_link) : null;
+    if (wa) {
+      var bar = h("div", "abz-wabar");
+      var waLink = h("a", "abz-walink", {
+        href: wa,
+        target: "_blank",
+        rel: "noopener noreferrer"
+      });
+      waLink.textContent = "Continue on WhatsApp";
+      var hint = h("span", "abz-visually-hidden");
+      hint.textContent = " (opens WhatsApp in a new tab)";
+      waLink.appendChild(hint);
+      bar.appendChild(waLink);
+      els.panel.appendChild(bar);
+    }
     els.panel.appendChild(els.log);
     els.panel.appendChild(els.quick);
     els.panel.appendChild(form);
@@ -177,6 +224,7 @@
   }
 
   function post(body) {
+    if (SOURCE) body.source = SOURCE;
     setBusy(true);
     showTyping();
     fetch(BASE + "/chat", {
@@ -221,7 +269,7 @@
   fetch(BASE + "/health")
     .then(function (r) { return r.json(); })
     .then(function (health) {
-      if (health && health.widget_enabled) build();
+      if (health && health.widget_enabled) build(health);
     })
     .catch(function () { /* backend down — stay invisible */ });
 })();

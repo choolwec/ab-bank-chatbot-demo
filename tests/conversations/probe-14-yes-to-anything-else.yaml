@@ -7,6 +7,7 @@ turns:
   - say: "0977123456"
   - say: Opening a business account
   - payload: Morning
+  - payload: "marketing_consent:no"   # MK2 consent question
   - payload: confirm_yes
     expect: {ticket_created: callback}
   - say: "yes"

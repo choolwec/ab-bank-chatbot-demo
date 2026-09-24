@@ -208,10 +208,28 @@ class FormFlow:
         except Exception:
             return None
 
+    def skip_step(self, session, field) -> bool:
+        """Hook: True to leave `field` out for this session (an optional
+        question that is switched off or not wanted, MK2). A skipped field is
+        not asked, not in the summary and not in "Change something"."""
+        return False
+
+    def _next_open_step(self, session, i):
+        """The first step from `i` on that is neither answered nor skipped."""
+        data = session.flow_state.get("data", {})
+        while i < len(self.steps) and (self.steps[i] in data or self.skip_step(session, self.steps[i])):
+            i += 1
+        return i
+
+    def display_value(self, field, value) -> str:
+        """Hook: how a stored value reads in the summary (default: as stored,
+        phone numbers spaced)."""
+        return read_back(str(value))
+
     def summary(self, session) -> str:
         """One line, values only: "Mary Banda · 0977 123 456 · a loan · Morning"."""
         data = session.flow_state.get("data", {})
-        return " · ".join(read_back(str(data[f])) for f in self.steps if data.get(f))
+        return " · ".join(self.display_value(f, data[f]) for f in self.steps if data.get(f))
 
     def _confirmation_prompt(self, session):
         return {
@@ -243,11 +261,26 @@ class FormFlow:
         if state.get("confirming"):
             return [self._confirmation_prompt(session)]
         i = min(state.get("step", 0), len(self.steps) - 1)
+        if self.skip_step(session, self.steps[i]):
+            # The current question stopped applying (an opt-out, a flag
+            # turned off): move past it rather than ask it.
+            i = self._next_open_step(session, i)
+            state["step"] = i
+            if i >= len(self.steps):
+                if self.require_confirmation:
+                    state["confirming"] = True
+                    return [self._confirmation_prompt(session)]
+                i = len(self.steps) - 1
         return [self._prompt(i, session)]
 
     def store_value(self, field, value):
         """Hook: the value stored for `field` (e.g. a canonical "skipped")."""
         return value
+
+    def stored(self, session, field, value):
+        """Hook: called after `field` is stored or changed (e.g. to record
+        when a consent answer was given, MK2)."""
+        return None
 
     def acknowledge(self, field, value, session=None):
         """Hook: optional read-back put in front of the next prompt. When a
@@ -317,11 +350,14 @@ class FormFlow:
 
         editing = state.get("editing")
         if editing:
+            if payload and payload.startswith(editing + ":"):
+                payload = payload[len(editing) + 1:]  # self-describing button id (P3)
             ok, value = self._validated(editing, (text or payload or "").strip())
             if not ok:
                 return self._retry(editing)
             value = self.store_value(editing, value)
             state["data"][editing] = value
+            self.stored(session, editing, value)
             state.pop("editing")
             ack = self.acknowledge(editing, value, session)
             return [_with_ack(ack, self._confirmation_prompt(session))], False
@@ -342,10 +378,11 @@ class FormFlow:
 
         value = self.store_value(field, value)
         state.setdefault("data", {})[field] = value
+        self.stored(session, field, value)
         ack = self.acknowledge(field, value, session)
-        i += 1
-        while i < len(self.steps) and self.steps[i] in state["data"]:
-            i += 1  # already answered (e.g. pre-filled from the first message, C8)
+        # Skip steps already answered (pre-filled from the first message, C8)
+        # or left out for this session (MK2).
+        i = self._next_open_step(session, i + 1)
         state["step"] = i
         if i < len(self.steps):
             # Deterministic rotation by turn number, so tests stay stable.

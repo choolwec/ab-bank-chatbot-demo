@@ -1,5 +1,7 @@
 {
   "FREE_TEXT_ENABLED": true,
   "WIDGET_ENABLED": true,
-  "JIRA_ENABLED": true
+  "JIRA_ENABLED": true,
+  "MARKETING_CONSENT_ENABLED": true,
+  "WA_LINK_ENABLED": false
 }

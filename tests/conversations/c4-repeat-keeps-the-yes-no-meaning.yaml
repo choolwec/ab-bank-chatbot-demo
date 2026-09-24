@@ -5,6 +5,7 @@ turns:
   - say: "0977123456"
   - say: a loan
   - say: morning
+  - say: "no"                   # MK2 consent question
   - say: repeat
     expect: {action: repeat, text_contains: [shall i send it]}
   - say: "yes"

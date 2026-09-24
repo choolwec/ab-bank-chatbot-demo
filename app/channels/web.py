@@ -8,7 +8,7 @@ channels use. The per-IP rate limiter applies here only (see ratelimit.py).
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from .. import config, router
+from .. import campaign, config, router
 from ..ratelimit import client_ip, ip_limiter
 from ..session import store
 
@@ -20,6 +20,9 @@ class ChatIn(BaseModel):
     # hard cap only; guards.clean() truncates to MAX_MESSAGE_CHARS
     message: str | None = Field(default=None, max_length=4000)
     payload: str | None = Field(default=None, max_length=100)
+    # MK3: the campaign the visitor came from (data-campaign or utm_*).
+    # Sanitised again here -- the client is never trusted.
+    source: str | None = Field(default=None, max_length=200)
 
 
 @api.post("/chat")
@@ -30,6 +33,8 @@ def chat(body: ChatIn, request: Request):
         raise HTTPException(status_code=429, detail="Too many messages — please slow down.")
 
     with store.web_session(body.session_id) as (session, created):
+        if body.source:
+            campaign.record(session, body.source)  # first touch; logged once
         if not body.message and not body.payload:
             # Empty post = the widget opening. A new session, or one idle past
             # IDLE_REGREET_MINUTES with nothing in progress, gets the welcome.

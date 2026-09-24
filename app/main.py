@@ -60,6 +60,9 @@ def health():
         "version": app.version,
         "free_text_enabled": config.free_text_enabled(),
         "widget_enabled": config.widget_enabled(),
+        # W10/MK4: the widget shows "Continue on WhatsApp" only when this is on.
+        "wa_link_enabled": config.wa_link_enabled(),
+        "wa_link": config.wa_link_url() if config.wa_link_enabled() else None,
     }
 
 

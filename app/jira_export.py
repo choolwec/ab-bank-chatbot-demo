@@ -26,6 +26,9 @@ _LABELS = {
     "callback": ["chatbot", "callback"],
     "handoff": ["chatbot", "handoff"],
 }
+# MK2: a callback whose customer agreed to news and offers. Leads stay in
+# Jira (no bulk export): Marketing filters on this label.
+CONSENT_LABEL = "marketing-consent"
 _TITLE = {"fraud": "Fraud / lost card report", "complaint": "Complaint", "callback": "Callback request",
           "handoff": "Conversation handed to a person"}
 
@@ -67,7 +70,9 @@ def push_ticket(kind: str, ref: str, fields: dict, transcript: list, channel="we
     summary = _summary(kind, ref, fields)
     description = _description(ref, fields, transcript, channel, reply_to)
     priority = _PRIORITY.get(kind, "Medium")
-    labels = _LABELS.get(kind, ["chatbot"])
+    labels = list(_LABELS.get(kind, ["chatbot"]))
+    if fields.get("marketing_consent") == "yes":
+        labels.append(CONSENT_LABEL)  # MK2: Marketing works from a Jira filter
 
     if config.jira_configured():
         return _push_real(summary, description, priority, labels)

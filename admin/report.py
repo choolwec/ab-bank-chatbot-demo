@@ -8,6 +8,7 @@ top unmatched utterances, which become new intent phrasings each week.
 
 import argparse
 import datetime as dt
+import json
 import sqlite3
 from pathlib import Path
 
@@ -48,6 +49,7 @@ def build_report(days: int) -> str:
             (since,),
         ).fetchall()
     )
+    campaigns = _campaigns(con, since)
     unmatched = con.execute(
         "SELECT lower(text), COUNT(*) AS n FROM events WHERE action='unmatched' "
         "AND ts >= ? GROUP BY lower(text) ORDER BY n DESC LIMIT 20",
@@ -83,6 +85,7 @@ def build_report(days: int) -> str:
     ]
     for action, count in sorted(actions.items(), key=lambda kv: -kv[1]):
         lines.append(f"| {action} | {count} |")
+    lines += campaigns
     lines += [
         "",
         "## Top unmatched utterances (feed these back into intents/*.yaml)",
@@ -95,6 +98,48 @@ def build_report(days: int) -> str:
         lines.append("None in this window.")
     lines.append("")
     return "\n".join(lines)
+
+
+def _campaigns(con, since) -> list[str]:
+    """MK3: sessions and callbacks per campaign source, marketing consent and
+    opt-outs. Counts only -- names and numbers stay in Jira."""
+    sessions = dict(
+        con.execute(
+            "SELECT substr(text, 9), COUNT(DISTINCT session_id) FROM events "
+            "WHERE action='session_source' AND ts >= ? GROUP BY text",
+            (since,),
+        ).fetchall()
+    )
+    callbacks, consent = {}, {}
+    for (raw,) in con.execute(
+        "SELECT fields FROM tickets WHERE type='callback' AND created >= ?", (since,)
+    ):
+        try:
+            fields = json.loads(raw or "{}")
+        except ValueError:
+            fields = {}
+        source = fields.get("source") or "unknown"
+        callbacks[source] = callbacks.get(source, 0) + 1
+        if fields.get("marketing_consent") == "yes":
+            consent[source] = consent.get(source, 0) + 1
+    opt_outs = con.execute(
+        "SELECT COUNT(*) FROM events WHERE action='marketing_opt_out' AND role='system' AND ts >= ?",
+        (since,),
+    ).fetchone()[0]
+    lines = [
+        "",
+        "## Campaigns (source from data-campaign, utm_* or a wa.me ref: token)",
+        "",
+        f"Marketing opt-outs: {opt_outs}",
+        "",
+        "| Source | Sessions | Callbacks | Callbacks with marketing consent |",
+        "|---|---|---|---|",
+    ]
+    for source in sorted(set(sessions) | set(callbacks), key=lambda s: (-callbacks.get(s, 0), s)):
+        lines.append(
+            f"| {source} | {sessions.get(source, 0)} | {callbacks.get(source, 0)} | {consent.get(source, 0)} |"
+        )
+    return lines
 
 
 def main() -> None:

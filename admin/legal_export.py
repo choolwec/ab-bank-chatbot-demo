@@ -86,6 +86,8 @@ def build_doc() -> str:
         sections.append(f"- Status: **{entry.get('status', 'draft')}**")
         if fills:
             sections.append("- Filled in by the bot: " + ", ".join(f"`{{{f}}}`" for f in fills))
+        if entry.get("legal_note"):
+            sections.append("- For Legal: " + " ".join(str(entry["legal_note"]).split()))
         if entry.get("variants"):
             sections.append("- Rotates between: " + " / ".join(f'"{v}"' for v in entry["variants"]))
         sections.append("\n> " + text.replace("\n", "\n> "))

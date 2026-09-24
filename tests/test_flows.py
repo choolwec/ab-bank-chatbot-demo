@@ -77,6 +77,7 @@ def test_callback_flow_promises_one_working_day(client):
     chat(client, sid, message="0977123456")
     chat(client, sid, message="Opening a business account")
     chat(client, sid, payload="Morning")
+    chat(client, sid, payload="marketing_consent:no")  # MK2
     data = chat(client, sid, payload="confirm_yes")
     text = _all_text(data)
     assert "one working day" in text
@@ -115,6 +116,7 @@ def test_saying_no_after_callback_is_recognised_as_goodbye(client):
     chat(client, sid, message="0977123456")
     chat(client, sid, message="Opening a business account")
     chat(client, sid, payload="Morning")
+    chat(client, sid, payload="marketing_consent:no")  # MK2
     chat(client, sid, payload="confirm_yes")
     data = chat(client, sid, message="no")
     assert data["meta"]["action"] == "answer"
@@ -418,7 +420,8 @@ def test_callback_summary_reads_the_phone_back(bot):
     assert len(b.last[0]) == 1  # read-back rides on the next prompt
     b.say("a loan")
     b.tap("Morning")
-    assert "Mary Banda · 0977 123 456 · a loan · Morning" in b.text
+    b.tap("marketing_consent:yes")  # MK2
+    assert "Mary Banda · 0977 123 456 · a loan · Morning · News and offers: yes" in b.text
 
 
 def test_pre_c7_edit_button_still_works(bot):

@@ -13,6 +13,7 @@ from rapidfuzz import fuzz
 from . import audit, config, guards, shadow, urgent_model
 from .messages import button, has, msg
 from .flows import FLOWS
+from .flows.lead import record_opt_out
 from .flows.locator import CITY_PREFIX, branches_mentioned
 from .render import MORE_PAYLOAD
 from .matcher import Matcher
@@ -63,6 +64,16 @@ COMMANDS = {
         "human_handoff",
     ),
     "help": "help",
+    # MK2: stop marketing. The bare word "stop" stays "cancel" (above).
+    **dict.fromkeys(
+        ["unsubscribe", "unsubscribe me", "unsubscribe please", "opt out",
+         "optout", "opt me out", "opt out please", "stop offers",
+         "stop the offers", "stop sending offers", "stop sending me offers",
+         "stop marketing", "stop marketing messages", "stop promotions",
+         "stop promos", "stop adverts", "no more offers", "no marketing",
+         "no marketing please", "no more marketing"],
+        "marketing_opt_out",
+    ),
     # C4: repairing the bot's own turn. Never a strike.
     **dict.fromkeys(
         ["repeat", "repeat that", "say again", "say that again", "come again",
@@ -84,6 +95,7 @@ COMMANDS = {
 COMMAND_ANSWERS = {"locator": {"agent", "an agent"}}
 CANCEL_YES = "cancel_yes"
 CANCEL_NO = "cancel_no"
+OPT_OUT = "marketing_opt_out"
 
 
 def _urgent_confirm(kind, sub):
@@ -330,6 +342,8 @@ def _route(session, text, payload):
         )
     if payload == CANCEL_NO:
         return _continue_flow(session)
+    if payload == OPT_OUT:
+        return _opt_out(session)
     # "Talk to a person" always works, even mid-flow (§1 rule 1)
     if payload == "human_handoff" and config.handoff_mode(session.channel) == "inbox":
         return _handoff_to_inbox(session)
@@ -822,6 +836,21 @@ def _help(session):
             {"action": "help"},
         )
     return [{"text": capabilities, "buttons": list(MENU_BUTTONS)}], {"action": "help"}
+
+
+def _opt_out(session):
+    """MK2: "unsubscribe" works anywhere. Recorded with the user_hash only
+    (never a phone number) so Marketing can honour it; the consent question
+    is not asked again in this session. A flow in progress carries on."""
+    record_opt_out(session)
+    _log(session, "system", "marketing opt-out", action="marketing_opt_out")
+    text = msg("marketing.opt_out")
+    if session.active_flow:
+        flow = FLOWS[session.active_flow]
+        prompt = flow.resume(session)[-1]
+        back = msg("back_to_flow", flow=flow.topic_label, prompt=prompt["text"])
+        return [dict(prompt, text=text + "\n\n" + back)], {"action": "marketing_opt_out"}
+    return [{"text": text, "buttons": list(MENU_BUTTONS)}], {"action": "marketing_opt_out"}
 
 
 def _confirm_cancel(session):

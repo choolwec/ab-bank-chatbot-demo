@@ -210,8 +210,12 @@ between a direct answer, a "did you mean…?" suggestion, or a fallback/strike.
 (<= 8 words) message that refers back (a pronoun, "how much", "what do I
 need"…). If one of the matcher's top 3 at `MEDIUM_CONFIDENCE` or above is a
 mapped generic intent, the specific one answers: "how much does it cost?"
-after Tamanga gets `fees_tamanga`. Every switch is logged as an
-`action=context_boost` audit event.
+after Tamanga gets `fees_tamanga`. Context breaks near-ties only: a
+confident (`HIGH_CONFIDENCE`) intent the topic does not remap, ranked above
+the mapped one by more than `router.CONTEXT_TIE_MARGIN` (0.10), answers as
+usual ("what are the fees" after the savings account is the fee list, not
+the documents a weaker `loan_requirements` match maps to). Every switch is
+logged as an `action=context_boost` audit event.
 
 **Two questions in one message (C10).** `router._two_questions` splits on
 " and " / " also " / "?" into exactly two clauses of 3+ words (the splitter

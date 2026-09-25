@@ -1,0 +1,11 @@
+id: c9-clear-winner-beats-context
+# "what are the fees" after the savings account is the fee list. The fees
+# intent wins clearly (0.78); the savings topic does not remap it, so context
+# must not reach down to a weaker match it does remap (loan_requirements,
+# 0.55) and answer with the account-opening documents instead.
+fixes: C9
+turns:
+  - say: tell me about the savings account
+    expect: {intent: savings_account}
+  - say: what are the fees
+    expect: {intent: fees_charges, text_lacks: ["Proof of residence"]}

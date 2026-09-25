@@ -521,8 +521,13 @@ def _route(session, text, payload):
 # After an answer, its intent's follow_ups ({generic: specific}) apply to the
 # next CONTEXT_TURNS messages, if they are short and refer back ("how much
 # does it cost?" after Tamanga means Tamanga's fee, not the whole fee list).
+# Context breaks near-ties; it never overturns a clear winner: a confident
+# intent the topic does not remap, ranked above the mapped one by more than
+# CONTEXT_TIE_MARGIN, answers as usual ("what are the fees" after the savings
+# account is the fee list, not the documents a lower-ranked match maps to).
 CONTEXT_TURNS = 2
 CONTEXT_MAX_WORDS = 8
+CONTEXT_TIE_MARGIN = 0.10
 _REFERS_BACK_RE = re.compile(
     r"(?i)\b(?:it|that|this|one|them|those|these|there)\b"
     r"|\b(?:how\s+much|what\s+do\s+i\s+need|what\s+does\s+it|where|how\s+do\s+i|"
@@ -537,8 +542,15 @@ def _context_follow_up(session, text, ranked):
     if len(text.split()) > CONTEXT_MAX_WORDS or not _REFERS_BACK_RE.search(text):
         return None
     follow_ups = (matcher.get(ctx["intent"]) or {}).get("follow_ups") or {}
+    leader = None  # best confident intent this topic has no mapping for
     for name, score in ranked[:3]:
-        if score >= config.MEDIUM_CONFIDENCE and name in follow_ups:
+        if name not in follow_ups:
+            if leader is None and score >= config.HIGH_CONFIDENCE:
+                leader = score
+            continue
+        if leader is not None and leader - score > CONTEXT_TIE_MARGIN:
+            return None
+        if score >= config.MEDIUM_CONFIDENCE:
             target = matcher.get(follow_ups[name])
             if not target:
                 return None

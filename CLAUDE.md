@@ -24,6 +24,10 @@ plan** tying both together: measurable quality bar, target architecture,
 small-model/Jev findings, eval harness, phased roadmap. Its matcher numbers
 come from `research/matcher-benchmark/` (research-only code, not part of the
 app or test suite; `python research/matcher-benchmark/bench_matcher.py`).
+`docs/huggingface-research.md` (27/09/2026) adds open-model and dataset
+findings on top of that: a measured local-language check
+(`research/language-id/`, proposed ticket L1), voice notes in shadow mode
+(V1), CLINC150's licence confirmed for N2, and a licence-trap list.
 **`docs/execution-plan.md` is the week-by-week build plan**: every ticket
 (S1, C6, W2…) with its spec, tests, acceptance criteria and dependencies.
 Work one ticket per branch (`feat/<ID>-<slug>`) and update its Status in

@@ -135,7 +135,7 @@ message ─► guards.mask ─► urgent scan ─► commands ─► active flow
    still feeling conversational.
 4. **Checks on every reply before it is sent:** no number that isn't in the
    facts; no request for a PIN or OTP; no prompt text; English only (reuse the
-   L1 language check); a length limit. Any failure, or no reply within about
+   LG1 language check); a length limit. Any failure, or no reply within about
    12 s, falls back to today's behaviour.
 5. **Buttons, audit and handoff are unchanged.** The router still adds
    buttons (no dead ends), the masked text and the chosen intent are logged,

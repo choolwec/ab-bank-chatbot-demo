@@ -19,7 +19,7 @@ production, and add it to the licence register (excellence plan §6).
 
 | # | Change | Why | Cost | Ticket |
 |---|---|---|---|---|
-| 1 | **Detect Bemba, Nyanja, Tonga and Lozi messages** and answer honestly ("I understand English best for now…" + buttons + talk to a person) instead of guessing. | Measured: **53%** of real Nyanja/English chat messages get a "did you mean…?" guess today. A 1.5 MB scikit-learn model catches most of them with **0.3%** false flags on our English phrases. No new dependency. | S (2 days) | new **L1** |
+| 1 | **Detect Bemba, Nyanja, Tonga and Lozi messages** and answer honestly ("I understand English best for now…" + buttons + talk to a person) instead of guessing. | Measured: **53%** of real Nyanja/English chat messages get a "did you mean…?" guess today. A 1.5 MB scikit-learn model catches most of them with **0.3%** false flags on our English phrases. No new dependency. | S (2 days) | new **LG1** |
 | 2 | **Add CLINC150's out-of-scope queries to `tests/eval/oos.yaml`.** | N2 was waiting on the licence. It is **CC BY 3.0**: commercial use allowed with attribution. | XS | N2 |
 | 3 | **Use InjongoIntent (Apache-2.0) as the template for the Bemba/Nyanja phrase workshop**, and its English split as extra test phrasings. | It is the first African multilingual intent set (16 languages, built from CLINC by native speakers who *culturally adapt*, not just translate). It includes balance, bill and transfer intents. No Zambian language, so our own collection is still needed. | XS | N1, N8 |
 | 4 | **Transcribe English voice notes in shadow mode** with faster-whisper (MIT) on our own server; keep sending `voice_not_supported` until the numbers are reviewed. | Voice notes are common on WhatsApp in the region (multi-platform research §4). Whisper is weak on African-accented English (see §3), so measure before promising anything. | M (3–4 days + review) | W5 extension, new **V1** |
@@ -62,7 +62,7 @@ It would replace **63 of the 130** nonsense "did you mean" guesses. The Nyanja
 lines it misses are mostly English-dominant ("Let us meet later"), which the
 matcher can reasonably try.
 
-**Proposed ticket L1 · Answer local-language messages honestly.**
+**Proposed ticket LG1 · Answer local-language messages honestly.**
 
 - Run the classifier only where the matcher would say "did you mean" or fall
   back. Never on a direct answer, a flow step, a button tap, or before the
@@ -157,7 +157,7 @@ Revisit after the English shadow review.
 | **CLINC150** (`clinc/clinc_oos`) | **CC BY 3.0** (checked on the GitHub LICENSE and the Hub) | N2: add its 1,200 out-of-scope queries to `oos.yaml` with an attribution line. This resolves the excellence plan's [VERIFY licence]. | Copy into `phrases:`. |
 | **InjongoIntent** (`masakhane/InjongoIntent`) | Apache-2.0 | Its English split (culturally adapted by African annotators) as extra held-out phrasings for banking-like intents; its method (native speakers adapt, not translate) as the brief for the N1/N8 workshop. | Expect Bemba or Nyanja: it has neither. |
 | **BANKING77** (`PolyAI/banking77`) | CC BY 4.0 | Already in `tests/eval/banking77.yaml`; licence re-confirmed. | — |
-| **Chichewa–English code-switch** (`suru8-ai/chichewa_english_code_switch_dataset`) | Apache-2.0 | N8 and L1: real code-switched chat lines (247, with audio). | Treat it as Zambian Nyanja without a speaker's check. |
+| **Chichewa–English code-switch** (`suru8-ai/chichewa_english_code_switch_dataset`) | Apache-2.0 | N8 and LG1: real code-switched chat lines (247, with audio). | Treat it as Zambian Nyanja without a speaker's check. |
 | **SIB-200 / Flores+** (`Davlan/sib200`, `openlanguagedata/flores_plus`) | CC BY-SA 4.0 | Language-ID training (bem, nya); test sentences. | Assume share-alike doesn't apply **[VERIFY]**. |
 | **MT560 pairs** (English–Tonga, English–Lozi) | CC BY 4.0 | Language-ID training for Tonga and Lozi. | Use as chat-like text: much of it is religious. |
 | **Bitext retail banking** | CDLA-Sharing 1.0 | A checklist for missing banking intents (26 intents, 9 categories). | Train on it: it is synthetic, and CDLA-Sharing is share-alike. |

@@ -28,6 +28,8 @@ app or test suite; `python research/matcher-benchmark/bench_matcher.py`).
 findings on top of that: a measured local-language check
 (`research/language-id/`, proposed ticket L1), voice notes in shadow mode
 (V1), CLINC150's licence confirmed for N2, and a licence-trap list.
+`docs/voice-chat-research.md` covers spoken replies in a custom voice
+(measured CPU speeds in `research/voice/`, proposed tickets V2/V3).
 **`docs/execution-plan.md` is the week-by-week build plan**: every ticket
 (S1, C6, W2…) with its spec, tests, acceptance criteria and dependencies.
 Work one ticket per branch (`feat/<ID>-<slug>`) and update its Status in

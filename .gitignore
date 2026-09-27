@@ -7,3 +7,4 @@ data/*
 models/
 research/language-id/.cache/
 research/voice/.out/
+research/llm-conversation/.out/

@@ -30,6 +30,9 @@ findings on top of that: a measured local-language check
 (V1), CLINC150's licence confirmed for N2, and a licence-trap list.
 `docs/voice-chat-research.md` covers spoken replies in a custom voice
 (measured CPU speeds in `research/voice/`, proposed tickets V2/V3).
+`docs/local-conversation-research.md` tests small local LLMs (Gemma 4 E2B
+recommended) for grounded free conversation and a local voice turn
+(`research/llm-conversation/`, proposed tickets G1-G3).
 **`docs/execution-plan.md` is the week-by-week build plan**: every ticket
 (S1, C6, W2…) with its spec, tests, acceptance criteria and dependencies.
 Work one ticket per branch (`feat/<ID>-<slug>`) and update its Status in

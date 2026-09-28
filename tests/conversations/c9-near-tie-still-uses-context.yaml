@@ -1,0 +1,9 @@
+id: c9-near-tie-still-uses-context
+# "how much is it" is a near-tie between a balance check and the fee list;
+# after Tamanga, context settles it as Tamanga's fee.
+fixes: C9
+turns:
+  - say: what is tamanga
+    expect: {intent: current_account}
+  - say: how much is it
+    expect: {intent: fees_tamanga, text_contains: ["36"]}

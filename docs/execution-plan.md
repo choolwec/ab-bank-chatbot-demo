@@ -1171,6 +1171,8 @@ conversation-routing setup screens in Business Suite.
 | O1 | **Operations decisions:** the 24/7 fraud route and out-of-hours promise, handoff hours and SLA, the handoff tool | Ops + CC | W01 → W03 | S2 wording, H3 |
 | O2 | **Holiday change-freeze window** (confirm the bank's policy; assumed mid-Dec to early Jan) | PO | W02 | Schedule |
 | MK1 | **Launch communications:** publish the official WhatsApp number everywhere, anti-scam messaging, branch QR codes | Marketing | W12 → W22 | M4, M6 |
+| L9 | *(Proposed 27/09/2026)* **Approval of a local generative model** writing customer-facing sentences: changes principle 1 ("models choose, people write"). Start with the verbatim-facts mode (`local-conversation-research.md` §6) | Legal / DPO | after G1 shadow review | G2, G3 |
+| L10 | *(Proposed 27/09/2026)* **Voice recordings and a synthetic bank voice:** voice notes in the DPIA, the voice actor's synthetic-use contract, biometric data under the DPA 2021 (`voice-chat-research.md` §6) | Legal / DPO + Marketing | before V1 shadow | V1, V2, V3 |
 
 ---
 
@@ -1445,8 +1447,15 @@ that finishes the ticket.
 | MK2 | Marketing consent in the callback flow; opt-out commands | 4 | — | 1 | C7 | Dev + Legal | ☑ |
 | MK3 | Campaign source attribution (widget, WhatsApp `ref:`) and the "Continue on WhatsApp" link | 4 | — | 1 | P2, W3 | Dev + Marketing | ☑ |
 | L1–L8, H-P, O1, O2, MK1 | Non-engineering tracks (§10) | — | W01+ | — | — | As listed | ☐ |
+| LG1 | *(Proposed)* Detect Bemba/Nyanja/Tonga/Lozi and answer honestly instead of guessing (`huggingface-research.md` §2) | 5 | — | 2 | Native-speaker wording | Dev | ☐ |
+| V1 | *(Proposed)* Voice notes transcribed in shadow mode (faster-whisper) (`huggingface-research.md` §3) | 5 | — | 3.5 | W5, L10 | Dev | ☐ |
+| V2 | *(Proposed)* Spoken answers (`spoken:` text) and pre-rendered voice replies (`voice-chat-research.md` §9) | 5 | — | 4 | V1, L10 | Dev + Legal | ☐ |
+| V3 | *(Proposed)* The bank's voice: voice-actor recording and a blind listening test (`voice-chat-research.md` §9) | 5 | — | 1 | L10 | Marketing + Dev | ☐ |
+| G1 | *(Proposed)* Local conversation model (Gemma 4 E2B) in shadow mode on its own VM (`local-conversation-research.md` §7) | 5 | — | 4 | — | Dev | ☐ |
+| G2 | *(Proposed)* Verbatim-facts conversational replies for unsure messages, web first (`local-conversation-research.md` §7) | 5 | — | 4 | G1, L9 | Dev | ☐ |
+| G3 | *(Proposed)* Local voice turn: listen → check → answer → speak (`local-conversation-research.md` §7) | 5 | — | 3 | G2, V1 | Dev | ☐ |
 
-**Engineering total ≈ 101 developer-days.**
+**Engineering total ≈ 101 developer-days.** The *(Proposed)* phase-5 rows (LG1, V1–V3, G1–G3, about 21.5 days) come from the 27/09/2026 research (`research-summary-2026-09-27.md`) and are not counted until the PO accepts them.
 
 **Status notes (24/09/2026).** Where a row says ◐ the code is done and the
 rest needs infrastructure or people. Details, owners and open decisions:

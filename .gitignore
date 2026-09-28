@@ -5,3 +5,6 @@ __pycache__/
 data/*
 !data/.gitkeep
 models/
+research/language-id/.cache/
+research/voice/.out/
+research/llm-conversation/.out/

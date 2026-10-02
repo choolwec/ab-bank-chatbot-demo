@@ -28,6 +28,12 @@
 #              answer, never new ones; no [CONFIRM placeholders
 #   on_yes / on_no: (optional) the payload a typed "yes" / "no" means, when
 #              the answer ends in a yes/no question ("anything else?")
+#   exact_phrases: (optional) whole-message wordings for any intent, kept out
+#              of the scored matcher; the same wording in two intents fails
+#              at load
+#   wording:   (optional) "flow_doc" -- the text comes from the team's flow
+#              document (V1/2026) and keeps its full length (exempt from the
+#              32-word short-answer limit)
 #
 # Content edits are deploys (§6): run pytest before committing. Git history
 # is the content audit trail.

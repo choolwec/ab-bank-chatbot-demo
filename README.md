@@ -46,7 +46,8 @@ app/
   housekeeping.py  retention purges at start-up and nightly
   campaign.py      campaign source attribution (MK3)
 knowledge/
-  intents/*.yaml   28 launch intents: phrases + approved answer + follow-up buttons
+  intents/*.yaml   74 intents: phrases + approved answer (short and full) + follow-up buttons
+  system_messages.yaml  every other reply text and button label (welcome, flows, greetings)
   faq/*.md         source content (basis for V2 RAG chunks)
   branches.json    branch + agent locator data  ← PLACEHOLDER, verify before launch
 widget/            widget.js, widget.css, demo.html (embeddable, WCAG 2.1 AA build spec)
@@ -73,6 +74,7 @@ Checked on **every request**: environment variable wins, then `flags.json`, then
 | `SHADOW_MATCHER` | no shadow-mode logging (off by default) |
 | `MARKETING_CONSENT_ENABLED` | the callback flow does not ask for marketing consent (tickets record `not_asked`) |
 | `WA_LINK_ENABLED` | no "Continue on WhatsApp" link in the widget (off by default) |
+| `HIDE_DRAFT_NOTES` | (demo only, off by default) when **on**, `[CONFIRM …]` / `[VERIFY …]` notes are removed from replies and the unconfirmed emergency line shows the 888 Contact Centre; the content files are unchanged. `render.yaml` sets it on for the demo site |
 
 Flip by editing `flags.json` (re-read live) or setting the env var (`0`/`false`).
 Values in `flags.json` must be `true`/`false` without quotes: a quoted
@@ -106,6 +108,32 @@ the customer-facing flow). Two modes, decided automatically:
 4. Regenerate the legal review doc: `python -m admin.legal_export`
 
 Intent schema is documented at the top of `knowledge/intents/smalltalk.yaml`.
+
+Fields added on 02/10/2026 (details in `CLAUDE.md`, Request pipeline):
+
+| Field | What it does |
+|---|---|
+| `answer_short` | Shown first, with a **More details** button for the full `answer`. Required for any answer over 40 words (at most 32 words, no `[CONFIRM`), unless `wording: flow_doc` |
+| `wording: flow_doc` | Text taken from the team's flow document (V1/2026); keeps its full length |
+| `lead_topic` | Marks a product: viewing it is recorded as an interest, and **Yes, contact me** (`lead:<intent>`) opens the callback form with it as the ticket topic |
+| `match: exact` | Small talk and menu words: answered only when the whole message is one of the phrases, never scored |
+| `exact_phrases` | Whole-message wordings for any intent, kept out of the scored matcher |
+| `on_yes` / `on_no` | The payload a typed yes/no means after this answer |
+
+Some topics are answered by a keyword anywhere in the message, before the
+scored matcher (`router._KEYWORD_INTENTS`, product owner 02/10/2026): any
+motorbike / tricycle / tuk-tuk / tractor → the Trader Mobility Loan; a card
+question → AB Bank offers no cards; closing an account or changing KYC
+details → visit a branch or ask for a callback; sending to another bank →
+eTumba or Online Banking (above K20,000 Online Banking); deposits → any
+branch or from mobile money. To change what these say, edit the intents
+(`cards_not_offered`, `account_changes`, `transfer_other_banks`,
+`deposit_money`, `trader_mobility_loan`); to change which words trigger
+them, a developer edits the rule.
+
+`tests/test_natural_conversation.py` (about 500 realistic messages and
+conversations, `docs/conversation-probe-2026-10-02.md`) must keep passing
+after a wording change.
 
 ## Deployment notes (read before hosting)
 

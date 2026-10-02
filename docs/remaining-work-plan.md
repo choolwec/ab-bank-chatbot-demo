@@ -474,6 +474,10 @@ content today, including items added during this build:
 | Service-status page | `technical.yaml` | IT |
 | Finding a nearby agent | `system_messages.yaml` `locator.agents` | eTumba team |
 | Complaint response-time commitment (BoZ Directive) | `system_messages.yaml` `complaint.finish` | Compliance |
+| **Agro Loan**: still offered? terms (added 02/10/2026) | `loans.yaml` `agri_loan` | Loans |
+| **Trader Mobility Loan**: amount range, deposit, period, vehicle as security (02/10/2026) | `loans.yaml` `trader_mobility_loan` | Loans |
+| **Interest rates to quote** for Micro and SME loans (02/10/2026) | `loans.yaml` `micro_loan`, `sme_loan` | Loans |
+| **Lost-card wording** still says "block your card", but AB Bank offers no cards (02/10/2026): reword for eTumba / account fraud? | `system_messages.yaml` urgent texts | PO / Ops |
 
 Also resolve the **[VERIFY]** items in code before go-live:
 - `WA_GRAPH_VERSION`;

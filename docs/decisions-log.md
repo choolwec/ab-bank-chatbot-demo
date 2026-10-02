@@ -63,3 +63,27 @@ product owner approves or reverses it.
 | B22 | Campaign source: sanitised, no long digit runs, first touch wins, logged as a separate `session_source` event; WhatsApp `ref:` token stripped before routing. No bulk lead export. | A code can never carry PII; campaigns measured without personal data leaving Jira. | Code change in `app/campaign.py`. | Proposed |
 | B23 | "Request a callback" added to the two account answers that lacked it, so every product answer reaches the callback flow in one tap. | Main entry points for account leads. | Edit `knowledge/intents/accounts.yaml`. | Proposed |
 | B24 | Go/no-go is signed in the commit the release tag points to; safety rows can never be waived; Jira hosting is its own legal question; staff pilot fraud tests start with "TEST". | Ties the signature to the exact code deployed; safety is non-negotiable. | Edit `go-no-go.md` and the pilot runbook. | Proposed |
+
+## Decisions taken on 02/10/2026
+
+The product owner's instructions while preparing the demo, and the team's
+flow document ("Chatbot flow — simple guide", V1/2026). Already built; each
+row is Proposed until initialled.
+
+| # | Decision | Rationale | Reversible how | Status |
+|---|---|---|---|---|
+| D17 | **Main menu follows the team's flow document**: Accounts / Loans / Invest / Digital Banking / Branches & agents / Complaints / Talk to an Agent. Branches & agents is our addition | The document is the team's agreed journey; branch questions are among the most common | `router.MENU_BUTTONS` | Proposed |
+| D18 | **The flow document's wording is used at full length** (`wording: flow_doc`), exempt from the short-answer limit | The PO asked to keep the document's length for any reply taken from it | Remove the marker and add an `answer_short` | Proposed |
+| D19 | **Short answers first** everywhere else (at most 32 words) with a **More details** button for the full answer | Replies were too long for a chat window | Delete the `answer_short` lines | Proposed |
+| D20 | **The callback form never asks what it is about**: the topic is the product tapped, else the last product viewed, else "General enquiry"; every product viewed goes on the ticket | A big part of the bot's job is leads; asking again what the customer just looked at is friction | Code change in `app/flows/lead.py` | Proposed |
+| D21 | **No "Here's what I'll send" summary on the callback form**: the last question (consent, or the time) sends it. The complaint form keeps its summary | The PO found it served no purpose after the consent question. A complaint is a formal record, so the read-back stays there | `LeadFlow.require_confirmation = True` | Proposed |
+| D22 | **Greeting says "automated assistant"**, without "not a person"; a "hi" later in a chat gets a natural reply, never the welcome again. Messaging channels still get the one-line disclosure first | §3.4 disclosure is met by "automated assistant"; repeating the welcome felt robotic | Wording in `system_messages.yaml` (`welcome`, `greeting.*`) | Proposed. Legal to confirm the disclosure |
+| D23 | **AB Bank offers no cards**: a card product question gets that answer, not card details | PO fact, 02/10/2026 | Edit `cards_not_offered` | Proposed. See open item below on the lost-card wording |
+| D24 | **Closing an account or changing KYC details** (number, address, name): visit any branch with original ID, or ask for a callback | PO instruction; these need identity checks the bot cannot do | Edit `account_changes` | Proposed |
+| D25 | **Transfers to other banks**: by yourself through eTumba or Online Banking; above K20,000 use Online Banking | PO fact | Edit `transfer_other_banks` | Proposed. Limits to confirm with Ops |
+| D26 | **Deposits**: at any branch, or straight from a mobile money account | PO fact | Edit `deposit_money` | Proposed |
+| D27 | **Any motorbike, tricycle, tuk-tuk or (walking) tractor mentioned anywhere offers the Trader Mobility Loan**; bicycles do not | PO instruction, corrected the same day ("motorbikes, not bicycles") | Word list in `router._KEYWORD_INTENTS` | Proposed |
+| D28 | **Loan details from abbank.co.zm** behind "More details": Micro K1,000-K350,000 over 4-24 months; SME K200,000-K5,000,000 over 4-60 months. Agro and Trader Mobility terms and both interest rates stay `[CONFIRM` | The PO asked for the loans to be researched; only published figures are used, nothing guessed (D12) | Edit `loans.yaml` | Proposed. Loans team to confirm |
+| D29 | **Demo switch `HIDE_DRAFT_NOTES`** (off by default, on for the Render demo): `[CONFIRM`/`[VERIFY` notes hidden from replies, emergency line shown as 888 | A clean demo without editing the content; the notes stay for Legal | Flag in `flags.json` / env | Proposed. Never on in production until K2 is done |
+| D30 | **Clear chat** (widget button, or "start over"): forgets the conversation but keeps consent, opt-out and campaign source; asks first inside a fraud report or complaint | Customers asked for a way to start again; a report must not be lost by accident | Remove the button in `widget/widget.js` | Proposed |
+

@@ -53,6 +53,13 @@ Operations: `docs/runbook-production.md` (deploy, roll back, restore, rotate)
 and `docs/runbook-incidents.md` (severities, alerts, kill switches). The owner
 has asked for work to land directly on `master`, not on per-ticket branches.
 
+**Update (02/10/2026):** the demo and lead-generation rework (team flow
+document, short answers, natural conversation, the product owner's rules,
+no callback summary, Clear chat, `HIDE_DRAFT_NOTES`) is summarised for the
+product owner in `docs/build-summary-2026-10-02.md`; its decisions are
+D17-D30 in `docs/decisions-log.md`, and the new `[CONFIRM` items are in
+`docs/remaining-work-plan.md` (K2).
+
 ## Commands
 
 Setup (Windows):

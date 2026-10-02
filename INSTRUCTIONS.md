@@ -37,6 +37,14 @@ py -m venv .venv
 - "I want to complain" — complaint intake with a reference number
 - Type a made-up word twice — after two failures it offers a person
 - Paste a fake 16-digit card number — the bot warns you and never stores it
+- "hi", "how are you", "bye" — natural small talk, not the welcome again
+- "I need a loan for a motorbike" — the Trader Mobility Loan
+- Open a product, tap **Yes, contact me**, and give "my name is Mary Banda,
+  call me on 0977 123 456 in the afternoon" — the form fills in at once
+- "where is the Kitwe branch" in the middle of the callback form — answered,
+  then the same question is asked again
+- The **Clear** button at the top of the chat, or type "start over" — a
+  fresh conversation
 
 ## 3. Stop the chatbot
 
@@ -46,7 +54,29 @@ Go back to the PowerShell window and press **Ctrl + C** (or just close it).
 
 The bot's answers live in text files here: `knowledge\intents\`
 (accounts.yaml, etumba.yaml, loans.yaml, locations.yaml, fees.yaml,
-smalltalk.yaml, urgent.yaml)
+smalltalk.yaml, technical.yaml, out_of_scope.yaml, urgent.yaml)
+
+Each answer can have two versions:
+
+- `answer_short:` — what the customer sees first. Keep it to 32 words or
+  fewer, with no `[CONFIRM` notes. A **More details** button under it sends
+  the full version.
+- `answer:` — the full version. Any answer longer than 40 words must also
+  have an `answer_short:` (a test checks this).
+- Answers marked `wording: flow_doc` come from the team's flow document and
+  keep that document's wording at its full length. Change them only if the
+  team changes the document.
+
+Other lines you may see on an answer:
+
+- `lead_topic:` — this answer is a product. Viewing it is remembered, and its
+  **Yes, contact me** button opens the callback form with this name as the
+  topic on the contact centre's ticket. The form never asks the customer
+  what it is about.
+- `match: exact` and `exact_phrases:` — the answer is given only when the
+  customer's *whole* message is one of those phrases (small talk such as
+  "how are you", or a menu word such as "loans"). This stops "how are you"
+  from catching "how are your loans priced".
 
 Everything else the bot says — the welcome, "I didn't quite catch that",
 the questions it asks during a fraud report, complaint or callback, and the
@@ -74,6 +104,33 @@ git commit -m "describe what you changed"
 
 That git step is important — it's our audit trail of every wording change,
 which is what we show a regulator or auditor.
+
+### Greetings, goodbyes and conversation wording
+
+In `knowledge\system_messages.yaml`:
+
+- `welcome` — the first message on the website (says "automated assistant").
+- `greeting.reply`, `greeting.timed`, `greeting.again` — the reply to "hi",
+  "good morning" and a second "hello" later in the chat. The bot never
+  repeats the full welcome to a "hi".
+- `goodbye`, `no_problem`, `take_your_time`, `bot_wrong` — the replies to
+  "bye" / "that's all", a plain "no", "let me think about it", and "that's
+  not what I asked".
+- `restart_confirm` — asked when someone clears the chat in the middle of a
+  fraud report or complaint.
+
+### Product owner's rules (02/10/2026)
+
+Some answers are given whenever a word appears anywhere in the message.
+The words are set by a developer; the wording is yours to edit:
+
+| The customer mentions | Answer (intent) |
+|---|---|
+| a motorbike, tricycle, tuk-tuk or (walking) tractor | Trader Mobility Loan (`trader_mobility_loan`) |
+| a debit, credit or ATM card (as a product) | AB Bank offers no cards (`cards_not_offered`) |
+| closing an account, changing a number, address, name or KYC | Visit a branch with original ID, or a callback (`account_changes`) |
+| sending money to another bank | eTumba or Online Banking; above K20,000 Online Banking (`transfer_other_banks`) |
+| depositing money | Any branch, or from mobile money (`deposit_money`) |
 
 ### 4a. Other content files
 
@@ -145,6 +202,9 @@ Open `flags.json` in the main folder:
 - `"MARKETING_CONSENT_ENABLED": false` → the callback flow stops asking about news and offers
 - `"WA_LINK_ENABLED": true` → shows "Continue on WhatsApp" in the chat (keep it
   `false` until the official WhatsApp number is confirmed)
+- `"HIDE_DRAFT_NOTES": true` → **demos only**: hides the `[CONFIRM …]` notes
+  from replies (the emergency line shows 888). The notes stay in the files
+  and still need answers before launch. Keep it `false` for reviews with Legal
 
 Save the file — it takes effect immediately. Set back to `true` to restore.
 

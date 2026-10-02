@@ -134,6 +134,7 @@ intents:
     short_label: "Complaints"
     category: locations
     status: draft
+    wording: flow_doc
     phrases:
       - "complaints and feedback"
       - "complaints & feedback"
@@ -142,12 +143,7 @@ intents:
       - "compliment"
       - "suggestion"
       - "complaints"
-    answer: |
-      We're here to listen. Share a compliment, complaint or suggestion:
-      Call: {contact_phone}
-      WhatsApp: {whatsapp_number}
-      Email: {contact_email}
-      Or visit any AB Bank branch, or submit it here and our team will contact you.
+    answer: "We're here to listen.\nYour feedback helps us serve you better. Whether you'd like to share a compliment, complaint, or suggestion, we're ready to help.\nGet in touch with us through:\n📞 Call: {contact_phone}\n💬 WhatsApp: {whatsapp_number}\n📧 Email: {contact_email}\n🏦 Visit: Any AB Bank branch\nOr tap \"Submit a complaint\" below and our team will contact you."
     buttons:
       - {label: "Submit a complaint", payload: "complaint"}
       - {label: "Talk to an agent", payload: "human_handoff"}

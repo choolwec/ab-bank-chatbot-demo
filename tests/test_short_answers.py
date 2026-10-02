@@ -16,6 +16,8 @@ def _words(text):
 def test_long_answers_have_a_short_version():
     assert len(SHORT) >= 35
     for name, intent in M.intents.items():
+        if intent.get("wording") == "flow_doc":
+            continue  # the team's flow document: its wording, at its length
         if intent.get("answer") and not intent.get("flow") and _words(intent["answer"]) > 40:
             assert name in SHORT, f"{name}: {_words(intent['answer'])} words and no answer_short"
 
@@ -24,9 +26,12 @@ def test_long_answers_have_a_short_version():
 def test_short_answer_is_short_and_clean(name):
     intent = SHORT[name]
     short, full = intent["answer_short"], intent["answer"]
+    assert "[CONFIRM" not in short and "[VERIFY" not in short, name
+    assert short.strip() != full.strip(), name
+    if intent.get("wording") == "flow_doc":
+        return  # the team's flow document: its wording, at its length
     assert _words(short) <= 32, name
     assert _words(short) < _words(full), name
-    assert "[CONFIRM" not in short and "[VERIFY" not in short, name
     assert set(re.findall(r"{(\w+)}", short)) <= set(re.findall(r"{(\w+)}", full)) | {"contact_phone"}, name
 
 
@@ -47,7 +52,7 @@ def test_typed_question_gets_the_short_answer(bot):
     b = bot()
     b.say("how do i open a savings acount")
     assert b.action == "answer"
-    assert len(b.text.split()) <= 32
+    assert b.text == _render(SHORT[b.last[1]["intent"]]["answer_short"])
     assert any(p.startswith(DETAILS_PREFIX) for p in b.buttons[:2])
 
 
@@ -85,12 +90,14 @@ def test_small_talk_only_on_the_whole_message():
         assert intent["phrases"], intent["intent"]  # an exact intent needs its phrases
 
 
-def test_greeting_is_short_and_still_discloses(bot):
+def test_greeting_is_the_documents_welcome_and_discloses(bot):
+    from app.messages import msg
+
     b = bot()
     b.say("hello")
     assert b.last[1].get("intent") == "greeting"
     assert "automated assistant" in b.text and "not a person" not in b.text
-    assert len(b.text.split()) <= 20
+    assert b.text == msg("welcome")
 
 
 # --- Clear chat -----------------------------------------------------------------

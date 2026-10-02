@@ -309,13 +309,13 @@ intents:
     label: "Loans"
     category: loans
     status: draft
+    wording: flow_doc
     phrases:
       - "loans"
       - "loan"
       - "business financing"
       - "financing"
-    answer: |
-      Looking for business financing? We support working capital, expansion and asset purchases. How can we help your business today?
+    answer: "Looking for business financing?\nWe have financing solutions to support your business needs, from working capital to expansion and asset acquisition.\nHow can we help your business today?"
     buttons:
       - {label: "Business Loan", payload: "business_loan_options"}
       - {label: "SME Overdraft", payload: "sme_overdraft"}
@@ -328,11 +328,11 @@ intents:
     label: "Business loans"
     category: loans
     status: draft
+    wording: flow_doc
     phrases:
       - "business loan options"
       - "types of business loans"
-    answer: |
-      Looking for financing to start, grow or support your business? Choose the product you're interested in:
+    answer: "Looking for financing to start, grow, or support your business?\nWe offer financing solutions tailored to help your business seize opportunities, manage cash flow, and achieve its goals.\nChoose the financing product you're interested in:"
     buttons:
       - {label: "Trader Mobility Loan", payload: "trader_mobility_loan"}
       - {label: "Micro Loan", payload: "micro_loan"}
@@ -345,6 +345,7 @@ intents:
     lead_topic: "Trader Mobility Loan"
     category: loans
     status: draft
+    wording: flow_doc
     phrases:
       - "trader mobility loan"
       - "loan for a motorbike"
@@ -354,8 +355,7 @@ intents:
       - "three wheeler loan"
       - "walking tractor loan"
       - "loan to buy a motorbike for my business"
-    answer: |
-      Our Trader Mobility Loan finances motorbikes, tricycles, three-wheelers and walking tractors, so your business can reach more customers and make more deliveries. Ready to make your next move?
+    answer: "Looking to keep your business moving?\nOur Trader Mobility Loan helps you finance motorbikes, tricycles, three-wheelers, and walking tractors, giving your business the mobility it needs to reach more customers, make more deliveries, and seize new opportunities.\nReady to make your next move?"
     on_yes: lead:trader_mobility_loan
     on_no: business_loan_options
     buttons:
@@ -367,14 +367,14 @@ intents:
     lead_topic: "Micro Loan"
     category: loans
     status: draft
+    wording: flow_doc
     phrases:
       - "micro loan"
       - "microloan"
       - "loan for market traders"
       - "small loan for my shop"
       - "loan for my stall"
-    answer: |
-      Our Micro Loan is for small businesses, market traders and shop owners who want to grow, manage cash flow or invest, with flexible repayments. Ready to take the next step?
+    answer: "Need financing to support your small business?\nOur Micro Loan is designed for small businesses, market traders, and shop owners looking to grow, manage cash flow, or invest in business opportunities.\nWith flexible repayment terms and financing tailored to your business needs, a Micro Loan can help you take your next step with confidence.\nReady to take your business to the next level?"
     on_yes: lead:micro_loan
     on_no: business_loan_options
     buttons:
@@ -386,12 +386,12 @@ intents:
     lead_topic: "SME Loan"
     category: loans
     status: draft
+    wording: flow_doc
     phrases:
       - "loan to expand my business"
       - "loan to buy equipment"
       - "loan to increase stock"
-    answer: |
-      Our SME Loan helps small and medium businesses invest in growth, buy equipment, increase stock or strengthen operations. Ready to grow your business?
+    answer: "Looking to expand your business?\nOur SME Loan is designed for small and medium-sized enterprises looking to invest in growth, purchase equipment, increase stock, or strengthen operations.\nWhether you're planning your next business move or financing a larger project, our SME Loan provides the support your business needs to grow.\nReady to grow your business?"
     on_yes: lead:sme_loan
     on_no: business_loan_options
     buttons:

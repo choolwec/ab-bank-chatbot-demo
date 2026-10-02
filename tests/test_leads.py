@@ -30,7 +30,7 @@ def _finish(b):
 def test_main_menu_follows_the_flow_document():
     assert [b["payload"] for b in MENU_BUTTONS] == [
         "account_types_overview", "loans_overview", "invest_overview",
-        "digital_banking", "complaints_feedback", "human_handoff",
+        "digital_banking", "branch_locator", "complaints_feedback", "human_handoff",
     ]
     for b in MENU_BUTTONS[:-1]:
         assert matcher.get(b["payload"]), b
@@ -123,3 +123,64 @@ def test_jira_summary_names_the_product(bot, isolated_data, monkeypatch):
     lines = (isolated_data / "jira_mock.jsonl").read_text(encoding="utf-8").strip().splitlines()
     assert "Internet Banking registration" in json.loads(lines[-1])["summary"]
     assert jira_export  # imported for the mock path
+
+
+# --- A direct question moves to what the customer wants -------------------------
+
+@pytest.mark.parametrize("steps", [
+    [],                                              # the name step
+    ["Mary Banda"],                                  # the phone step
+    ["Mary Banda", "0977123456"],                    # the time step
+])
+@pytest.mark.parametrize("question", ["where is the kitwe branch", "kitwe branch"])
+def test_branch_question_inside_the_callback_form_is_answered(bot, steps, question):
+    b = bot()
+    b.tap("human_handoff")
+    for s in steps:
+        b.say(s)
+    before = dict(b.session.flow_state["data"])
+    b.say(question)
+    assert b.action == "digression:lead"
+    assert "Kitwe Branch" in b.text and "Chisokone" in b.text
+    assert b.session.flow_state["data"] == before  # nothing stored as a name or time
+    assert b.session.active_flow == "lead"
+
+
+def test_agent_question_inside_the_callback_form_is_answered(bot):
+    b = bot()
+    b.tap("human_handoff")
+    b.say("where can i find an agent")
+    assert b.action == "digression:lead" and "Kazang" in b.text
+    assert "name" not in b.session.flow_state["data"]
+
+
+@pytest.mark.parametrize("opener", ["someone stole my card", "I want to complain"])
+def test_branch_question_inside_a_report_is_answered_and_the_report_kept(bot, opener):
+    b = bot()
+    b.say(opener)
+    flow = b.session.active_flow
+    b.say("where is the kitwe branch?")
+    assert b.action == f"digression:{flow}" and "Kitwe Branch" in b.text
+    assert b.session.active_flow == flow
+
+
+def test_a_branch_in_the_fraud_story_stays_part_of_the_story(bot):
+    b = bot()
+    b.say("someone stole my card")
+    b.say("it happened at the kitwe branch")
+    assert b.session.flow_state["data"]["what_happened"] == "it happened at the kitwe branch"
+
+
+@pytest.mark.parametrize("typed", ["where is the kitwe branch", "kitwe", "is there a branch in ndola?"])
+def test_branch_finder_reads_the_town_from_a_sentence(bot, typed):
+    b = bot()
+    b.tap("branch_locator")
+    b.say(typed)
+    assert "Here's what I found" in b.text, b.text
+    assert b.session.active_flow is None
+
+
+def test_the_documents_wording_is_used_in_full():
+    assert matcher.get("micro_loan")["answer"].startswith("Need financing to support your small business?")
+    assert "K300,000 per day" in matcher.get("online_banking")["answer"]
+    assert matcher.get("savings_plan_account")["answer_short"].endswith("Ready to start saving towards your goal?")

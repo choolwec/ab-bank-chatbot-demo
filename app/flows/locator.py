@@ -119,7 +119,9 @@ class LocatorFlow:
             city = city[len(CITY_PREFIX):]
         if not city:
             return [self._city_prompt("")], False
-        if " ".join(city.lower().split()) in AGENT_WORDS:
+        if " ".join(city.lower().split()) in AGENT_WORDS or (
+            not payload and "agent" in city.lower().split() and not branches_mentioned(city)
+        ):
             # "agent" typed at the town question means an eTumba agent.
             session.flow_state = {}
             return self._agents(), True
@@ -131,11 +133,14 @@ class LocatorFlow:
         buttons = [{"label": c, "payload": CITY_PREFIX + c} for c in cities] + [CANCEL_BUTTON]
         return {"text": text, "buttons": buttons}
 
-    def _agents(self):
+    def agents_text(self):
         networks = ", ".join(n["name"] for n in _load()["agent_networks"])
+        return msg("locator.agents", networks=networks)
+
+    def _agents(self):
         return [
             {
-                "text": msg("locator.agents", networks=networks),
+                "text": self.agents_text(),
                 "buttons": [
                     button("find_a_branch", "branch_locator"),
                     button("about_etumba", "etumba_what_is"),
@@ -167,7 +172,8 @@ class LocatorFlow:
         }]
 
     def _branch_lookup(self, session, city):
-        matches = find_branches(city)
+        # A bare town ("Kitwe") or a whole question ("where is the kitwe branch").
+        matches = find_branches(city) or branches_mentioned(city)
         if matches:
             return [self.found_reply(session, matches)], True
         state = session.flow_state

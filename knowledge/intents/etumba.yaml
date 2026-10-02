@@ -4,6 +4,7 @@ intents:
     lead_topic: "eTumba registration"
     category: etumba
     status: draft
+    wording: flow_doc
     phrases:
       - "what is etumba"
       - "wat is etumba"
@@ -21,7 +22,7 @@ intents:
       - "ab bank mobile money"
       - "what can i do with etumba"
       - "tell me about the etumba wallet"
-    answer_short: "eTumba is AB Bank's digital wallet: buy airtime, pay bills, make transfers and save with Yaka Savings, from any phone ({ussd_code}). Would you like to register?"
+    answer_short: "eTumba is AB Bank's digital wallet. You can buy airtime, pay bills, make transfers, and save on active accounts and Yaka Savings.\nWould you like to register for eTumba?"
     answer: |
       eTumba is AB Bank Zambia's mobile wallet. It lets you send and
       receive money, buy airtime on MTN, Airtel and Zamtel, pay ZESCO and
@@ -397,13 +398,13 @@ intents:
     label: "Digital banking"
     category: etumba
     status: draft
+    wording: flow_doc
     phrases:
       - "digital banking"
       - "digital"
       - "mobile banking"
       - "banking on my phone"
-    answer: |
-      Banking on the go? What would you like to know about?
+    answer: "Banking on the go? What would you like to know about?"
     buttons:
       - {label: "eTumba", payload: "etumba_what_is"}
       - {label: "Online Banking", payload: "online_banking"}
@@ -416,6 +417,7 @@ intents:
     lead_topic: "Internet Banking registration"
     category: etumba
     status: draft
+    wording: flow_doc
     phrases:
       - "online banking"
       - "internet banking"
@@ -426,12 +428,7 @@ intents:
       - "sign up for online banking"
       - "i want internet banking"
       - "i want online banking"
-    answer_short: "Internet Banking gives you secure access to your accounts anytime: check balances, see transactions and send money, up to K300,000 a day. Would you like to register?"
-    answer: |
-      AB Bank Internet Banking gives you secure access to your accounts anytime,
-      anywhere. You can check your account balance, view transactions, transfer
-      funds between AB Bank accounts, and send money to other banks across Zambia.
-      You can transfer up to K300,000 per day.
+    answer: "Bank conveniently with AB Bank Internet Banking.\nAB Bank Internet Banking gives you secure access to your accounts anytime, anywhere. You can check your account balance, view transactions, transfer funds between AB Bank accounts, and send money to other banks across Zambia. You can also make transfers of up to K300,000 per day, helping you manage your finances with ease.\nWould you like to register for Internet Banking?"
     on_yes: lead:online_banking
     on_no: digital_banking
     buttons:

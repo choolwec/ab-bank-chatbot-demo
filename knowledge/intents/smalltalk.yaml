@@ -56,12 +56,13 @@ intents:
       - "hello ab bank"
       - "mwabuka shani"
       - "mulishani"
-    answer: "👋 Hi! I'm AB Bank's automated assistant. How can I help you today?"
+    answer: "👋 Welcome to AB Bank!\nI'm an automated assistant here to help you learn about our products and services, answer your banking questions, and connect you with our team when needed.\nHow can I help you today?"
     buttons:
       - {label: "🏦 Accounts", payload: "account_types_overview"}
       - {label: "💰 Loans", payload: "loans_overview"}
       - {label: "💵 Invest", payload: "invest_overview"}
       - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "📍 Branches & agents", payload: "branch_locator"}
       - {label: "💬 Complaints", payload: "complaints_feedback"}
       - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
@@ -139,6 +140,7 @@ intents:
       - {label: "💰 Loans", payload: "loans_overview"}
       - {label: "💵 Invest", payload: "invest_overview"}
       - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "📍 Branches & agents", payload: "branch_locator"}
       - {label: "💬 Complaints", payload: "complaints_feedback"}
       - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
@@ -168,6 +170,7 @@ intents:
       - {label: "💰 Loans", payload: "loans_overview"}
       - {label: "💵 Invest", payload: "invest_overview"}
       - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "📍 Branches & agents", payload: "branch_locator"}
       - {label: "💬 Complaints", payload: "complaints_feedback"}
       - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
@@ -199,6 +202,7 @@ intents:
       - {label: "💰 Loans", payload: "loans_overview"}
       - {label: "💵 Invest", payload: "invest_overview"}
       - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "📍 Branches & agents", payload: "branch_locator"}
       - {label: "💬 Complaints", payload: "complaints_feedback"}
       - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
@@ -225,6 +229,7 @@ intents:
       - {label: "💰 Loans", payload: "loans_overview"}
       - {label: "💵 Invest", payload: "invest_overview"}
       - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "📍 Branches & agents", payload: "branch_locator"}
       - {label: "💬 Complaints", payload: "complaints_feedback"}
       - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
@@ -255,6 +260,7 @@ intents:
       - {label: "💰 Loans", payload: "loans_overview"}
       - {label: "💵 Invest", payload: "invest_overview"}
       - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "📍 Branches & agents", payload: "branch_locator"}
       - {label: "💬 Complaints", payload: "complaints_feedback"}
       - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
@@ -285,6 +291,7 @@ intents:
       - {label: "💰 Loans", payload: "loans_overview"}
       - {label: "💵 Invest", payload: "invest_overview"}
       - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "📍 Branches & agents", payload: "branch_locator"}
       - {label: "💬 Complaints", payload: "complaints_feedback"}
       - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
@@ -306,6 +313,7 @@ intents:
       - {label: "💰 Loans", payload: "loans_overview"}
       - {label: "💵 Invest", payload: "invest_overview"}
       - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "📍 Branches & agents", payload: "branch_locator"}
       - {label: "💬 Complaints", payload: "complaints_feedback"}
       - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
@@ -329,6 +337,7 @@ intents:
       - {label: "💰 Loans", payload: "loans_overview"}
       - {label: "💵 Invest", payload: "invest_overview"}
       - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "📍 Branches & agents", payload: "branch_locator"}
       - {label: "💬 Complaints", payload: "complaints_feedback"}
       - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 

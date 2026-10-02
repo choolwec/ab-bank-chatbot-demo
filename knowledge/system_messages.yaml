@@ -19,8 +19,10 @@ messages:
   # --- Session ---------------------------------------------------------------
   welcome:
     status: draft
-    text: |
-      👋 Welcome to AB Bank! I'm an automated assistant here to help with our products and services, and to connect you with our team. How can I help you today?
+    text: |-
+      👋 Welcome to AB Bank!
+      I'm an automated assistant here to help you learn about our products and services, answer your banking questions, and connect you with our team when needed.
+      How can I help you today?
   disclosure:
     status: draft
     text: I'm AB Bank's automated assistant.
@@ -325,7 +327,7 @@ messages:
   lead.topic_label: {status: draft, text: callback request}
   lead.intro.agent:
     status: draft
-    text: Of course. We're happy to help. Please share your details and an AB Bank Contact Centre representative will get in touch with you.
+    text: Of course. We're happy to help. Please provide your details and an AB Bank Contact Centre representative will get in touch with you.
   lead.intro.interest:
     status: draft
     fills: [topic]
@@ -463,6 +465,7 @@ messages:
   button.menu_invest: {status: draft, text: "💵 Invest"}
   button.menu_digital: {status: draft, text: "📱 Digital Banking"}
   button.menu_complaints: {status: draft, text: "💬 Complaints"}
+  button.menu_branches: {status: draft, text: "📍 Branches & agents"}
   button.talk_to_an_agent: {status: draft, text: "📞 Talk to an Agent"}
   button.an_etumba_agent: {status: draft, text: "An eTumba agent"}
   button.back_to_menu: {status: draft, text: "Back to menu"}

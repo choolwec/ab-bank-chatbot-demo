@@ -162,7 +162,10 @@ not incidental:
   answer. Any other message clears the expectation.
 - Lead generation (team flow document "Chatbot flow — simple guide", V1/2026,
   2026-10-02): the main menu is Accounts / Loans / Invest / Digital Banking /
-  Complaints / Talk to an Agent (`router.MENU_BUTTONS`), with button-only
+  Branches & agents (our addition) / Complaints / Talk to an Agent
+  (`router.MENU_BUTTONS`). Replies taken from the document carry
+  `wording: flow_doc` and keep the document's full wording (exempt from the
+  32-word short-answer limit). There are button-only
   menu intents (`loans_overview`, `business_loan_options`, `savings_options`,
   `invest_overview`, `digital_banking`, `complaints_feedback`). A product
   intent has a `lead_topic`; viewing it is recorded in
@@ -174,6 +177,13 @@ not incidental:
   ticket and the Jira summary. Time slots: Morning / Afternoon / Anytime.
   The welcome and greeting say "automated assistant" without "not a person"
   (§3.4 disclosure still met).
+- Branch questions mid-form (`router._locator_digression`): "where is the
+  kitwe branch" (any question naming a branch or town) or "where can I find
+  an agent" inside a flow gets the branch details or agent networks and the
+  same step re-asked, nothing stored. In the callback form "kitwe branch"
+  (a town and the word branch) counts too; in a fraud report or complaint
+  only a question does. The branch finder's town step reads the town from a
+  whole sentence (`branches_mentioned`).
 - Short answers first (2026-10-02): an intent with `answer_short` shows it
   with a **More details** button (`details:<intent>`, action `details`) that
   sends the full `answer`. A channel's `answer_by_channel` variant still wins.

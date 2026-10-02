@@ -49,6 +49,7 @@ intents:
     lead_topic: "Savings Account"
     category: accounts
     status: draft
+    wording: flow_doc
     phrases:
       - "savings account"
       - "tell me about savings"
@@ -67,7 +68,7 @@ intents:
       - "i want to start saving"
       - "account to keep my money and earn interest"
       - "can i withdraw anytime from savings"
-    answer_short: "Our Savings Account earns 5% a year, credited monthly, with no monthly fee and up to two free withdrawals a month. Would you like to open one?"
+    answer_short: "Looking to grow your savings?\nOur Savings Account helps you grow your money while keeping it accessible. Enjoy 5% interest per annum, credited monthly, no monthly maintenance fee, and up to two free withdrawals each month.\nWould you like to open a Savings Account?"
     answer: |
       Our Savings account lets you deposit and withdraw at any time:
       - Minimum balance: ZMW 100
@@ -93,6 +94,7 @@ intents:
     short_label: "Tamanga account"
     category: accounts
     status: draft
+    wording: flow_doc
     phrases:
       - "current account"
       - "curent account"
@@ -115,7 +117,7 @@ intents:
       - "euro account"
       - "account to receive my salary"
       - "salary account"
-    answer_short: "Looking for an account for everyday banking? Our Tamanga Current Account lets you bank in ZMW, USD or EUR. Would you like to open one or speak to our team?"
+    answer_short: "Looking for an account for your everyday banking needs?\nOur Tamanga Current Account gives you the flexibility to bank and transact in ZMW, USD, or EUR, making it easy to manage your finances your way.\nWould you like to know more or speak to our team about opening an account?"
     answer: |
       Tamanga is our everyday current account, available in ZMW, USD, or
       EURO:
@@ -146,6 +148,7 @@ intents:
     short_label: "Tamanga Plus"
     category: accounts
     status: draft
+    wording: flow_doc
     phrases:
       - "tamanga plus"
       - "premium current account"
@@ -163,7 +166,7 @@ intents:
       - "upgrade to tamanga plus"
       - "tamanga plus benefits"
       - "account with internet banking"
-    answer_short: "Want more from your current account? Tamanga Plus gives you everything in Tamanga, plus Online Banking to manage your money anytime. Shall we help you get started?"
+    answer_short: "Want more from your current account?\nUpgrade to Tamanga Plus and enjoy all the benefits of a Tamanga Account, plus the convenience of Online Banking to manage your money anytime, anywhere.\nWould you like us to help you get started?"
     answer: |
       Tamanga Plus has everything Tamanga has, plus a cheque book and
       Online Banking (MyABZ) access. Monthly maintenance fee: ZMW 135.
@@ -186,6 +189,7 @@ intents:
     short_label: "Mukula Plus account"
     category: accounts
     status: draft
+    wording: flow_doc
     phrases:
       - "business account"
       - "busness account"
@@ -208,7 +212,7 @@ intents:
       - "business acc"
       - "account for my small business"
       - "account for a club or association"
-    answer_short: "Growing your business? Mukula Plus is our business account for companies, sole traders, partnerships, NGOs, churches, clubs and associations, in ZMW, USD or EUR. Shall we help you get started?"
+    answer_short: "Growing your business? Let's help you bank with confidence.\nOur Mukula Plus Corporate Current Account is designed for limited companies, sole traders, partnerships, NGOs, churches, clubs and associations. Open your account in ZMW, USD or EUR and enjoy banking solutions tailored to your business needs.\nWould you like us to help you get started?"
     answer: |
       Mukula Plus is our corporate/business current account — for limited
       companies, sole traders/partnerships, and clubs/NGOs/churches/
@@ -278,6 +282,7 @@ intents:
     lead_topic: "Savings Plan"
     category: accounts
     status: draft
+    wording: flow_doc
     phrases:
       - "savings plan account"
       - "blocked savings"
@@ -293,7 +298,7 @@ intents:
       - "save for a goal"
       - "goal savings account"
       - "savings plan minimum deposit"
-    answer_short: "Saving for a goal? Our Savings Plan earns up to 7% a year with no monthly fee, and limits withdrawals so you stay on track (6 months minimum). Ready to start?"
+    answer_short: "Saving for a specific goal?\nOur Savings Plan is designed to help you build your savings over time while limiting access to your funds, making it easier to stay on track.\nBenefits:\n• Earn up to 7% interest per annum\n• Minimum tenure of 6 months\n• No monthly maintenance fee\nReady to start saving towards your goal?"
     answer: |
       The Savings Plan account lets you deposit any time, but withdrawals
       are blocked — good for a savings goal you don't want to dip into:
@@ -317,6 +322,7 @@ intents:
     lead_topic: "Kids Savings Account"
     category: accounts
     status: draft
+    wording: flow_doc
     phrases:
       - "kids savings"
       - "childrens account"
@@ -335,7 +341,7 @@ intents:
       - "bank account for my kids"
       - "junior savings account"
       - "kids savings interest"
-    answer_short: "Saving for your child's future? Our Kids Savings Account, for children under 16, earns 7% a year and builds good saving habits. Ready to start?"
+    answer_short: "Saving for your child's future?\nOur Kids Savings Account is designed for children under 16. It's a great way to help your child develop healthy savings habits from an early age while earning 7% interest per annum to grow their savings over time.\nReady to start saving for your child's future?"
     answer: |
       Kids Savings is a joint account opened for a minor (under 16) by
       their guardian:
@@ -357,6 +363,7 @@ intents:
     short_label: "Term deposit"
     category: accounts
     status: draft
+    wording: flow_doc
     phrases:
       - "term deposit"
       - "fixed deposit"
@@ -375,7 +382,7 @@ intents:
       - "fix money for 90 days"
       - "where can i invest money"
       - "minimum amount for a fixed deposit"
-    answer_short: "Our Term Deposit grows your money securely, for 30 to 365 days at up to 16% a year. Ready to start investing?"
+    answer_short: "Looking to invest your funds for a fixed period?\nOur Term Deposit offers a secure way to grow your money, with investment periods ranging from 30 to 365 days and interest rates of up to 16% per annum.\nReady to start investing?"
     answer: |
       A Term Deposit Account (TDA) fixes your money for a chosen term to
       earn a higher interest rate:
@@ -514,6 +521,7 @@ intents:
     short_label: "Opening an account"
     category: accounts
     status: draft
+    wording: flow_doc
     phrases:
       - "how do i open an account"
       - "i want to open an account"
@@ -532,7 +540,7 @@ intents:
       - "opening an account"
       - "can i open an account on my phone"
       - "how do i become a customer"
-    answer_short: "Visit your nearest AB Bank branch with a valid original ID (NRC, passport or driver's licence), proof of residence and a TPIN certificate. Which account would you like to open?"
+    answer_short: "To get started, simply visit your nearest AB Bank branch with:\n• A valid original ID (NRC, Passport, or Driver's License)\n• Proof of residence\n• TPIN Certificate\nWhat type of account would you like to open?"
     answer: |
       Accounts are opened at any branch only — there's no online/remote
       account opening. Bring the right documents and it's usually done
@@ -643,13 +651,13 @@ intents:
     label: "Savings options"
     category: accounts
     status: draft
+    wording: flow_doc
     phrases:
       - "savings options"
       - "savings accounts"
       - "savings"
       - "i want to save"
-    answer: |
-      Looking to grow your savings? We have savings options for everyday needs, future goals, or your child's future. Which one would you like to explore?
+    answer: "Looking to grow your savings?\nAB Bank offers a range of savings solutions to help you save for everyday needs, future goals, or your child's future.\nWhich savings solution would you like to explore?"
     buttons:
       - {label: "Savings Account", payload: "savings_account"}
       - {label: "Savings Plan", payload: "savings_plan_account"}
@@ -662,14 +670,14 @@ intents:
     label: "Invest"
     category: accounts
     status: draft
+    wording: flow_doc
     phrases:
       - "invest"
       - "investments"
       - "investing"
       - "i want to invest"
       - "save and invest"
-    answer: |
-      Looking to grow your money? Our investment solutions help your money work harder, for a future goal or higher returns. What would you like to explore?
+    answer: "Looking to grow your money through investing?\nWhether you're setting aside funds for a future goal or looking for higher returns on your savings, AB Bank's investment solutions can help you make your money work harder.\nWhat would you like to explore today?"
     buttons:
       - {label: "Term Deposit", payload: "term_deposit_account"}
       - {label: "Main menu", payload: "menu"}

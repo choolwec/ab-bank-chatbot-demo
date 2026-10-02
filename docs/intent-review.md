@@ -57,7 +57,9 @@ Follow-up buttons: Tamanga Current Account · Tamanga Plus · Savings Account ·
 
 Short answer (shown first, with a "More details" button):
 
-> Our Savings Account earns 5% a year, credited monthly, with no monthly fee and up to two free withdrawals a month. Would you like to open one?
+> Looking to grow your savings?
+> Our Savings Account helps you grow your money while keeping it accessible. Enjoy 5% interest per annum, credited monthly, no monthly maintenance fee, and up to two free withdrawals each month.
+> Would you like to open a Savings Account?
 
 Full answer (after "More details"):
 
@@ -81,7 +83,9 @@ Follow-up buttons: Yes, I'm interested · Back
 
 Short answer (shown first, with a "More details" button):
 
-> Looking for an account for everyday banking? Our Tamanga Current Account lets you bank in ZMW, USD or EUR. Would you like to open one or speak to our team?
+> Looking for an account for your everyday banking needs?
+> Our Tamanga Current Account gives you the flexibility to bank and transact in ZMW, USD, or EUR, making it easy to manage your finances your way.
+> Would you like to know more or speak to our team about opening an account?
 
 Full answer (after "More details"):
 
@@ -107,7 +111,9 @@ Follow-up buttons: Open an account · Tamanga Plus · Speak to an agent · Back 
 
 Short answer (shown first, with a "More details" button):
 
-> Want more from your current account? Tamanga Plus gives you everything in Tamanga, plus Online Banking to manage your money anytime. Shall we help you get started?
+> Want more from your current account?
+> Upgrade to Tamanga Plus and enjoy all the benefits of a Tamanga Account, plus the convenience of Online Banking to manage your money anytime, anywhere.
+> Would you like us to help you get started?
 
 Full answer (after "More details"):
 
@@ -126,7 +132,9 @@ Follow-up buttons: Yes, I'm interested · Back
 
 Short answer (shown first, with a "More details" button):
 
-> Growing your business? Mukula Plus is our business account for companies, sole traders, partnerships, NGOs, churches, clubs and associations, in ZMW, USD or EUR. Shall we help you get started?
+> Growing your business? Let's help you bank with confidence.
+> Our Mukula Plus Corporate Current Account is designed for limited companies, sole traders, partnerships, NGOs, churches, clubs and associations. Open your account in ZMW, USD or EUR and enjoy banking solutions tailored to your business needs.
+> Would you like us to help you get started?
 
 Full answer (after "More details"):
 
@@ -176,7 +184,13 @@ Follow-up buttons: Business account overview · Find a branch · Talk to a perso
 
 Short answer (shown first, with a "More details" button):
 
-> Saving for a goal? Our Savings Plan earns up to 7% a year with no monthly fee, and limits withdrawals so you stay on track (6 months minimum). Ready to start?
+> Saving for a specific goal?
+> Our Savings Plan is designed to help you build your savings over time while limiting access to your funds, making it easier to stay on track.
+> Benefits:
+> • Earn up to 7% interest per annum
+> • Minimum tenure of 6 months
+> • No monthly maintenance fee
+> Ready to start saving towards your goal?
 
 Full answer (after "More details"):
 
@@ -197,7 +211,9 @@ Follow-up buttons: Yes, contact me · Back
 
 Short answer (shown first, with a "More details" button):
 
-> Saving for your child's future? Our Kids Savings Account, for children under 16, earns 7% a year and builds good saving habits. Ready to start?
+> Saving for your child's future?
+> Our Kids Savings Account is designed for children under 16. It's a great way to help your child develop healthy savings habits from an early age while earning 7% interest per annum to grow their savings over time.
+> Ready to start saving for your child's future?
 
 Full answer (after "More details"):
 
@@ -219,7 +235,9 @@ Follow-up buttons: Yes, contact me · Back
 
 Short answer (shown first, with a "More details" button):
 
-> Our Term Deposit grows your money securely, for 30 to 365 days at up to 16% a year. Ready to start investing?
+> Looking to invest your funds for a fixed period?
+> Our Term Deposit offers a secure way to grow your money, with investment periods ranging from 30 to 365 days and interest rates of up to 16% per annum.
+> Ready to start investing?
 
 Full answer (after "More details"):
 
@@ -308,7 +326,11 @@ Follow-up buttons: Find a branch · Types of accounts · Business account docume
 
 Short answer (shown first, with a "More details" button):
 
-> Visit your nearest AB Bank branch with a valid original ID (NRC, passport or driver's licence), proof of residence and a TPIN certificate. Which account would you like to open?
+> To get started, simply visit your nearest AB Bank branch with:
+> • A valid original ID (NRC, Passport, or Driver's License)
+> • Proof of residence
+> • TPIN Certificate
+> What type of account would you like to open?
 
 Full answer (after "More details"):
 
@@ -375,7 +397,9 @@ Follow-up buttons: Find a branch · Talk to a person
 
 Customer-facing answer:
 
-> Looking to grow your savings? We have savings options for everyday needs, future goals, or your child's future. Which one would you like to explore?
+> Looking to grow your savings?
+> AB Bank offers a range of savings solutions to help you save for everyday needs, future goals, or your child's future.
+> Which savings solution would you like to explore?
 
 Follow-up buttons: Savings Account · Savings Plan · Kids Savings Account · Back to Accounts · Talk to a person
 
@@ -386,7 +410,9 @@ Follow-up buttons: Savings Account · Savings Plan · Kids Savings Account · Ba
 
 Customer-facing answer:
 
-> Looking to grow your money? Our investment solutions help your money work harder, for a future goal or higher returns. What would you like to explore?
+> Looking to grow your money through investing?
+> Whether you're setting aside funds for a future goal or looking for higher returns on your savings, AB Bank's investment solutions can help you make your money work harder.
+> What would you like to explore today?
 
 Follow-up buttons: Term Deposit · Main menu · Talk to a person
 
@@ -400,7 +426,8 @@ Follow-up buttons: Term Deposit · Main menu · Talk to a person
 
 Short answer (shown first, with a "More details" button):
 
-> eTumba is AB Bank's digital wallet: buy airtime, pay bills, make transfers and save with Yaka Savings, from any phone ({ussd_code}). Would you like to register?
+> eTumba is AB Bank's digital wallet. You can buy airtime, pay bills, make transfers, and save on active accounts and Yaka Savings.
+> Would you like to register for eTumba?
 
 Full answer (after "More details"):
 
@@ -645,16 +672,11 @@ Follow-up buttons: eTumba · Online Banking · Main menu · Talk to a person
 - Status: **draft**
 - Trigger phrases (9): "online banking", "internet banking", "myabz", "my abz", "register for internet banking", "register for online banking", "sign up for online banking", "i want internet banking", "i want online banking"
 
-Short answer (shown first, with a "More details" button):
+Customer-facing answer:
 
-> Internet Banking gives you secure access to your accounts anytime: check balances, see transactions and send money, up to K300,000 a day. Would you like to register?
-
-Full answer (after "More details"):
-
-> AB Bank Internet Banking gives you secure access to your accounts anytime,
-> anywhere. You can check your account balance, view transactions, transfer
-> funds between AB Bank accounts, and send money to other banks across Zambia.
-> You can transfer up to K300,000 per day.
+> Bank conveniently with AB Bank Internet Banking.
+> AB Bank Internet Banking gives you secure access to your accounts anytime, anywhere. You can check your account balance, view transactions, transfer funds between AB Bank accounts, and send money to other banks across Zambia. You can also make transfers of up to K300,000 per day, helping you manage your finances with ease.
+> Would you like to register for Internet Banking?
 
 Follow-up buttons: Yes, contact me · Back
 
@@ -889,7 +911,9 @@ Follow-up buttons: Loan requirements · Find a branch · Request a callback
 
 Customer-facing answer:
 
-> Looking for business financing? We support working capital, expansion and asset purchases. How can we help your business today?
+> Looking for business financing?
+> We have financing solutions to support your business needs, from working capital to expansion and asset acquisition.
+> How can we help your business today?
 
 Follow-up buttons: Business Loan · SME Overdraft · Personal loan · Main menu · Talk to a person
 
@@ -900,7 +924,9 @@ Follow-up buttons: Business Loan · SME Overdraft · Personal loan · Main menu 
 
 Customer-facing answer:
 
-> Looking for financing to start, grow or support your business? Choose the product you're interested in:
+> Looking for financing to start, grow, or support your business?
+> We offer financing solutions tailored to help your business seize opportunities, manage cash flow, and achieve its goals.
+> Choose the financing product you're interested in:
 
 Follow-up buttons: Trader Mobility Loan · Micro Loan · SME Loan · Back · Talk to a person
 
@@ -911,7 +937,9 @@ Follow-up buttons: Trader Mobility Loan · Micro Loan · SME Loan · Back · Tal
 
 Customer-facing answer:
 
-> Our Trader Mobility Loan finances motorbikes, tricycles, three-wheelers and walking tractors, so your business can reach more customers and make more deliveries. Ready to make your next move?
+> Looking to keep your business moving?
+> Our Trader Mobility Loan helps you finance motorbikes, tricycles, three-wheelers, and walking tractors, giving your business the mobility it needs to reach more customers, make more deliveries, and seize new opportunities.
+> Ready to make your next move?
 
 Follow-up buttons: Yes, contact me · Back
 
@@ -922,7 +950,10 @@ Follow-up buttons: Yes, contact me · Back
 
 Customer-facing answer:
 
-> Our Micro Loan is for small businesses, market traders and shop owners who want to grow, manage cash flow or invest, with flexible repayments. Ready to take the next step?
+> Need financing to support your small business?
+> Our Micro Loan is designed for small businesses, market traders, and shop owners looking to grow, manage cash flow, or invest in business opportunities.
+> With flexible repayment terms and financing tailored to your business needs, a Micro Loan can help you take your next step with confidence.
+> Ready to take your business to the next level?
 
 Follow-up buttons: Yes, contact me · Back
 
@@ -933,7 +964,10 @@ Follow-up buttons: Yes, contact me · Back
 
 Customer-facing answer:
 
-> Our SME Loan helps small and medium businesses invest in growth, buy equipment, increase stock or strengthen operations. Ready to grow your business?
+> Looking to expand your business?
+> Our SME Loan is designed for small and medium-sized enterprises looking to invest in growth, purchase equipment, increase stock, or strengthen operations.
+> Whether you're planning your next business move or financing a larger project, our SME Loan provides the support your business needs to grow.
+> Ready to grow your business?
 
 Follow-up buttons: Yes, contact me · Back
 
@@ -1016,11 +1050,14 @@ Follow-up buttons: Request a callback · Find a branch · Opening hours
 
 Customer-facing answer:
 
-> We're here to listen. Share a compliment, complaint or suggestion:
-> Call: {contact_phone}
-> WhatsApp: {whatsapp_number}
-> Email: {contact_email}
-> Or visit any AB Bank branch, or submit it here and our team will contact you.
+> We're here to listen.
+> Your feedback helps us serve you better. Whether you'd like to share a compliment, complaint, or suggestion, we're ready to help.
+> Get in touch with us through:
+> 📞 Call: {contact_phone}
+> 💬 WhatsApp: {whatsapp_number}
+> 📧 Email: {contact_email}
+> 🏦 Visit: Any AB Bank branch
+> Or tap "Submit a complaint" below and our team will contact you.
 
 Follow-up buttons: Submit a complaint · Talk to an agent · Main menu
 
@@ -1053,9 +1090,11 @@ Follow-up buttons: 🏦 Accounts · 💰 Loans · 📱 Digital Banking · Branch
 
 Customer-facing answer:
 
-> 👋 Hi! I'm AB Bank's automated assistant. How can I help you today?
+> 👋 Welcome to AB Bank!
+> I'm an automated assistant here to help you learn about our products and services, answer your banking questions, and connect you with our team when needed.
+> How can I help you today?
 
-Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 💬 Complaints · 📞 Talk to an Agent
+Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 📍 Branches & agents · 💬 Complaints · 📞 Talk to an Agent
 
 ### Thanks / goodbye  `thanks_goodbye`
 
@@ -1077,7 +1116,7 @@ Customer-facing answer:
 
 > I'm an automated assistant, not a person. I can help with branches, accounts, eTumba and loans, take fraud reports and complaints, or arrange a callback. I never ask for PINs or passwords.
 
-Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 💬 Complaints · 📞 Talk to an Agent
+Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 📍 Branches & agents · 💬 Complaints · 📞 Talk to an Agent
 
 ### How are you?  `how_are_you`
 
@@ -1088,7 +1127,7 @@ Customer-facing answer:
 
 > I'm doing well, thank you for asking! How can I help you today?
 
-Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 💬 Complaints · 📞 Talk to an Agent
+Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 📍 Branches & agents · 💬 Complaints · 📞 Talk to an Agent
 
 ### I'm fine  `small_talk_fine`
 
@@ -1099,7 +1138,7 @@ Customer-facing answer:
 
 > Glad to hear it! What can I help you with today?
 
-Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 💬 Complaints · 📞 Talk to an Agent
+Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 📍 Branches & agents · 💬 Complaints · 📞 Talk to an Agent
 
 ### Your name  `bot_name`
 
@@ -1110,7 +1149,7 @@ Customer-facing answer:
 
 > I'm AB Bank's automated assistant. I don't have a name, but I'm here to help with your banking questions.
 
-Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 💬 Complaints · 📞 Talk to an Agent
+Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 📍 Branches & agents · 💬 Complaints · 📞 Talk to an Agent
 
 ### Okay  `acknowledgement`
 
@@ -1121,7 +1160,7 @@ Customer-facing answer:
 
 > Great! What else can I help you with?
 
-Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 💬 Complaints · 📞 Talk to an Agent
+Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 📍 Branches & agents · 💬 Complaints · 📞 Talk to an Agent
 
 ### Compliment  `compliment`
 
@@ -1132,7 +1171,7 @@ Customer-facing answer:
 
 > Thank you, that's kind of you! Anything else I can help with?
 
-Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 💬 Complaints · 📞 Talk to an Agent
+Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 📍 Branches & agents · 💬 Complaints · 📞 Talk to an Agent
 
 ### Nice to meet you  `nice_to_meet_you`
 
@@ -1143,7 +1182,7 @@ Customer-facing answer:
 
 > Nice to meet you too! How can I help today?
 
-Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 💬 Complaints · 📞 Talk to an Agent
+Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 📍 Branches & agents · 💬 Complaints · 📞 Talk to an Agent
 
 ### Are you there?  `are_you_there`
 
@@ -1154,7 +1193,7 @@ Customer-facing answer:
 
 > Yes, I'm here! What can I help you with?
 
-Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 💬 Complaints · 📞 Talk to an Agent
+Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Banking · 📍 Branches & agents · 💬 Complaints · 📞 Talk to an Agent
 
 ### About AB Bank  `about_ab_bank`
 
@@ -1293,7 +1332,7 @@ Submitted to Meta under these names; `{{1}}` is the case reference.
 > Hello, this is AB Bank. Your callback request {{1}} is booked, and our team will call you within one working day.
 
 
-## System messages (166 texts)
+## System messages (167 texts)
 
 Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts, retries, confirmations. Source: `knowledge/system_messages.yaml`. `{placeholders}` are filled in by the bot (contact details from `app/config.py`, or the values listed).
 
@@ -1301,7 +1340,9 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 
 - Status: **draft**
 
-> 👋 Welcome to AB Bank! I'm an automated assistant here to help with our products and services, and to connect you with our team. How can I help you today?
+> 👋 Welcome to AB Bank!
+> I'm an automated assistant here to help you learn about our products and services, answer your banking questions, and connect you with our team when needed.
+> How can I help you today?
 
 ### `disclosure`
 
@@ -1890,7 +1931,7 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 
 - Status: **draft**
 
-> Of course. We're happy to help. Please share your details and an AB Bank Contact Centre representative will get in touch with you.
+> Of course. We're happy to help. Please provide your details and an AB Bank Contact Centre representative will get in touch with you.
 
 ### `lead.intro.interest`
 
@@ -2136,6 +2177,12 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Status: **draft**
 
 > 💬 Complaints
+
+### `button.menu_branches`
+
+- Status: **draft**
+
+> 📍 Branches & agents
 
 ### `button.talk_to_an_agent`
 

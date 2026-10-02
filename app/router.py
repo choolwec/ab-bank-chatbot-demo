@@ -26,6 +26,7 @@ MENU_BUTTONS = [
     button("menu_loans", "loans_overview"),
     button("menu_invest", "invest_overview"),
     button("menu_digital", "digital_banking"),
+    button("menu_branches", "branch_locator"),  # not in the document; kept
     button("menu_complaints", "complaints_feedback"),
     button("talk_to_an_agent", "human_handoff"),
 ]
@@ -874,16 +875,22 @@ def _digression(flow, session, text):
     3. at a validated step (a phone number), the message also fails the
        validator.
     """
-    if not _question_shaped(text):
-        return None
-    ranked = matcher.match(text)
-    top_name, top_score = ranked[0] if ranked else (None, 0.0)
-    bar = config.HIGH_CONFIDENCE + (0.05 if flow.name in ("fraud", "complaint") else 0.0)
-    if not top_name or top_score < bar:
-        return None
-    intent = matcher.get(top_name)
-    if intent.get("flow") or not intent.get("answer"):
-        return None
+    located = _locator_digression(flow, session, text)
+    if located is not None:
+        answer_text, meta = located
+    else:
+        if not _question_shaped(text):
+            return None
+        ranked = matcher.match(text)
+        top_name, top_score = ranked[0] if ranked else (None, 0.0)
+        bar = config.HIGH_CONFIDENCE + (0.05 if flow.name in ("fraud", "complaint") else 0.0)
+        if not top_name or top_score < bar:
+            return None
+        intent = matcher.get(top_name)
+        if intent.get("flow") or not intent.get("answer"):
+            return None
+        answer_text = short_answer(intent).strip()
+        meta = {"intent": intent["intent"], "confidence": round(top_score, 3)}
     state = session.flow_state
     steps = getattr(flow, "steps", None)
     if steps and not state.get("confirming"):
@@ -893,9 +900,30 @@ def _digression(flow, session, text):
             return None
     prompt = flow.resume(session)[-1]
     back = msg("back_to_flow", flow=flow.topic_label, prompt=prompt["text"])
-    reply = dict(prompt, text=short_answer(intent).strip() + "\n\n" + back)
-    return [reply], {"action": f"digression:{flow.name}", "intent": intent["intent"],
-                     "confidence": round(top_score, 3)}
+    reply = dict(prompt, text=answer_text + "\n\n" + back)
+    return [reply], dict(meta, action=f"digression:{flow.name}")
+
+
+_BRANCH_WORD_RE = re.compile(r"\b(?:branch|branches|office)\b", re.IGNORECASE)
+_AGENT_WORD_RE = re.compile(r"\bagents?\b", re.IGNORECASE)
+
+
+def _locator_digression(flow, session, text):
+    """ "where is the kitwe branch" mid-form: the branch details (or the
+    agent networks), never a stored answer such as a name. A question in
+    any form; inside the callback form also "kitwe branch" (a town and the
+    word branch). Inside a fraud report or complaint only a question, since
+    "it happened at the kitwe branch" is part of the customer's account."""
+    if flow.name == "locator":
+        return None
+    asked = _question_shaped(text)
+    branches = branches_mentioned(text)
+    if branches and (asked or (flow.name == "lead" and _BRANCH_WORD_RE.search(text))):
+        found = FLOWS["locator"].found_reply(session, branches)
+        return found["text"], {"intent": "branch_locator"}
+    if asked and _AGENT_WORD_RE.search(text) and not branches:
+        return FLOWS["locator"].agents_text(), {"intent": "agent_locator"}
+    return None
 
 
 # P3: a list shows at most this many options before "More…" (per channel).

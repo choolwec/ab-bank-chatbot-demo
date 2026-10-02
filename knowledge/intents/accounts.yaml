@@ -548,6 +548,7 @@ intents:
 
   - intent: account_opening_how
     label: "How to open an account"
+    lead_topic: "Opening an account"
     short_label: "Opening an account"
     category: accounts
     status: draft

@@ -117,7 +117,7 @@ def test_saying_no_after_callback_is_recognised_as_goodbye(client):
     data = chat(client, sid, message="no")
     assert data["meta"]["action"] == "answer"
     assert data["meta"]["intent"] == "thanks_goodbye"
-    assert "welcome" in _all_text(data).lower()
+    assert "have a great day" in _all_text(data).lower()  # a goodbye, not "you're welcome"
 
 
 def test_two_strike_rule_offers_human(client):

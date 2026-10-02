@@ -1452,7 +1452,7 @@ Submitted to Meta under these names; `{{1}}` is the case reference.
 > Hello, this is AB Bank. Your callback request {{1}} is booked, and our team will call you within one working day.
 
 
-## System messages (172 texts)
+## System messages (177 texts)
 
 Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts, retries, confirmations. Source: `knowledge/system_messages.yaml`. `{placeholders}` are filled in by the bot (contact details from `app/config.py`, or the values listed).
 
@@ -1500,6 +1500,36 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Filled in by the bot: `{flow}`
 
 > Your {flow} isn't sent yet. Stop anyway?
+
+### `goodbye`
+
+- Status: **draft**
+
+> Thank you for chatting with AB Bank. Have a great day! If you need anything else, I'm here.
+
+### `take_your_time`
+
+- Status: **draft**
+
+> No problem. I'm here whenever you're ready.
+
+### `no_problem`
+
+- Status: **draft**
+
+> No problem. Is there anything else I can help with?
+
+### `bot_wrong`
+
+- Status: **draft**
+
+> Sorry, I got that wrong. Could you put it another way, or pick a topic below? I can also put you through to a person.
+
+### `lead.visit_branch_ok`
+
+- Status: **draft**
+
+> Of course, you're welcome to visit any AB Bank branch instead. If you'd still like a call, just carry on below.
 
 ### `no_more_details`
 

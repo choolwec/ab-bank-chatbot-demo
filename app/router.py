@@ -85,6 +85,18 @@ COMMANDS = {
          "no marketing please", "no more marketing"],
         "marketing_opt_out",
     ),
+    # The customer says the bot got it wrong: apologise, offer a way on, and
+    # log it (action=bot_wrong) for the weekly review.
+    **dict.fromkeys(
+        ["that's not what i asked", "thats not what i asked", "not what i asked", "that is not what i asked",
+         "wrong answer", "that's wrong", "thats wrong", "that is wrong", "wrong", "not that", "no that's not it",
+         "thats not it", "that's not it", "you didn't answer my question", "you did not answer my question",
+         "that doesn't answer my question", "that does not answer my question", "irrelevant",
+         "that's not what i meant", "thats not what i meant", "not what i meant", "no not that",
+         "that's not right", "thats not right", "not right", "that is not right", "incorrect",
+         "that's incorrect", "thats incorrect", "you got it wrong", "wrong information"],
+        "bot_wrong",
+    ),
     # "Tell me more" after a short answer: its full answer.
     **dict.fromkeys(
         ["tell me more", "tell me more please", "more info", "more information", "more details",
@@ -271,6 +283,10 @@ def handle(session, text=None, payload=None, merge=None, prior_findings=None,
     routed, meta = _route(session, masked if text else None, payload)
     if meta.get("intent") == "greeting" and text and routed:
         routed[-1] = dict(routed[-1], text=_natural_greeting(session, masked))
+    if meta.get("intent") == "thanks_goodbye" and text and routed and (
+            not _THANKS_RE.search(masked) or _BYE_RE.search(masked)):
+        # "no" / "that's all" / "bye": a proper goodbye, not "you're welcome".
+        routed[-1] = dict(routed[-1], text=msg("goodbye"))
     if first_contact:
         # Every first message on a messaging channel says it's automated
         # (§3.4); the greeting itself stays a plain "Hi!".
@@ -280,6 +296,9 @@ def handle(session, text=None, payload=None, merge=None, prior_findings=None,
     return respond(session, replies, meta, merge)
 
 
+_THANKS_RE = re.compile(r"\b(?:thank\w*|thanks|thx|thnx|tnx|ty|zikomo|natotela|twalumba|cheers|appreciate\w*)\b",
+                        re.IGNORECASE)
+_BYE_RE = re.compile(r"\b(?:bye|goodbye|good\s+night|see\s+you|take\s+care|later)\b", re.IGNORECASE)
 _TIME_OF_DAY_RE = re.compile(r"\b(?:good\s+)?(morning|afternoon|evening)\b", re.IGNORECASE)
 
 
@@ -373,7 +392,9 @@ _SOFT_NO = frozenset({
     "another time", "some other time", "i'll think about it", "ill think about it", "let me think about it",
     "i will think about it", "not interested", "i'm not interested", "im not interested",
     "no i'm not interested", "no im not interested", "not really", "no not really", "i'm ok", "im ok",
-    "i'm okay", "nope not now", "no maybe later",
+    "i'm okay", "nope not now", "no maybe later", "let me think", "hmm let me think", "let me think first",
+    "i will come back later", "i'll come back later", "ill come back later", "i will come back", "not for now",
+    "i need to think", "i need to think about it", "let me check first", "maybe", "maybe next time",
 })
 _BACK_WORDS = frozenset({"back", "go back", "back please", "previous", "take me back", "return", "go back please"})
 
@@ -389,7 +410,7 @@ def _expected_payload(expecting, text, in_flow=False):
     if answer is None and not in_flow and expecting.get("yes") and _INTERESTED_RE.match(t):
         answer = True
     if answer is None and not in_flow and expecting.get("no") and t in _SOFT_NO:
-        answer = False
+        return SOFT_NO_PICK
     if answer is True and expecting.get("yes"):
         return expecting["yes"]
     if answer is False and expecting.get("no"):
@@ -524,6 +545,8 @@ def _route(session, text, payload):
             return _repeat(session)
         if command == "clarify":
             return _clarify(session)
+        if command == "bot_wrong":
+            return _bot_wrong(session)
         if command == "more_details":
             if any(p == MORE_PAYLOAD for _, p in (expecting or {}).get("options", [])):
                 return _more_options(session)  # "More…" in a WhatsApp list
@@ -535,12 +558,31 @@ def _route(session, text, payload):
                 command = "cancel_flow"  # never drop a report without asking
             return _route(session, None, command)
 
+    # "bye" while filling in a callback or a branch search: they are leaving.
+    if text and not payload and session.active_flow in ("lead", "locator") and guards.normalise(text) in _GOODBYES:
+        return _route(session, None, "cancel_flow")
+
     # 1c'. "yes", "2", or a typed button label answering the last reply (C3).
     if text and not payload:
         picked = _expected_payload(expecting, text, in_flow=bool(session.active_flow))
+        if picked and picked.startswith(LEAD_PREFIX) and not session.active_flow:
+            # "yes, call me on 0966 123 456": the number goes on the form too.
+            return _start_lead(session, picked[len(LEAD_PREFIX):], trigger=text, expected_pick=picked)
+        if picked == SOFT_NO_PICK:
+            # "hmm, let me think": no pressure, the offer stays one tap away.
+            offer = [(label, p) for label, p in expecting.get("options", []) if p == expecting.get("yes")]
+            buttons = [{"label": label, "payload": p} for label, p in offer] + [button("main_menu", "menu")]
+            reply = {"text": msg("take_your_time"), "buttons": buttons}
+            if offer:
+                reply["yes"] = offer[0][1]  # "ok, yes" later still means the offer
+            return [reply], {"action": "take_your_time"}
         if picked:
             replies, meta = _route(session, None, picked)
             return replies, dict(meta, expected_pick=picked)
+        if not session.active_flow and guards.normalise(text) in _BARE_NO:
+            # A plain "no" with nothing asked: not a goodbye, not a guess.
+            return ([{"text": msg("no_problem"), "buttons": list(MENU_BUTTONS), "yes": "menu", "no": "thanks_goodbye"}],
+                    {"action": "no_problem"})
 
     # 1d. Answer to "Your report isn't sent yet. Stop anyway?"
     pending_cancel = session.flow_state.pop("confirm_cancel", False) if session.active_flow else False
@@ -580,12 +622,7 @@ def _route(session, text, payload):
     if payload == MORE_PAYLOAD:
         return _more_options(session)
     if payload and payload.startswith(LEAD_PREFIX):
-        session.strikes = 0
-        interest = payload[len(LEAD_PREFIX):]
-        replies, done = FLOWS["lead"].start(session, kind=interest if matcher.get(interest) else None)
-        if done:
-            session.active_flow = None
-        return replies, {"intent": "request_callback", "action": "flow_start", "interest": interest}
+        return _start_lead(session, payload[len(LEAD_PREFIX):])
     if payload and payload.startswith(DETAILS_PREFIX):
         intent = matcher.get(payload[len(DETAILS_PREFIX):])
         if intent:
@@ -879,6 +916,9 @@ _KEYWORD_INTENTS = [
                 r"access\s+bank|ecobank|citibank|investrust|natsave|zicb|first\s+capital|bank\s+of\s+china|"
                 r"united\s+bank|first\s+alliance|standard\s+chartered)\b"
                 r"|\b(?:interbank|inter-bank|rtgs|eft)\b", re.I), "transfer_other_banks"),
+    # "I need money for my business": choose a business loan.
+    (re.compile(r"\b(?:need|want|looking\s+for|get|raise)\s+(?:some\s+)?(?:money|cash|funds|capital|financing|finance)\b"
+                r".{0,40}\b(?:business|shop|stall|trade|trading|company|stock|farm)\b", re.I), "business_loan_options"),
     (re.compile(r"\b(?:deposit|depositing|put|bank)\s+(?:some\s+)?(?:money|cash|funds)\b"
                 r"|\b(?:mobile\s+money|airtel\s+money|mtn\s+(?:money|momo)|momo|zamtel\s+kwacha)\b.{0,30}\b(?:to|into)\s+"
                 r"(?:my\s+)?(?:ab\s+bank\s+|bank\s+)?account\b|\bwhere\s+(?:can|do)\s+i\s+deposit\b"
@@ -892,6 +932,43 @@ _CARD_PRODUCT_QUESTION_RE = re.compile(
     r"\b(?:get|apply\s+for|order|offer|issue|have|want|need)\s+(?:a\s+|an\s+)?(?:new\s+)?"
     r"(?:debit\s+|visa\s+|atm\s+|credit\s+|bank\s+)?cards?\b|\bdo\s+you\s+(?:have|offer|issue)\b.{0,20}\bcards?\b",
     re.IGNORECASE)
+
+
+_TALK_ABOUT_RE = re.compile(
+    r"\b(?:talk|speak|chat)\s+(?:to|with)\s+(?:someone|somebody|a\s+person|an?\s+agent|a\s+consultant|staff|"
+    r"your\s+team|a\s+loan\s+officer|an?\s+officer|a\s+human)\b.{0,15}\b(?:about|regarding|on|concerning)\s+(.+)$"
+    r"|\b(?:call|phone|contact|ring)\s+me\b.{0,15}\b(?:about|regarding|concerning)\s+(.+)$", re.IGNORECASE)
+_CALL_ME_RE = re.compile(r"\b(?:call|phone|ring|contact|reach)\s+me\b|\bmy\s+(?:phone\s+|cell\s+|mobile\s+)?number\s+is\b",
+                         re.IGNORECASE)
+_GENERIC_TOPICS = [
+    (re.compile(r"\bloans?\b|\bborrow", re.I), "loans_overview"),
+    (re.compile(r"\binvest", re.I), "invest_overview"),
+    (re.compile(r"\bsav(?:e|ing|ings)\b", re.I), "savings_options"),
+    (re.compile(r"\bopen(?:ing)?\s+(?:an?\s+|my\s+)?(?:\w+\s+)?accounts?\b", re.I), "account_opening_how"),
+    (re.compile(r"\baccounts?\b", re.I), "account_types_overview"),
+    (re.compile(r"\b(?:digital|online|internet|app)\b", re.I), "digital_banking"),
+]
+
+
+def _topic_in(text):
+    """The product or area a message names, for a callback's topic."""
+    named = _named_product(text) or _keyword_intent(text)
+    if named:
+        return named
+    return next((name for pattern, name in _GENERIC_TOPICS if pattern.search(text)), None)
+
+
+def _callback_request(session, text):
+    """ "I want to talk to someone about a loan", "please call me on 0977...":
+    the callback form, with the topic and any number already filled in."""
+    from .flows.base import is_valid_zambian_phone, value_candidates
+
+    m = _TALK_ABOUT_RE.search(text)
+    has_number = any(is_valid_zambian_phone(c) for c in value_candidates(text))
+    if not m and not (has_number and _CALL_ME_RE.search(text)):
+        return None
+    topic = _topic_in(m.group(1) or m.group(2)) if m else _topic_in(text)
+    return _start_lead(session, topic, trigger=text)
 
 
 def _keyword_intent(text):
@@ -1027,6 +1104,9 @@ def _free_text(session, text, urgent_flows=True):
     unknown_town = _branch_in_unlisted_town(session, text)
     if unknown_town:
         return unknown_town
+    callback = _callback_request(session, text)
+    if callback:
+        return callback
     keyword = _keyword_intent(text)
     if keyword:
         return _answer(session, matcher.get(keyword), 1.0, text=text)
@@ -1183,6 +1263,9 @@ def _locator_digression(flow, session, text):
         return found["text"], {"intent": "branch_locator"}
     if asked and _AGENT_WORD_RE.search(text) and not branches:
         return FLOWS["locator"].agents_text(), {"intent": "agent_locator"}
+    if asked and flow.name == "lead" and _BRANCH_WORD_RE.search(text):
+        # "can I just visit the branch instead?"
+        return msg("lead.visit_branch_ok"), {"intent": "branch_locator"}
     return None
 
 
@@ -1248,6 +1331,32 @@ def _repeat(session):
     if not session.last_replies:
         return [{"text": msg("menu"), "buttons": list(MENU_BUTTONS)}], {"action": "repeat"}
     return copy.deepcopy(session.last_replies), {"action": "repeat"}
+
+
+SOFT_NO_PICK = "__soft_no__"
+_BARE_NO = frozenset({"no", "nope", "nah", "no no", "noo", "no."})
+_GOODBYES = frozenset({"bye", "goodbye", "bye bye", "byee", "good bye", "see you", "see you later", "later",
+                       "i'm leaving", "im leaving", "never mind bye", "ok bye", "okay bye"})
+
+
+def _start_lead(session, interest, trigger=None, **extra_meta):
+    """The callback form for `interest` (an intent id, or None for a general
+    enquiry); `trigger` is the message that asked for it, so a phone number
+    or name already given is not asked again."""
+    session.strikes = 0
+    kind = interest if interest and matcher.get(interest) else None
+    replies, done = FLOWS["lead"].start(session, kind=kind, trigger=trigger)
+    if done:
+        session.active_flow = None
+        session.flow_state = {}
+    return replies, dict({"intent": "request_callback", "action": "flow_start", "interest": interest}, **extra_meta)
+
+
+def _bot_wrong(session):
+    _log(session, "system", "customer said the answer was wrong", action="bot_wrong",
+         intent=session.last_answer_intent)
+    buttons = [button("talk_to_a_person", "human_handoff"), button("main_menu", "menu")]
+    return [{"text": msg("bot_wrong"), "buttons": buttons}], {"action": "bot_wrong"}
 
 
 def _more_details(session):

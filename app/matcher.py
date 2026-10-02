@@ -50,7 +50,11 @@ _GREETING = (r"(?:hi+|hello+|helo|hallo|hey+|hie|howdy|greetings|dear|yo|"
 # After a greeting only: "hi there", "hello sir" -- "there is an odd
 # withdrawal" keeps its "there".
 _ADDRESSEE = r"(?:there|sir|madam|mam|maam|boss|ba|bro|team|bot|ab\s+bank|abbank|guys)"
-_POLITE = r"(?:please|pls|plz|kindly|excuse\s+me|sorry\s+to\s+bother(?:\s+you)?)"
+_POLITE = (r"(?:please|pls|plz|kindly|excuse\s+me|sorry\s+to\s+bother(?:\s+you)?|"
+           # a correction or an answer before the real request: "no i meant
+           # savings", "yes i want to ask about loans", "ok what about etumba"
+           r"(?:no|nope|sorry)?\s*(?:i\s+meant|i\s+mean|i\s+was\s+asking\s+about|i\s+asked\s+about|not\s+that)|"
+           r"yes|yeah|yep|ok|okay|alright|sure|well|so|and|also)")
 _LEAD_SOCIAL_RE = re.compile(
     rf"^(?:(?:{_GREETING}(?:\s+{_ADDRESSEE})*|{_POLITE})\s+)+")
 _TRAIL_SOCIAL_RE = re.compile(
@@ -63,6 +67,7 @@ _TOPIC_LEAD_RE = re.compile(
     r"^(?:(?:can\s+you\s+|could\s+you\s+|please\s+)?(?:tell|show)\s+me\s+(?:more\s+)?about|"
     r"(?:i\s+(?:want|would\s+like|wanna)\s+to\s+know|i\s+need\s+(?:info|information))\s+(?:more\s+)?about|"
     r"(?:more\s+)?(?:info|information|details)\s+(?:on|about)|what\s+about|how\s+about|explain|"
+    r"(?:i\s+(?:want|would\s+like|wanted)\s+to\s+|i'?d\s+like\s+to\s+|can\s+i\s+)?(?:ask|enquire|inquire|know)\s+about|"
     r"what\s+is|what\s+s|whats|what\s+are)\s+(?:the\s+|your\s+|a\s+|an\s+)?")
 
 

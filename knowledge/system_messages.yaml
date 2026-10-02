@@ -42,6 +42,21 @@ messages:
     status: draft
     fills: [flow]
     text: Your {flow} isn't sent yet. Stop anyway?
+  goodbye:
+    status: draft
+    text: Thank you for chatting with AB Bank. Have a great day! If you need anything else, I'm here.
+  take_your_time:
+    status: draft
+    text: No problem. I'm here whenever you're ready.
+  no_problem:
+    status: draft
+    text: No problem. Is there anything else I can help with?
+  bot_wrong:
+    status: draft
+    text: Sorry, I got that wrong. Could you put it another way, or pick a topic below? I can also put you through to a person.
+  lead.visit_branch_ok:
+    status: draft
+    text: Of course, you're welcome to visit any AB Bank branch instead. If you'd still like a call, just carry on below.
   no_more_details:
     status: draft
     text: That's everything I have on this here. Our team can tell you more and answer any questions.

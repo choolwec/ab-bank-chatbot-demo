@@ -77,16 +77,37 @@ The held-out quality gates (which no fix was tuned on) improved:
 - A message with a card or account number in it still gets its answer (after
   the warning about sharing numbers).
 
+## Round 5: conversation flow (same day)
+
+After the product owner removed the callback summary ("Here's what I'll
+send" served no purpose after the consent question), a further round on how
+conversations flow:
+
+- Details given at once are kept and read back: "my name is Mary Banda,
+  call me on 0977 123 456 in the afternoon" fills the whole form; so do
+  "Mary Banda 0977123456" at the name step and "0977... anytime" at the
+  phone step. "Yes, call me on 0966..." after a product starts the form with
+  the product and the number.
+- "I want to talk to someone about a loan" opens the callback with "Loans"
+  as the topic (also "a tractor loan", "the SME loan", "opening an account").
+- Recovering from a miss: "no, I meant savings" answers savings; "that's not
+  what I asked" apologises, offers a person or the menu, and is logged for
+  the weekly review.
+- Closing: "no" after an answer gets "No problem. Anything else?"; "that's
+  all", "bye" and "thank you, bye" get a proper goodbye; "bye" in the middle
+  of the callback form leaves it.
+- No pressure: "hmm, let me think", "not interested", "I'll come back
+  later" after an offer get "No problem. I'm here whenever you're ready.",
+  with the offer still one tap away.
+
 ## Content gaps found (no answer exists yet)
 
 Customers asked these and the bot can only say it can't help or pass them to
 a person. Worth adding answers once the facts are confirmed:
 
-- How to get a **debit or Visa card**, and replacing one
-- **Closing** an account; **changing the phone number** on an account
+- ~~Cards, closing an account / KYC changes, transfers to other banks,
+  deposits~~: answered since (product owner, 02/10/2026)
 - **Cheque books** (only mentioned inside Tamanga Plus and Mukula Plus)
-- **Transfers to other banks** (only mentioned under Online Banking)
-- **Depositing cash** (only covered for eTumba)
 - **School fees, car and mortgage loans** (not offered, but customers ask:
   a "we don't offer this, here is what we do offer" answer would help)
 - Reference letters for embassies and visas

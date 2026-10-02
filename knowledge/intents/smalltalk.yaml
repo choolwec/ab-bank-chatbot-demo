@@ -143,9 +143,14 @@ intents:
       - "no im fine"
       - "i'm fine thanks bye"
       - "nothing thanks"
+      - "i will come back later"
+      - "i'll come back later"
+      - "i will come back"
+      - "i will call later"
     answer: |
       You're welcome! Anything else I can help with? If not, goodbye for now.
     on_yes: menu
+    on_no: thanks_goodbye
     buttons:
       - {label: "Main menu", payload: "menu"}
       - {label: "Talk to a person", payload: "human_handoff"}
@@ -189,6 +194,12 @@ intents:
       - "are you ai"
       - "are you chatgpt"
       - "what are you"
+      - "what else do you have"
+      - "what else"
+      - "what other products do you have"
+      - "other products"
+      - "show me other options"
+      - "what other services do you offer"
     answer: "I'm an automated assistant, not a person. I can help with branches, accounts, eTumba and loans, take fraud reports and complaints, or arrange a callback. I never ask for PINs or passwords."
     buttons:
       - {label: "🏦 Accounts", payload: "account_types_overview"}

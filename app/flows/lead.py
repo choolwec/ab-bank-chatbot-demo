@@ -92,12 +92,27 @@ _NOT_A_NAME = frozenset({
     "afternoon", "evening", "fine", "nope", "cancel", "stop", "back", "loan", "loans", "account", "bank",
     "the", "is", "my", "a", "i", "me", "not", "dont", "don't", "want", "need", "name", "agent", "person",
     "agents", "branch", "branches", "office", "atm", "card", "etumba", "number", "phone",
+    "bye", "goodbye", "later", "thank", "cheers", "welcome", "great", "cool", "nice", "wow", "hmm",
 })
 _TIME_WORDS = (
+    (re.compile(r"\b(?:asap|as\s+soon\s+as\s+possible|now|right\s+now|immediately|urgently|soonest|today)\b", re.I),
+     "As soon as possible"),
     (re.compile(r"\b(?:any\s*time|whenever|any|doesn'?t\s+matter|dont\s+mind|don'?t\s+mind|either)\b", re.I), "Anytime"),
     (re.compile(r"\b(?:morning|a\.?m\.?)\b", re.I), "Morning"),
     (re.compile(r"\b(?:afternoon|after\s+lunch|p\.?m\.?)\b", re.I), "Afternoon"),
 )
+
+
+_STATED_NAME_RE = re.compile(
+    r"(?i)\b(?:my\s+name\s+is|my\s+names?\s+(?:is\s+)?|my\s+name'?s|this\s+is)\s*"
+    r"((?!(?:and|my|i|please|call|on|is)\b)[a-z][a-z'-]+"
+    r"(?:\s+(?!(?:and|my|i|please|call|on|is|you|me)\b)[a-z][a-z'-]+)?)\b")
+
+
+def _clear_time(text):
+    """A call time stated outright ("in the morning", "after 2pm", "asap")."""
+    text = re.sub(r"(?i)\bgood\s+(?:morning|afternoon|evening)\b", " ", text or "")  # a greeting, not a time
+    return any(p.search(text) for p, _ in _TIME_WORDS[:1] + _TIME_WORDS[2:]) or bool(_CLOCK_RE.search(text))
 
 
 def extract_name(text):
@@ -123,7 +138,8 @@ _CLOCK_RE = re.compile(r"\b(\d{1,2})(?::\d{2})?\s*(am|pm|hrs)\b|\b(\d{1,2}):\d{2
 def call_time(text):
     """ "in the morning" -> "Morning", "any time" -> "Anytime", "after 2pm" ->
     "Afternoon"; else as typed."""
-    m = _CLOCK_RE.search(text or "")
+    text = re.sub(r"(?i)\bgood\s+(?:morning|afternoon|evening)\b", " ", text or "")  # a greeting, not a time
+    m = _CLOCK_RE.search(text)
     if m:
         hour = int(m.group(1) or m.group(3))
         suffix = (m.group(2) or "").lower()
@@ -198,7 +214,70 @@ class LeadFlow(FormFlow):
         data["topic"] = topic
         if interests:
             data["interests"] = interests
+        if trigger and self._prefill(data, trigger):
+            # "my name is Mary, call me on 0977...": ask only what is left.
+            i = self._next_open_step(session, 0)
+            if i >= len(self.steps):
+                finished = self.finish(session)
+                return finished, True
+            session.flow_state["step"] = i
+            heard = []
+            if "phone" in data:
+                heard.append(msg("read_back", value=read_back(data["phone"])))
+            if "name" in data:
+                first = data["name"].split()[0]
+                heard.append(msg("thanks_name", name=first))
+            intro = self.intro(session, kind) + ([{"text": " ".join(heard), "buttons": []}] if heard else [])
+            return self.opening(session, intro, self._prompt(i, session)), False
         return replies, done
+
+    @staticmethod
+    def _prefill(data, text):
+        """Name, phone and call time stated in a message: stored if clear."""
+        from .base import value_candidates
+
+        found = False
+        phones = [c for c in value_candidates(text) if is_valid_zambian_phone(c)]
+        if len(phones) == 1 and "phone" not in data:
+            data["phone"], found = clean_phone(phones[0]), True
+        m = _STATED_NAME_RE.search(text)
+        if m and "name" not in data and is_name(m.group(1)):
+            data["name"], found = extract_name(m.group(1)), True
+        slot = call_time(text) if "time" not in data and _clear_time(text) else None
+        if slot:
+            data["time"], found = slot, True
+        return found
+
+    def handle(self, session, text, payload=None):
+        """ "Mary Banda 0977123456" at the name step, "0977... in the
+        morning" at the phone step: every detail given is kept."""
+        state = session.flow_state
+        if text and not payload and not state.get("confirming") and not state.get("editing"):
+            field = self.steps[min(state.get("step", 0), len(self.steps) - 1)]
+            data = state.setdefault("data", {})
+            if field == "name":
+                from .base import value_candidates
+
+                phones = [c for c in value_candidates(text) if is_valid_zambian_phone(c)]
+                rest = text
+                for p in phones:
+                    rest = rest.replace(p, " ")
+                rest = re.sub(r"(?i)\b(?:and\s+)?(?:my\s+(?:phone\s+|cell\s+)?number\s+is|call\s+me\s+on|on|number)\b", " ", rest)
+                rest = " ".join(rest.replace(",", " ").split())
+                if len(phones) == 1 and rest and is_name(rest):
+                    data["phone"] = clean_phone(phones[0])
+                    text = rest
+            elif field == "phone" and "time" not in data:
+                from .base import value_candidates
+
+                rest = text
+                for p in value_candidates(text):
+                    rest = rest.replace(p, " ")
+                rest = " ".join(rest.replace(",", " ").split())
+                slot = call_time(rest) if rest else ""
+                if _clear_time(text) or slot in ("Anytime", "Morning", "Afternoon", "As soon as possible"):
+                    data["time"] = slot or call_time(text)
+        return super().handle(session, text, payload)
 
     def intro(self, session, kind):
         if kind:

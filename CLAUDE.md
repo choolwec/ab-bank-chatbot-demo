@@ -240,6 +240,21 @@ not incidental:
   (K200,000-K5,000,000, 4-60 months) and Agro (website, [CONFIRM]) details
   from abbank.co.zm sit behind "More details"; the team document's wording
   stays the first reply.
+- Conversation flow (round 5, 02/10/2026): the callback form takes every
+  detail given at once (`LeadFlow._prefill` on the starting message: phone,
+  "my name is...", a clear call time; `LeadFlow.handle`: "Mary Banda
+  0977..." at the name step, "0977... in the morning" at the phone step) and
+  reads them back. "Talk to someone about a loan" / "call me on 0977..."
+  (`router._callback_request`) starts it with the topic (`_topic_in`) and
+  number filled in; "yes, call me on ..." after a product does too
+  (`_start_lead`). "no i meant X" / "yes i want to ask about X" are read as X
+  (matcher `_POLITE`, `topic_of`). "that's not what I asked" -> apology and
+  options, `action=bot_wrong` (`_bot_wrong`). A bare "no" with nothing asked
+  -> `no_problem`; "that's all" / "bye" -> `goodbye` (thanks_goodbye's text
+  is swapped when no thanks word, `_THANKS_RE`/`_BYE_RE`); "bye" inside the
+  callback or branch search leaves it. "Hmm, let me think" / "not
+  interested" after an offer -> `take_your_time`, keeping the offer button.
+  Call times: "asap" / "now" -> "As soon as possible".
 - Every reply is guaranteed at least one button before `handle()` returns —
   a hard "no dead ends" invariant enforced in code, not a per-answer
   convention to remember.
@@ -372,9 +387,11 @@ flow object, so one flow instance is stateless and shared across sessions.
 Fraud/complaint flows always end in a ticket (`audit.create_ticket`) that
 only a human closes — the bot never marks its own case resolved.
 
-Complaint and callback flows (`require_confirmation = True`, ticket C7) end
-with "Here's what I'll send: Mary Banda · 0977 123 456 · a loan · Morning"
-and **[Send it] [Change something]**. "Change something" offers one button
+The complaint flow (`require_confirmation = True`, ticket C7) ends with
+"Here's what I'll send: ..." and **[Send it] [Change something]**. The
+callback (lead) flow does NOT (product owner, 02/10/2026): its last question
+(consent, or the time when consent is skipped) sends it; a form with no
+summary step that has nothing left to ask is sent by `resume()` too. "Change something" offers one button
 per field, re-asks just that field, then shows the summary again. The
 **fraud flow deliberately has no confirmation step**, so a report goes out
 as fast as possible; its finish message shows the summary instead. That

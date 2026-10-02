@@ -143,7 +143,7 @@ SINGLES2 = [
  ("muli shani", ("greeting","how_are_you")), ("ndifuna loan", ("loans_overview","msme_loan","loan_apply_how",DYM)), ("ndifuna kutsegula account", ("account_opening_how","account_types_overview",DYM)),
  ("zikomo kwambiri", ("thanks_goodbye",)), ("natotela sana", ("thanks_goodbye",)), ("bwanji", ("greeting","how_are_you")),
  # situations, not product names
- ("i am a market trader and need money for stock", ("micro_loan","msme_loan","loans_overview",DYM)),
+ ("i am a market trader and need money for stock", ("micro_loan","msme_loan","loans_overview","business_loan_options",DYM)),
  ("i want to buy a motorbike for deliveries", ("trader_mobility_loan",)),
  ("my business needs money to expand", ("sme_loan","msme_loan","loans_overview",DYM)),
  ("i want to save for my child's school", ("kids_savings_account","savings_plan_account","savings_options",DYM)),
@@ -270,7 +270,7 @@ CONVOS = [
  ("two questions", [("say","what is etumba and how do i register for it", lambda b: b.last[1].get("intents") is not None or "register" in b.text.lower())]),
  ("welcome 8", [("say","hi"), ("say","8", ("action:fallback","action:did_you_mean","action:clarify",lambda b: True))]),
  ("after answer thanks", [("tap","opening_hours"), ("say","thanks", "thanks_goodbye")]),
- ("after thanks no", [("tap","opening_hours"), ("say","thanks"), ("say","no", "thanks_goodbye")]),
+ ("after thanks no", [("tap","opening_hours"), ("say","thanks"), ("say","no", ("thanks_goodbye", lambda b: "have a great day" in b.text.lower()))]),
  ("after thanks yes", [("tap","opening_hours"), ("say","thanks"), ("say","yes", "action:menu")]),
  ("greet mid-convo", [("tap","opening_hours"), ("say","hi", "greeting")]),
  ("kids from savings menu", [("tap","savings_options"), ("say","kids", "kids_savings_account")]),
@@ -293,7 +293,7 @@ CONVOS2 = [
    ("say","savings", ("savings_options","savings_account",LEAD)), ("say","savings account", ("savings_account",LEAD)), ("say","yes", LEAD),
    ("say","Mwila Tembo", data(name="Mwila Tembo")), ("say","0966 111 222", data(phone="0966111222")), ("say","afternoon", data(time="Afternoon")),
    ("say","no", ticket), ("say","bye", "thanks_goodbye")]),
- ("loan journey", [("say","i need money for my shop", ("micro_loan","msme_loan","loans_overview","action:did_you_mean")),
+ ("loan journey", [("say","i need money for my shop", ("micro_loan","msme_loan","loans_overview","business_loan_options","action:did_you_mean")),
    ("say","micro loan", "micro_loan"), ("say","ok call me", LEAD), ("say","Bupe", lambda b: "Micro Loan" in str(b.session.flow_state))]),
  ("etumba journey", [("say","etumba", "etumba_what_is"), ("say","how do i register", "etumba_register"), ("say","where can i find an agent", "agent_locator"), ("say","ok thanks", "thanks_goodbye")]),
  ("fraud preempts lead", [("tap","human_handoff"), ("say","Mary"), ("say","someone stole my card", ("flow:fraud","action:urgent"))]),
@@ -360,8 +360,55 @@ CONVOS4 = [
                                 ("say", "Mary", lambda b: True), ("say", "0977123456", lambda b: b.session.flow_state["data"]["topic"] == "Account changes / KYC update")]),
 ]
 
-ALL_SINGLES = SINGLES + SINGLES2 + SINGLES3 + SINGLES4
-ALL_CONVOS = CONVOS + CONVOS2 + CONVOS4
+# --- round 5: conversation flow (details given at once, recovering from a
+# miss, closing, no pressure after an offer, no summary at the end)
+def has(**kv):
+    return lambda b: all(b.session.flow_state.get("data", {}).get(k) == v for k, v in kv.items())
+
+
+SINGLES5 = [
+ ("please call me on 0977123456", has(phone="0977123456")),
+ ("pls call me 0966111222", has(phone="0966111222")),
+ ("you can reach me on +260966111222", has(phone="0966111222")),
+ ("call me back on 0955 123 456 tomorrow morning", has(phone="0955123456", time="Morning")),
+ ("my name is Mary Banda, please call me on 0977123456", has(name="Mary Banda", phone="0977123456")),
+ ("my names John and my number is 0977123456", has(name="John", phone="0977123456")),
+ ("good morning, my name is Mary Banda, call me on 0977123456 in the afternoon", has(time="Afternoon")),
+ ("i want to talk to someone about a loan", has(topic="Loans")),
+ ("can someone call me about a tractor loan", has(topic="Trader Mobility Loan")),
+ ("can i speak to a loan officer about the sme loan", has(topic="SME Loan")),
+ ("i'd like someone to call me about opening an account", has(topic="Opening an account")),
+ ("i need money urgently for my business", "business_loan_options"),
+]
+CONVOS5 = [
+ ("name and phone together", [("tap", "human_handoff"), ("say", "Mary Banda 0977123456", has(name="Mary Banda", phone="0977123456"))]),
+ ("name with comma and phone", [("tap", "human_handoff"), ("say", "John Phiri, 0977 123 456", has(name="John Phiri", phone="0977123456"))]),
+ ("phone and time together", [("tap", "human_handoff"), ("say", "Mary"), ("say", "0977123456 in the morning", has(time="Morning"))]),
+ ("phone and anytime", [("tap", "human_handoff"), ("say", "Grace"), ("say", "0966111222, anytime", has(time="Anytime"))]),
+ ("asap", [("tap", "human_handoff"), ("say", "Mary"), ("say", "0977123456"), ("say", "as soon as possible", has(time="As soon as possible"))]),
+ ("yes with a number", [("tap", "micro_loan"), ("say", "yes call me on 0966123456", has(phone="0966123456", topic="Micro Loan"))]),
+ ("no summary at the end", [("tap", "human_handoff"), ("say", "Mary"), ("say", "0977123456"), ("say", "morning"),
+                             ("say", "no", lambda b: "CBK-" in b.text and "here's what i'll send" not in b.text.lower())]),
+ ("no i meant", [("say", "tell me about tamanga"), ("say", "no i meant savings", ("savings_options", "savings_account"))]),
+ ("i was asking about", [("tap", "savings_account"), ("say", "no, i was asking about kids savings", "kids_savings_account")]),
+ ("not what i asked", [("say", "what is etumba"), ("say", "that's not what i asked", "action:bot_wrong")]),
+ ("not right", [("tap", "savings_account"), ("say", "that's not right", "action:bot_wrong")]),
+ ("bare no", [("tap", "opening_hours"), ("say", "no", "action:no_problem")]),
+ ("that's all closes", [("tap", "opening_hours"), ("say", "that's all", lambda b: "have a great day" in b.text.lower())]),
+ ("thank you bye closes", [("tap", "opening_hours"), ("say", "thank you bye", lambda b: "have a great day" in b.text.lower())]),
+ ("thanks keeps it open", [("tap", "opening_hours"), ("say", "thanks", lambda b: "anything else" in b.text.lower())]),
+ ("bye mid form leaves", [("tap", "human_handoff"), ("say", "bye", lambda b: b.session.active_flow is None)]),
+ ("branch instead", [("tap", "human_handoff"), ("say", "can i just visit the branch instead?", "action:digression")]),
+ ("let me think", [("tap", "term_deposit_account"), ("say", "hmm let me think", "action:take_your_time")]),
+ ("not interested", [("tap", "micro_loan"), ("say", "not interested", "action:take_your_time")]),
+ ("yes after thinking", [("tap", "term_deposit_account"), ("say", "maybe later"), ("say", "yes", "flow:lead")]),
+ ("yes then a question", [("tap", "opening_hours"), ("say", "thanks"), ("say", "yes i want to ask about loans", "loans_overview")]),
+ ("ok what about", [("tap", "savings_account"), ("say", "ok what about etumba", "etumba_what_is")]),
+ ("what else", [("tap", "savings_account"), ("say", "what else do you have", "bot_capabilities")]),
+]
+
+ALL_SINGLES = SINGLES + SINGLES2 + SINGLES3 + SINGLES4 + SINGLES5
+ALL_CONVOS = CONVOS + CONVOS2 + CONVOS4 + CONVOS5
 
 
 @pytest.mark.parametrize("text, expect", ALL_SINGLES, ids=[t for t, _ in ALL_SINGLES])

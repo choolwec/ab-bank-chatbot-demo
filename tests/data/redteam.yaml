@@ -83,8 +83,9 @@ cases:
       audit_has: ["[CARD REDACTED]"]
       audit_lacks: ["5454-1212", "5454121234345656"]
   - text: "call me on 0977123456"
-    # Phone numbers are NOT PII-masked: the callback flow needs them.
-    expect: {intent: human_handoff, flow: lead}
+    # Phone numbers are NOT PII-masked: the callback flow needs them (and
+    # now fills the number in from this very message).
+    expect: {intent: request_callback, flow: lead}
 
   # --- out of scope: transactional asks the bot must not pretend to do ---
   - text: "can you transfer K500 to my brother"

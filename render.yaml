@@ -29,6 +29,10 @@ services:
         value: "true"
       - key: EMBEDDINGS_ENABLED
         value: "false"
+      # Demo: keep the [CONFIRM …] notes in draft answers out of replies
+      # (the emergency line falls back to 888). Remove once content is signed off.
+      - key: HIDE_DRAFT_NOTES
+        value: "true"
     # The free plan's disk is wiped on every deploy, restart and spin-down,
     # which takes the shadow-mode audit events with it. A week of shadow data
     # needs a persistent disk, which needs a paid instance type. [VERIFY: the

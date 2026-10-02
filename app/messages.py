@@ -56,6 +56,29 @@ def msg(key: str, **fmt) -> str:
     return text
 
 
+_DRAFT_NOTE = re.compile(r"\s*\[(?:CONFIRM|VERIFY)\b[^\]]*\]")
+_GONE = "\x00"
+# A label whose whole value was a note: the "- eTumba PIN: [CONFIRM …]" list
+# line, or "Phone: [CONFIRM …]." inside a branch line.
+_EMPTY_LIST_LINE = re.compile(rf"(?m)^[ \t]*[-•][^\n:]*:[ \t]*{_GONE}[ \t]*\.?[ \t]*(?:\n|$)")
+_EMPTY_LABEL = re.compile(rf"[ \t]*\b[A-Z][\w()/]*(?: [\w()/]+){{0,3}}:[ \t]*{_GONE}\.?")
+
+
+def strip_draft_notes(text: str) -> str:
+    """Remove [CONFIRM …]/[VERIFY …] notes, and any label they leave with
+    no value (config.hide_draft_notes)."""
+    if "[CONFIRM" not in text and "[VERIFY" not in text:
+        return text
+    text = _DRAFT_NOTE.sub(_GONE, text)
+    text = _EMPTY_LIST_LINE.sub("", text)
+    text = _EMPTY_LABEL.sub("", text)
+    text = text.replace(_GONE, "")
+    text = re.sub(r"[ \t]+([.,;])", r"\1", text)
+    text = re.sub(r"[ \t]+\n", "\n", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
 def has(key: str) -> bool:
     return key in MESSAGES
 

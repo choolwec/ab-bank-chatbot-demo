@@ -8,6 +8,7 @@ re-read on every check. Env var wins over file, file wins over default.
 import json
 import logging
 import os
+import re
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -354,6 +355,26 @@ def channel_enabled(channel: str) -> bool:
 
 def free_text_enabled() -> bool:
     return flag("FREE_TEXT_ENABLED", True)
+
+
+def hide_draft_notes() -> bool:
+    """Demo switch: customers never see the [CONFIRM …]/[VERIFY …] notes
+    left in draft content. Off by default, so they stay visible in review
+    until each fact is confirmed; the content itself is never changed."""
+    return flag("HIDE_DRAFT_NOTES", False)
+
+
+def contacts() -> dict:
+    """CONTACTS as answers render them. With HIDE_DRAFT_NOTES on, a contact
+    that is still a [CONFIRM …] note falls back to the Contact Centre number
+    (the emergency line is unconfirmed; 888 is the confirmed route)."""
+    values = dict(CONTACTS)
+    if hide_draft_notes():
+        number = re.sub(r"\s*\(.*\)$", "", CONTACTS["contact_phone"])  # "888 (not toll-free)" -> "888"
+        for key, value in values.items():
+            if "[CONFIRM" in value or "[VERIFY" in value:
+                values[key] = number
+    return values
 
 
 def widget_enabled() -> bool:

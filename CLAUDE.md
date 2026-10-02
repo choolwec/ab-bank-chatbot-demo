@@ -101,7 +101,9 @@ catches this. An env var set in the production env file silently overrides
 `WHATSAPP_ENABLED`, `MESSENGER_ENABLED`, `JIRA_ENABLED`, `CHATWOOT_ENABLED`,
 `EMBEDDINGS_ENABLED`, `URGENT_MODEL_ENABLED`, `SHADOW_MATCHER`,
 `MESSENGER_PUBLIC_REPLIES`, `MARKETING_CONSENT_ENABLED`, `WA_LINK_ENABLED`,
-`COEXISTENCE_ENABLED`; `CSAT_SAMPLE_RATE` (0-1) is
+`COEXISTENCE_ENABLED`, `HIDE_DRAFT_NOTES` (demo only, off: strips `[CONFIRM …]`/`[VERIFY …]`
+notes from replies in `router._render` and falls back to 888 for the unconfirmed emergency
+line; content is unchanged); `CSAT_SAMPLE_RATE` (0-1) is
 read the same way. Full steps: `docs/runbook-incidents.md` section 4.
 `ABZ_DATA_DIR` and `ABZ_FLAGS_FILE` move `data/` and `flags.json` out of the
 release directory (on the VM: `/var/lib/abz-chatbot`, `/etc/abz-chatbot`);

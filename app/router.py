@@ -11,7 +11,7 @@ import re
 from rapidfuzz import fuzz
 
 from . import audit, config, guards, shadow, urgent_model
-from .messages import button, has, msg
+from .messages import button, has, msg, strip_draft_notes
 from .flows import FLOWS
 from .flows.lead import record_opt_out
 from .flows.locator import CITY_PREFIX, branches_mentioned
@@ -126,9 +126,12 @@ class _SafeDict(dict):
 
 def _render(text: str) -> str:
     try:
-        return text.format_map(_SafeDict(config.CONTACTS))
+        text = text.format_map(_SafeDict(config.contacts()))
     except (ValueError, IndexError):
-        return text
+        pass
+    if config.hide_draft_notes():
+        text = strip_draft_notes(text)
+    return text
 
 
 def _log(session, role, text, **kwargs):

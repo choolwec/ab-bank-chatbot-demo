@@ -34,7 +34,7 @@ from fastapi.responses import PlainTextResponse
 from .. import audit, config, guards, metrics, render
 from ..identity import user_hash
 from ..inbox import inbox
-from ..messages import msg
+from ..messages import msg, strip_draft_notes
 from .base import InboundMessage
 
 api = APIRouter()
@@ -287,7 +287,10 @@ def handle_comment(message: InboundMessage) -> dict:
                         channel=NAME, user_hash=who)
         return {"action": "comment_ignored"}
     key = "comment_private.fraud" if signal.kind == "fraud" else "comment_private.complaint"
-    sender.private_reply(message.ref, msg(key).format_map(_Contacts()), message.user_key)
+    text = msg(key).format_map(_Contacts())
+    if config.hide_draft_notes():
+        text = strip_draft_notes(text)
+    sender.private_reply(message.ref, text, message.user_key)
     audit.log_event("-", "system", f"private reply sent ({signal.kind}, {signal.strength})",
                     action=f"comment_private:{signal.kind}", channel=NAME, user_hash=who)
     if config.flag("MESSENGER_PUBLIC_REPLIES", False):
@@ -297,7 +300,7 @@ def handle_comment(message: InboundMessage) -> dict:
 
 class _Contacts(dict):
     def __init__(self):
-        super().__init__(config.CONTACTS)
+        super().__init__(config.contacts())
 
     def __missing__(self, key):
         return "{" + key + "}"

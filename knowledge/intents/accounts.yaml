@@ -22,7 +22,7 @@ intents:
       - "which account should i open"
       - "account types"
       - "what kind of accounts are there"
-    answer_short: "We have everyday current accounts (Tamanga, Tamanga Plus), a business account (Mukula Plus), savings accounts, Kids Savings and fixed term deposits. Which one interests you?"
+    answer_short: "What type of account are you interested in?"
     answer: |
       We offer these main account types:
       - Tamanga — everyday current account (ZMW 36/month)
@@ -37,14 +37,16 @@ intents:
     answer_simple: >-
       We have everyday accounts (Tamanga and Tamanga Plus), a business account (Mukula Plus), and savings accounts for adults and for children. Tell me which one you'd like to know about.
     buttons:
-      - {label: "Savings account", payload: "savings_account"}
-      - {label: "Current account (Tamanga)", short_label: "Tamanga account", payload: "current_account"}
-      - {label: "Business account", payload: "business_account"}
+      - {label: "Tamanga Current Account", short_label: "Tamanga account", payload: "current_account"}
+      - {label: "Tamanga Plus", payload: "tamanga_plus_account"}
+      - {label: "Savings Account", payload: "savings_options"}
+      - {label: "Business Account", payload: "business_account"}
       - {label: "How to open an account", short_label: "Opening an account", payload: "account_opening_how"}
-      - {label: "Request a callback", payload: "request_callback"}
+      - {label: "Talk to a person", payload: "human_handoff"}
 
   - intent: savings_account
     label: "Savings account"
+    lead_topic: "Savings Account"
     category: accounts
     status: draft
     phrases:
@@ -65,7 +67,7 @@ intents:
       - "i want to start saving"
       - "account to keep my money and earn interest"
       - "can i withdraw anytime from savings"
-    answer_short: "Our Savings account earns 5% interest a year, with no monthly fees and a ZMW 100 minimum balance. Open one at any branch."
+    answer_short: "Our Savings Account earns 5% a year, credited monthly, with no monthly fee and up to two free withdrawals a month. Would you like to open one?"
     answer: |
       Our Savings account lets you deposit and withdraw at any time:
       - Minimum balance: ZMW 100
@@ -79,15 +81,15 @@ intents:
       account_opening_requirements: account_opening_requirements
       loan_requirements: account_opening_requirements
       business_account_requirements: account_opening_requirements
+    on_yes: lead:savings_account
+    on_no: savings_options
     buttons:
-      - {label: "What you need to open", short_label: "What you need", payload: "account_opening_requirements"}
-      - {label: "Savings Plan account", payload: "savings_plan_account"}
-      - {label: "Find a branch", payload: "branch_locator"}
-      - {label: "Fees & charges", payload: "fees_charges"}
-      - {label: "Request a callback", payload: "request_callback"}
+      - {label: "Yes, I'm interested", payload: "lead:savings_account"}
+      - {label: "Back", payload: "savings_options"}
 
   - intent: current_account
     label: "Current account (Tamanga)"
+    lead_topic: "Tamanga Current Account"
     short_label: "Tamanga account"
     category: accounts
     status: draft
@@ -113,7 +115,7 @@ intents:
       - "euro account"
       - "account to receive my salary"
       - "salary account"
-    answer_short: "Tamanga is our everyday current account: free to open, no minimum balance, and ZMW 36 a month. Available in ZMW, USD or EURO."
+    answer_short: "Looking for an account for everyday banking? Our Tamanga Current Account lets you bank in ZMW, USD or EUR. Would you like to open one or speak to our team?"
     answer: |
       Tamanga is our everyday current account, available in ZMW, USD, or
       EURO:
@@ -131,14 +133,16 @@ intents:
       account_opening_requirements: account_opening_requirements
       loan_requirements: account_opening_requirements
       business_account_requirements: account_opening_requirements
+    on_yes: account_opening_how
     buttons:
-      - {label: "Tamanga Plus (premium)", short_label: "Tamanga Plus", payload: "tamanga_plus_account"}
-      - {label: "What you need to open", short_label: "What you need", payload: "account_opening_requirements"}
-      - {label: "Fees & charges", payload: "fees_charges"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "Open an account", payload: "account_opening_how"}
+      - {label: "Tamanga Plus", payload: "tamanga_plus_account"}
+      - {label: "Speak to an agent", payload: "human_handoff"}
+      - {label: "Back to Accounts", payload: "account_types_overview"}
 
   - intent: tamanga_plus_account
     label: "Tamanga Plus (premium current account)"
+    lead_topic: "Tamanga Plus"
     short_label: "Tamanga Plus"
     category: accounts
     status: draft
@@ -159,7 +163,7 @@ intents:
       - "upgrade to tamanga plus"
       - "tamanga plus benefits"
       - "account with internet banking"
-    answer_short: "Tamanga Plus adds a cheque book and Online Banking (MyABZ) to Tamanga, for ZMW 135 a month. A branch can upgrade your Tamanga account."
+    answer_short: "Want more from your current account? Tamanga Plus gives you everything in Tamanga, plus Online Banking to manage your money anytime. Shall we help you get started?"
     answer: |
       Tamanga Plus has everything Tamanga has, plus a cheque book and
       Online Banking (MyABZ) access. Monthly maintenance fee: ZMW 135.
@@ -170,14 +174,15 @@ intents:
       account_opening_requirements: account_opening_requirements
       loan_requirements: account_opening_requirements
       business_account_requirements: account_opening_requirements
+    on_yes: lead:tamanga_plus_account
+    on_no: current_account
     buttons:
-      - {label: "Tamanga (standard)", payload: "current_account"}
-      - {label: "Bank statements", payload: "bank_statement_request"}
-      - {label: "Find a branch", payload: "branch_locator"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "Yes, I'm interested", payload: "lead:tamanga_plus_account"}
+      - {label: "Back", payload: "current_account"}
 
   - intent: business_account
     label: "Business account (Mukula Plus)"
+    lead_topic: "Mukula Plus business account"
     short_label: "Mukula Plus account"
     category: accounts
     status: draft
@@ -203,7 +208,7 @@ intents:
       - "business acc"
       - "account for my small business"
       - "account for a club or association"
-    answer_short: "Mukula Plus is our business current account, for companies, sole traders and clubs/NGOs/churches. No minimum balance; ZMW 200 a month."
+    answer_short: "Growing your business? Mukula Plus is our business account for companies, sole traders, partnerships, NGOs, churches, clubs and associations, in ZMW, USD or EUR. Shall we help you get started?"
     answer: |
       Mukula Plus is our corporate/business current account — for limited
       companies, sole traders/partnerships, and clubs/NGOs/churches/
@@ -218,11 +223,12 @@ intents:
       account_opening_requirements: business_account_requirements
       loan_requirements: business_account_requirements
       business_account_requirements: business_account_requirements
+    on_yes: lead:business_account
+    on_no: account_types_overview
     buttons:
-      - {label: "Documents needed by entity type", short_label: "Documents needed", payload: "business_account_requirements"}
-      - {label: "Business loans", payload: "msme_loan"}
-      - {label: "Find a branch", payload: "branch_locator"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "Yes, contact me", payload: "lead:business_account"}
+      - {label: "Documents needed", payload: "business_account_requirements"}
+      - {label: "Back to Accounts", payload: "account_types_overview"}
 
   - intent: business_account_requirements
     label: "Business account documents by entity type"
@@ -269,6 +275,7 @@ intents:
 
   - intent: savings_plan_account
     label: "Savings Plan account"
+    lead_topic: "Savings Plan"
     category: accounts
     status: draft
     phrases:
@@ -286,7 +293,7 @@ intents:
       - "save for a goal"
       - "goal savings account"
       - "savings plan minimum deposit"
-    answer_short: "The Savings Plan account earns up to 7% a year. You can deposit any time but not withdraw, so it's good for a savings goal. Start with ZMW 150."
+    answer_short: "Saving for a goal? Our Savings Plan earns up to 7% a year with no monthly fee, and limits withdrawals so you stay on track (6 months minimum). Ready to start?"
     answer: |
       The Savings Plan account lets you deposit any time, but withdrawals
       are blocked — good for a savings goal you don't want to dip into:
@@ -299,14 +306,15 @@ intents:
       account_opening_requirements: account_opening_requirements
       loan_requirements: account_opening_requirements
       business_account_requirements: account_opening_requirements
+    on_yes: lead:savings_plan_account
+    on_no: savings_options
     buttons:
-      - {label: "Savings account (flexible)", short_label: "Savings account", payload: "savings_account"}
-      - {label: "Kids Savings account", payload: "kids_savings_account"}
-      - {label: "Find a branch", payload: "branch_locator"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "Yes, contact me", payload: "lead:savings_plan_account"}
+      - {label: "Back", payload: "savings_options"}
 
   - intent: kids_savings_account
     label: "Kids Savings account"
+    lead_topic: "Kids Savings Account"
     category: accounts
     status: draft
     phrases:
@@ -327,7 +335,7 @@ intents:
       - "bank account for my kids"
       - "junior savings account"
       - "kids savings interest"
-    answer_short: "Kids Savings is for children under 16, opened by a guardian. It earns 7% a year with no monthly charges, from a ZMW 10 minimum balance."
+    answer_short: "Saving for your child's future? Our Kids Savings Account, for children under 16, earns 7% a year and builds good saving habits. Ready to start?"
     answer: |
       Kids Savings is a joint account opened for a minor (under 16) by
       their guardian:
@@ -337,13 +345,15 @@ intents:
       To open, bring your own ID/proof of residence/TPIN certificate plus
       the child's document (under-5 card, birth certificate, or birth
       record) to any branch.
+    on_yes: lead:kids_savings_account
+    on_no: savings_options
     buttons:
-      - {label: "Savings account (adult)", short_label: "Savings account", payload: "savings_account"}
-      - {label: "Find a branch", payload: "branch_locator"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "Yes, contact me", payload: "lead:kids_savings_account"}
+      - {label: "Back", payload: "savings_options"}
 
   - intent: term_deposit_account
     label: "Term Deposit Account (TDA)"
+    lead_topic: "Term Deposit"
     short_label: "Term deposit"
     category: accounts
     status: draft
@@ -365,7 +375,7 @@ intents:
       - "fix money for 90 days"
       - "where can i invest money"
       - "minimum amount for a fixed deposit"
-    answer_short: "A Term Deposit fixes your money for 30-365 days at about 9.3%-16% a year. Minimum ZMW 10,000, and you need a Savings or Current account first."
+    answer_short: "Our Term Deposit grows your money securely, for 30 to 365 days at up to 16% a year. Ready to start investing?"
     answer: |
       A Term Deposit Account (TDA) fixes your money for a chosen term to
       earn a higher interest rate:
@@ -379,10 +389,11 @@ intents:
       account_opening_requirements: account_opening_requirements
       loan_requirements: account_opening_requirements
       business_account_requirements: account_opening_requirements
+    on_yes: lead:term_deposit_account
+    on_no: invest_overview
     buttons:
-      - {label: "What you need to open", short_label: "What you need", payload: "account_opening_requirements"}
-      - {label: "Types of accounts", payload: "account_types_overview"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "Yes, contact me", payload: "lead:term_deposit_account"}
+      - {label: "Back", payload: "invest_overview"}
 
   - intent: joint_account
     label: "Joint accounts"
@@ -521,7 +532,7 @@ intents:
       - "opening an account"
       - "can i open an account on my phone"
       - "how do i become a customer"
-    answer_short: "Visit any branch with your documents. It's usually done the same day. Accounts can't be opened online."
+    answer_short: "Visit your nearest AB Bank branch with a valid original ID (NRC, passport or driver's licence), proof of residence and a TPIN certificate. Which account would you like to open?"
     answer: |
       Accounts are opened at any branch only — there's no online/remote
       account opening. Bring the right documents and it's usually done
@@ -530,9 +541,10 @@ intents:
     answer_simple: >-
       You open an account at a branch. Bring your documents with you. It is usually done on the same day.
     buttons:
-      - {label: "What to bring", payload: "account_opening_requirements"}
-      - {label: "Find a branch", payload: "branch_locator"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "Tamanga Current Account", short_label: "Tamanga account", payload: "lead:current_account"}
+      - {label: "Tamanga Plus", payload: "lead:tamanga_plus_account"}
+      - {label: "Savings Account", payload: "lead:savings_account"}
+      - {label: "Business Account", payload: "lead:business_account"}
 
   - intent: bank_statement_request
     label: "Getting a bank statement"
@@ -624,4 +636,41 @@ intents:
       it, or check the branch list.
     buttons:
       - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: savings_options
+    match: exact
+    label: "Savings options"
+    category: accounts
+    status: draft
+    phrases:
+      - "savings options"
+      - "savings accounts"
+      - "savings"
+      - "i want to save"
+    answer: |
+      Looking to grow your savings? We have savings options for everyday needs, future goals, or your child's future. Which one would you like to explore?
+    buttons:
+      - {label: "Savings Account", payload: "savings_account"}
+      - {label: "Savings Plan", payload: "savings_plan_account"}
+      - {label: "Kids Savings Account", short_label: "Kids Savings", payload: "kids_savings_account"}
+      - {label: "Back to Accounts", payload: "account_types_overview"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: invest_overview
+    match: exact
+    label: "Invest"
+    category: accounts
+    status: draft
+    phrases:
+      - "invest"
+      - "investments"
+      - "investing"
+      - "i want to invest"
+      - "save and invest"
+    answer: |
+      Looking to grow your money? Our investment solutions help your money work harder, for a future goal or higher returns. What would you like to explore?
+    buttons:
+      - {label: "Term Deposit", payload: "term_deposit_account"}
+      - {label: "Main menu", payload: "menu"}
       - {label: "Talk to a person", payload: "human_handoff"}

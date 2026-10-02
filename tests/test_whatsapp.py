@@ -65,8 +65,8 @@ def test_good_signature_stores_and_answers(meta_env):
     assert meta_env.post("whatsapp", payload("text")).status_code == 200
     meta_env.process()
     texts = meta_env.sent_texts("whatsapp")
-    assert any("mobile wallet" in t for t in texts)
-    assert any("automated helper" in t for t in texts)  # first contact discloses (§3.4)
+    assert any("digital wallet" in t for t in texts)
+    assert any("automated assistant" in t for t in texts)  # first contact discloses (§3.4)
 
 
 def test_duplicate_delivery_is_processed_once(meta_env):
@@ -295,7 +295,7 @@ def test_per_user_limit_does_not_throttle_other_customers(meta_env, monkeypatch)
     meta_env.process()
     log = audit.JSONL_FILE.read_text(encoding="utf-8")
     assert log.count("rate_limited") == 2
-    assert len([t for t in meta_env.sent_texts("whatsapp") if "mobile wallet" in t]) == 3
+    assert len([t for t in meta_env.sent_texts("whatsapp") if "digital wallet" in t]) == 3
 
 
 # --- privacy: the raw number is stored nowhere readable -----------------------------------------

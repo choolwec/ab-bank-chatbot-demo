@@ -24,8 +24,7 @@ def _to_summary(b, consent=None):
     b.tap(HUMAN)
     b.say("Mary Banda")
     b.say("0977123456")
-    b.say("a loan")
-    b.tap("time:Morning")
+    b.tap("time:Morning")  # the topic is never asked any more
     if consent:
         b.tap(f"marketing_consent:{consent}")
 
@@ -72,7 +71,7 @@ def test_consent_yes_is_stored_with_a_timestamp_and_shown_in_the_summary(bot):
     data = b.session.flow_state["data"]
     assert data["marketing_consent"] == "yes"
     assert data["marketing_consent_at"].endswith("+00:00")
-    assert "Mary Banda · 0977 123 456 · a loan · Morning · News and offers: yes" in b.text
+    assert "Mary Banda · 0977 123 456 · General enquiry · Morning · News and offers: yes" in b.text
 
 
 @pytest.mark.parametrize("typed, stored", [("yes", "yes"), ("no", "no"), ("I agree", "yes"), ("no thanks", "no")])
@@ -358,7 +357,7 @@ def _wa_say(meta_env, text):
 
 def test_whatsapp_token_is_recorded_and_stripped_before_matching(meta_env):
     _wa_say(meta_env, "what is etumba ref:CAIRO01")
-    assert any("mobile wallet" in t for t in meta_env.sent_texts("whatsapp"))
+    assert any("digital wallet" in t for t in meta_env.sent_texts("whatsapp"))
     assert [e[0] for e in _events("session_source")] == ["source: cairo01"]
     con = sqlite3.connect(audit.DB_FILE)
     user_texts = [r[0] for r in con.execute("SELECT text FROM events WHERE role='user'")]
@@ -420,9 +419,11 @@ def test_every_product_answer_offers_a_callback_in_one_tap(bot):
             continue
         b = bot()
         b.tap(name)
-        # "Request a callback" (request_callback) or, on the website where it
-        # means the same, "Talk to a person".
-        tap = next((p for p in (CALLBACK, HUMAN) if p in b.buttons), None)
+        # "Yes, contact me" (lead:<intent>), "Request a callback"
+        # (request_callback) or, on the website where it means the same,
+        # "Talk to a person".
+        leads = [p for p in b.buttons if p.startswith("lead:")]
+        tap = next((p for p in leads + [CALLBACK, HUMAN] if p in b.buttons), None)
         if not tap:
             missing.append(name)
             continue
@@ -439,7 +440,8 @@ def test_intent_files_declare_the_callback_button():
         for intent in yaml.safe_load(path.read_text(encoding="utf-8"))["intents"]:
             if intent.get("category") in PRODUCT_CATEGORIES and not intent.get("flow"):
                 payloads = [b["payload"] for b in intent.get("buttons", [])]
-                assert HUMAN in payloads or CALLBACK in payloads, intent["intent"]
+                has_lead = any(p.startswith("lead:") for p in payloads)
+                assert HUMAN in payloads or CALLBACK in payloads or has_lead, intent["intent"]
 
 
 def test_every_request_a_callback_button_uses_the_callback_payload():
@@ -473,14 +475,13 @@ def test_request_a_callback_starts_the_lead_flow_on_every_channel(bot, jira_mock
     b.session.user_hash = "0" * 32
     campaign.record(b.session, "cairo01")
     b.tap("savings_account")
-    assert CALLBACK in b.buttons
-    b.tap(CALLBACK)
+    assert "lead:savings_account" in b.buttons  # "Yes, I'm interested"
+    b.tap("lead:savings_account")
     assert b.session.active_flow == "lead"
-    assert b.last[1] == {"intent": "request_callback", "action": "flow_start"}
+    assert b.last[1] == {"intent": "request_callback", "action": "flow_start", "interest": "savings_account"}
     assert not b.session.slots.get("handoff_requested")  # no live-agent handoff
     b.say("Mary Banda")
-    b.say("0977123456")
-    b.say("a loan")
+    b.say("0977123456")  # never asked what it is about
     b.tap("time:Morning")
     assert "news and offers" in b.text  # MK2: consent is asked
     b.tap("marketing_consent:yes")
@@ -488,6 +489,7 @@ def test_request_a_callback_starts_the_lead_flow_on_every_channel(bot, jira_mock
     (kind, fields), = _tickets()
     assert kind == "callback"
     assert fields["marketing_consent"] == "yes" and fields["source"] == "cairo01"
+    assert fields["topic"] == "Savings Account" and fields["interests"] == "Savings Account"
 
 
 @pytest.mark.parametrize("channel", ["whatsapp", "messenger"])
@@ -499,12 +501,12 @@ def test_talk_to_a_person_keeps_its_live_agent_meaning(bot, monkeypatch, channel
 
 
 @pytest.mark.parametrize("channel", ["web", "whatsapp", "messenger"])
-@pytest.mark.parametrize("typed", ["Request a callback", "request callback", "6"])
+@pytest.mark.parametrize("typed", ["Request a callback", "request callback", "4"])
 def test_typed_label_or_number_picks_the_callback(bot, monkeypatch, channel, typed):
     _inbox_everywhere(monkeypatch)
     b = bot(channel=channel)
-    b.tap("account_types_overview")  # "More details" + five buttons, the sixth "Request a callback"
-    assert b.buttons[5] == CALLBACK
+    b.tap("loan_apply_how")  # "More details" + three buttons, the fourth "Request a callback"
+    assert b.buttons[3] == CALLBACK
     b.say(typed)
     assert b.session.active_flow == "lead", b.last
     assert b.last[1].get("intent") == "request_callback"
@@ -539,9 +541,9 @@ def test_rendered_ids_carry_the_callback_payload(bot):
             ids |= {r["id"] for sec in inter["action"]["sections"] for r in sec["rows"]}
         elif inter.get("type") == "button":
             ids |= {x["reply"]["id"] for x in inter["action"]["buttons"]}
-    assert CALLBACK in ids
+    assert "lead:savings_account" in ids  # "Yes, I'm interested"
     quick = render.messenger(b.last[0][-1])[-1]["quick_replies"]
-    assert CALLBACK in {q["payload"] for q in quick}
+    assert "lead:savings_account" in {q["payload"] for q in quick}
 
 
 def _wa_tap(meta_env, button_id):

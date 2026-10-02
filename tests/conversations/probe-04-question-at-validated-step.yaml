@@ -13,4 +13,4 @@ turns:
       text_lacks: [doesn't look like a valid number]
       strikes: 0
   - say: "0977123456"
-    expect: {flow_step: topic}
+    expect: {flow_step: time}

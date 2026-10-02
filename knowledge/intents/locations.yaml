@@ -127,3 +127,28 @@ intents:
       - {label: "Request a callback", payload: "request_callback"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Opening hours", payload: "opening_hours"}
+
+  - intent: complaints_feedback
+    match: exact
+    label: "Complaints & feedback"
+    short_label: "Complaints"
+    category: locations
+    status: draft
+    phrases:
+      - "complaints and feedback"
+      - "complaints & feedback"
+      - "feedback"
+      - "give feedback"
+      - "compliment"
+      - "suggestion"
+      - "complaints"
+    answer: |
+      We're here to listen. Share a compliment, complaint or suggestion:
+      Call: {contact_phone}
+      WhatsApp: {whatsapp_number}
+      Email: {contact_email}
+      Or visit any AB Bank branch, or submit it here and our team will contact you.
+    buttons:
+      - {label: "Submit a complaint", payload: "complaint"}
+      - {label: "Talk to an agent", payload: "human_handoff"}
+      - {label: "Main menu", payload: "menu"}

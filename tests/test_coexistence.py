@@ -157,7 +157,7 @@ def test_a_new_echo_extends_the_pause(coexist):
 def test_a_late_redelivered_echo_does_not_pause(coexist):
     echo(coexist, ts=time.time() - (HOURS + 1) * 3600)
     say(coexist, "what is etumba")
-    assert any("mobile wallet" in t for t in coexist.sent_texts("whatsapp"))
+    assert any("digital wallet" in t for t in coexist.sent_texts("whatsapp"))
     assert events("human_reply_echo_stale")
 
 
@@ -184,7 +184,7 @@ def test_the_bot_resumes_after_the_timeout(coexist):
     with coexist.store.session(KEY, "whatsapp") as (session, _):
         session.bot_paused_until = time.time() - 1  # COEXISTENCE_PAUSE_HOURS with no new echo
     say(coexist, "what is etumba")
-    assert "mobile wallet" in coexist.sent_texts("whatsapp")[-1]
+    assert "digital wallet" in coexist.sent_texts("whatsapp")[-1]
     session = state(coexist)
     assert coexistence.PAUSED_SLOT not in session.slots and session.bot_paused_until == 0
     (event,) = events("coexistence_resumed")
@@ -205,7 +205,7 @@ def test_the_bot_resumes_on_menu(coexist, how):
     assert session.bot_paused_until == 0 and coexistence.PAUSED_SLOT not in session.slots
     assert events("coexistence_resumed")
     say(coexist, "what is etumba")
-    assert "mobile wallet" in coexist.sent_texts("whatsapp")[-1]
+    assert "digital wallet" in coexist.sent_texts("whatsapp")[-1]
 
 
 def test_menu_inside_a_sentence_does_not_resume(coexist):
@@ -282,7 +282,7 @@ def test_with_the_flag_off_echoes_are_ignored_and_logged(meta_env, monkeypatch):
     assert session.bot_paused_until == 0 and coexistence.PAUSED_SLOT not in session.slots
     assert events("human_reply_echo_ignored") and not events("human_reply_echo")
     say(meta_env, "what is etumba")
-    assert "mobile wallet" in meta_env.sent_texts("whatsapp")[-1]
+    assert "digital wallet" in meta_env.sent_texts("whatsapp")[-1]
     say(meta_env, "someone stole my card")
     assert state(meta_env).active_flow == "fraud"  # the normal flow, as today
 
@@ -292,7 +292,7 @@ def test_turning_the_flag_off_lifts_a_running_pause(coexist, monkeypatch):
     echo(coexist)
     monkeypatch.setenv("COEXISTENCE_ENABLED", "false")
     say(coexist, "what is etumba")
-    assert "mobile wallet" in coexist.sent_texts("whatsapp")[-1]
+    assert "digital wallet" in coexist.sent_texts("whatsapp")[-1]
     assert "switched off" in events("coexistence_resumed")[0]["text"]
 
 

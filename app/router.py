@@ -20,12 +20,14 @@ from .matcher import CLAUSE_MIN_WORDS, CLAUSE_SPLIT_RE as _CLAUSE_SPLIT_RE, Matc
 
 matcher = Matcher()
 
+# The main menu (team flow document, V1/2026 section 1).
 MENU_BUTTONS = [
-    button("branches_agents", "branch_locator"),
-    button("open_an_account", "account_types_overview"),
-    button("etumba", "etumba_what_is"),
-    button("loans", "msme_loan"),
-    button("talk_to_a_person", "human_handoff"),
+    button("menu_accounts", "account_types_overview"),
+    button("menu_loans", "loans_overview"),
+    button("menu_invest", "invest_overview"),
+    button("menu_digital", "digital_banking"),
+    button("menu_complaints", "complaints_feedback"),
+    button("talk_to_an_agent", "human_handoff"),
 ]
 DEFAULT_BUTTONS = [
     button("main_menu", "menu"),
@@ -116,6 +118,13 @@ RESTART = "restart"
 RESTART_YES = "restart_yes"
 # "More details" under a short answer: the intent's full answer.
 DETAILS_PREFIX = "details:"
+# "Yes, contact me" on a product: the callback (lead) form, with that product
+# as the topic, so the customer is never asked what they want to discuss.
+LEAD_PREFIX = "lead:"
+# The products a customer looked at this conversation (intent ids, newest
+# last), for the lead's topic when they didn't tap a product's button.
+INTERESTS_SLOT = "interests"
+MAX_INTERESTS = 5
 
 
 def _urgent_confirm(kind, sub):
@@ -484,6 +493,13 @@ def _route(session, text, payload):
     # 3. Quick-reply payload → direct intent
     if payload == MORE_PAYLOAD:
         return _more_options(session)
+    if payload and payload.startswith(LEAD_PREFIX):
+        session.strikes = 0
+        interest = payload[len(LEAD_PREFIX):]
+        replies, done = FLOWS["lead"].start(session, kind=interest if matcher.get(interest) else None)
+        if done:
+            session.active_flow = None
+        return replies, {"intent": "request_callback", "action": "flow_start", "interest": interest}
     if payload and payload.startswith(DETAILS_PREFIX):
         intent = matcher.get(payload[len(DETAILS_PREFIX):])
         if intent:
@@ -1046,6 +1062,16 @@ def _continue_flow(session):
     )
 
 
+def is_product(intent):
+    """A product page (it has a `lead_topic`): viewing it is an interest."""
+    return bool(intent.get("lead_topic"))
+
+
+def note_interest(session, name):
+    seen = [n for n in session.slots.get(INTERESTS_SLOT, []) if n != name]
+    session.slots[INTERESTS_SLOT] = (seen + [name])[-MAX_INTERESTS:]
+
+
 def short_answer(intent, channel=None):
     """The text shown first: `answer_short` when the intent has one, unless
     the channel has its own variant of the answer (W9)."""
@@ -1082,7 +1108,7 @@ def _restart(session):
     session.transcript = []
     session.last_replies = []
     session.last_answer_intent = None
-    for key in ("context", "last_intent", "topic", "pending_urgent"):
+    for key in ("context", "last_intent", "topic", "pending_urgent", INTERESTS_SLOT):
         session.slots.pop(key, None)
     return [{"text": msg("welcome"), "buttons": list(MENU_BUTTONS)}], {"action": "restart"}
 
@@ -1150,10 +1176,14 @@ def _answer(session, intent, score, text=None, keep_context=False, full=False):
     if not answer:
         return [{"text": msg("fallback"), "buttons": list(MENU_BUTTONS)}], meta
     buttons = [dict(b) for b in intent.get("buttons", [])]
+    if is_product(intent):
+        note_interest(session, intent["intent"])
     if not full and short_answer(intent, session.channel) != answer:
-        # Short first; the full answer is one tap away.
+        # Short first; the full answer is one tap away (after "Yes, contact
+        # me" when there is one: the lead is the point of a product page).
         answer = short_answer(intent, session.channel)
-        buttons.insert(0, button("more_details", DETAILS_PREFIX + intent["intent"]))
+        at = 1 if buttons and buttons[0]["payload"].startswith(LEAD_PREFIX) else 0
+        buttons.insert(at, button("more_details", DETAILS_PREFIX + intent["intent"]))
     meta["action"] = "out_of_scope" if intent["intent"] == OUT_OF_SCOPE else "answer"
     reply = {"text": answer.strip(), "buttons": buttons}
     # An answer that ends in a yes/no question declares what each means (C3).

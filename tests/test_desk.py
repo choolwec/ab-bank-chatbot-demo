@@ -247,7 +247,7 @@ def test_resolving_the_conversation_resumes_the_bot(meta_env, desk):
     session = session_state(meta_env)
     assert session.bot_paused_until == 0 and bridge.CONVERSATION_SLOT not in session.slots
     wa(meta_env, "what is etumba")
-    assert "mobile wallet" in meta_env.sent_texts("whatsapp")[-1]
+    assert "digital wallet" in meta_env.sent_texts("whatsapp")[-1]
     assert not desk.posted(7, message_type="incoming")  # no longer forwarded
     assert events("desk_resolved")
 
@@ -257,7 +257,7 @@ def test_idle_fallback_unpauses_after_24_hours(meta_env, desk):
     with meta_env.store.session(KEY, "whatsapp") as (session, _):
         session.bot_paused_until = time.time() - 1  # DESK_IDLE_HOURS without an agent reply
     wa(meta_env, "what is etumba")
-    assert "mobile wallet" in meta_env.sent_texts("whatsapp")[-1]
+    assert "digital wallet" in meta_env.sent_texts("whatsapp")[-1]
     note = desk.posted(7, private=True)[-1]["content"]
     assert f"No agent reply for {config.DESK_IDLE_HOURS} hours" in note
     assert bridge.CONVERSATION_SLOT not in session_state(meta_env).slots
@@ -422,7 +422,7 @@ def test_a_chatwoot_outage_leaves_the_bot_answering(meta_env, desk):
     (failed,) = events("desk_failed")
     assert "HTTP 503" in failed["text"]
     wa(meta_env, "what is etumba")
-    assert "mobile wallet" in meta_env.sent_texts("whatsapp")[-1]
+    assert "digital wallet" in meta_env.sent_texts("whatsapp")[-1]
 
 
 def test_a_chatwoot_outage_withdraws_the_promise_of_a_person(meta_env, desk):

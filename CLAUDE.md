@@ -160,6 +160,20 @@ not incidental:
   The next message can then be "yes", "2", or a typed button label. Numbered
   picks need at least 2 real options, so "2" at a free-text step stays an
   answer. Any other message clears the expectation.
+- Lead generation (team flow document "Chatbot flow — simple guide", V1/2026,
+  2026-10-02): the main menu is Accounts / Loans / Invest / Digital Banking /
+  Complaints / Talk to an Agent (`router.MENU_BUTTONS`), with button-only
+  menu intents (`loans_overview`, `business_loan_options`, `savings_options`,
+  `invest_overview`, `digital_banking`, `complaints_feedback`). A product
+  intent has a `lead_topic`; viewing it is recorded in
+  `slots["interests"]` (newest last, at most 5, cleared by Clear chat). Its
+  "Yes, contact me" button (`lead:<intent>`, also its `on_yes`) starts the
+  lead flow with that product. The lead flow never asks the topic any more:
+  `topic` = the tapped product, else the last product viewed, else "General
+  enquiry", and `interests` lists every product viewed; both go on the
+  ticket and the Jira summary. Time slots: Morning / Afternoon / Anytime.
+  The welcome and greeting say "automated assistant" without "not a person"
+  (§3.4 disclosure still met).
 - Short answers first (2026-10-02): an intent with `answer_short` shows it
   with a **More details** button (`details:<intent>`, action `details`) that
   sends the full `answer`. A channel's `answer_by_channel` variant still wins.
@@ -173,8 +187,8 @@ not incidental:
   action. Inside a fraud report or complaint it asks first
   (`restart_confirm`, `flow_state["confirm_cancel"] = "restart"`).
 - Small talk ("how are you", "I'm fine", "what's your name", "ok", "haha",
-  "nice to meet you", "are you there") lives in `smalltalk.yaml` intents with
-  `match: exact`: answered only when the WHOLE normalised message is one of
+  "nice to meet you", "are you there"), the menu intents ("loans", "invest")
+  and `online_banking` use `match: exact`: answered only when the WHOLE normalised message is one of
   the phrases, and kept out of the scored TF-IDF index so it can never take a
   real question or move the E3 gates.
 - Every reply is guaranteed at least one button before `handle()` returns —

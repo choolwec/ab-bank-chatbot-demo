@@ -48,8 +48,8 @@ def test_verify_and_signature(meta_env):
 def test_text_gets_an_answer_with_quick_replies(meta_env):
     send(meta_env, "text")
     (reply,) = replies(meta_env)
-    assert "mobile wallet" in reply["message"]["text"]
-    assert "automated helper" in reply["message"]["text"]  # first contact discloses
+    assert "digital wallet" in reply["message"]["text"]
+    assert "automated assistant" in reply["message"]["text"]  # first contact discloses
     quick = reply["message"]["quick_replies"]
     assert 1 <= len(quick) <= 13 and all(len(q["title"]) <= 20 for q in quick)
     assert reply["messaging_type"] == "RESPONSE"

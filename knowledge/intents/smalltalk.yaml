@@ -17,6 +17,9 @@
 #              matches the generic intent gets the specific one (C9)
 #   answer_by_channel: (optional) {whatsapp|messenger|web: text} -- a channel
 #              variant of the answer, same facts (W9)
+#   lead_topic: (optional) a product: viewing it is recorded as an interest,
+#              and "Yes, contact me" (payload lead:<intent>) starts the
+#              callback form with this as the ticket's topic
 #   match:     (optional) "exact" -- small talk that answers only when the
 #              WHOLE message is one of its phrases; kept out of the scored
 #              matcher so it never captures a real question
@@ -53,13 +56,14 @@ intents:
       - "hello ab bank"
       - "mwabuka shani"
       - "mulishani"
-    answer: "Hi! I'm AB Bank's automated assistant, not a person. How can I help you today?"
+    answer: "👋 Hi! I'm AB Bank's automated assistant. How can I help you today?"
     buttons:
-      - {label: "Branches & agents", payload: "branch_locator"}
-      - {label: "Open an account", payload: "account_types_overview"}
-      - {label: "eTumba", payload: "etumba_what_is"}
-      - {label: "Loans", payload: "msme_loan"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "🏦 Accounts", payload: "account_types_overview"}
+      - {label: "💰 Loans", payload: "loans_overview"}
+      - {label: "💵 Invest", payload: "invest_overview"}
+      - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "💬 Complaints", payload: "complaints_feedback"}
+      - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
   - intent: thanks_goodbye
     label: "Thanks / goodbye"
@@ -131,11 +135,12 @@ intents:
       - "what services can you help with"
     answer: "I'm an automated assistant, not a person. I can help with branches, accounts, eTumba and loans, take fraud reports and complaints, or arrange a callback. I never ask for PINs or passwords."
     buttons:
-      - {label: "Branches & agents", payload: "branch_locator"}
-      - {label: "Open an account", payload: "account_types_overview"}
-      - {label: "eTumba", payload: "etumba_what_is"}
-      - {label: "Loans", payload: "msme_loan"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "🏦 Accounts", payload: "account_types_overview"}
+      - {label: "💰 Loans", payload: "loans_overview"}
+      - {label: "💵 Invest", payload: "invest_overview"}
+      - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "💬 Complaints", payload: "complaints_feedback"}
+      - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
   - intent: how_are_you
     match: exact
@@ -159,11 +164,12 @@ intents:
     answer: |
       I'm doing well, thank you for asking! How can I help you today?
     buttons:
-      - {label: "Branches & agents", payload: "branch_locator"}
-      - {label: "Open an account", payload: "account_types_overview"}
-      - {label: "eTumba", payload: "etumba_what_is"}
-      - {label: "Loans", payload: "msme_loan"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "🏦 Accounts", payload: "account_types_overview"}
+      - {label: "💰 Loans", payload: "loans_overview"}
+      - {label: "💵 Invest", payload: "invest_overview"}
+      - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "💬 Complaints", payload: "complaints_feedback"}
+      - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
   - intent: small_talk_fine
     match: exact
@@ -189,11 +195,12 @@ intents:
     answer: |
       Glad to hear it! What can I help you with today?
     buttons:
-      - {label: "Branches & agents", payload: "branch_locator"}
-      - {label: "Open an account", payload: "account_types_overview"}
-      - {label: "eTumba", payload: "etumba_what_is"}
-      - {label: "Loans", payload: "msme_loan"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "🏦 Accounts", payload: "account_types_overview"}
+      - {label: "💰 Loans", payload: "loans_overview"}
+      - {label: "💵 Invest", payload: "invest_overview"}
+      - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "💬 Complaints", payload: "complaints_feedback"}
+      - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
   - intent: bot_name
     match: exact
@@ -214,11 +221,12 @@ intents:
     answer: |
       I'm AB Bank's automated assistant. I don't have a name, but I'm here to help with your banking questions.
     buttons:
-      - {label: "Branches & agents", payload: "branch_locator"}
-      - {label: "Open an account", payload: "account_types_overview"}
-      - {label: "eTumba", payload: "etumba_what_is"}
-      - {label: "Loans", payload: "msme_loan"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "🏦 Accounts", payload: "account_types_overview"}
+      - {label: "💰 Loans", payload: "loans_overview"}
+      - {label: "💵 Invest", payload: "invest_overview"}
+      - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "💬 Complaints", payload: "complaints_feedback"}
+      - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
   - intent: acknowledgement
     match: exact
@@ -243,11 +251,12 @@ intents:
     answer: |
       Great! What else can I help you with?
     buttons:
-      - {label: "Branches & agents", payload: "branch_locator"}
-      - {label: "Open an account", payload: "account_types_overview"}
-      - {label: "eTumba", payload: "etumba_what_is"}
-      - {label: "Loans", payload: "msme_loan"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "🏦 Accounts", payload: "account_types_overview"}
+      - {label: "💰 Loans", payload: "loans_overview"}
+      - {label: "💵 Invest", payload: "invest_overview"}
+      - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "💬 Complaints", payload: "complaints_feedback"}
+      - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
   - intent: compliment
     match: exact
@@ -272,11 +281,12 @@ intents:
     answer: |
       Thank you, that's kind of you! Anything else I can help with?
     buttons:
-      - {label: "Branches & agents", payload: "branch_locator"}
-      - {label: "Open an account", payload: "account_types_overview"}
-      - {label: "eTumba", payload: "etumba_what_is"}
-      - {label: "Loans", payload: "msme_loan"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "🏦 Accounts", payload: "account_types_overview"}
+      - {label: "💰 Loans", payload: "loans_overview"}
+      - {label: "💵 Invest", payload: "invest_overview"}
+      - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "💬 Complaints", payload: "complaints_feedback"}
+      - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
   - intent: nice_to_meet_you
     match: exact
@@ -292,11 +302,12 @@ intents:
     answer: |
       Nice to meet you too! How can I help today?
     buttons:
-      - {label: "Branches & agents", payload: "branch_locator"}
-      - {label: "Open an account", payload: "account_types_overview"}
-      - {label: "eTumba", payload: "etumba_what_is"}
-      - {label: "Loans", payload: "msme_loan"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "🏦 Accounts", payload: "account_types_overview"}
+      - {label: "💰 Loans", payload: "loans_overview"}
+      - {label: "💵 Invest", payload: "invest_overview"}
+      - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "💬 Complaints", payload: "complaints_feedback"}
+      - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
   - intent: are_you_there
     match: exact
@@ -314,11 +325,12 @@ intents:
     answer: |
       Yes, I'm here! What can I help you with?
     buttons:
-      - {label: "Branches & agents", payload: "branch_locator"}
-      - {label: "Open an account", payload: "account_types_overview"}
-      - {label: "eTumba", payload: "etumba_what_is"}
-      - {label: "Loans", payload: "msme_loan"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "🏦 Accounts", payload: "account_types_overview"}
+      - {label: "💰 Loans", payload: "loans_overview"}
+      - {label: "💵 Invest", payload: "invest_overview"}
+      - {label: "📱 Digital Banking", payload: "digital_banking"}
+      - {label: "💬 Complaints", payload: "complaints_feedback"}
+      - {label: "📞 Talk to an Agent", payload: "human_handoff"}
 
   - intent: about_ab_bank
     label: "About AB Bank"

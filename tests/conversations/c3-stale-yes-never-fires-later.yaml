@@ -3,12 +3,11 @@ turns:
   - payload: human_handoff
   - say: Mary Banda
   - say: "0977123456"
-  - say: a loan
   - say: morning
   - say: "no"                   # MK2: news and offers? (not the summary's yes)
   - say: "yes"
     expect: {ticket_created: callback, text_contains: [anything else]}
-  - say: what is etumba          # moves on; the "anything else?" is gone
-    expect: {intent: etumba_what_is}
+  - say: what are your opening hours  # moves on; the "anything else?" is gone
+    expect: {intent: opening_hours}
   - say: "yes"
     expect: {action_in: [fallback, did_you_mean, answer, two_strike]}

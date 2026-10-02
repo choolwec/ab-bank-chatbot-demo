@@ -97,8 +97,8 @@ intents:
     answer_simple: >-
       I can't help with that. I can help with accounts, eTumba, loans and branches.
     buttons:
-      - {label: "Open an account", payload: "account_types_overview"}
-      - {label: "eTumba", payload: "etumba_what_is"}
-      - {label: "Loans", payload: "msme_loan"}
+      - {label: "🏦 Accounts", payload: "account_types_overview"}
+      - {label: "💰 Loans", payload: "loans_overview"}
+      - {label: "📱 Digital Banking", payload: "digital_banking"}
       - {label: "Branches & agents", payload: "branch_locator"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "📞 Talk to an Agent", payload: "human_handoff"}

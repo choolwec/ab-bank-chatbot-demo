@@ -2,4 +2,4 @@ id: c2-zero-on-the-menu
 turns:
   - say: what is etumba
   - say: "0"
-    expect: {action: menu, active_flow: null, last_buttons_include: [branch_locator, human_handoff]}
+    expect: {action: menu, active_flow: null, last_buttons_include: [account_types_overview, human_handoff]}

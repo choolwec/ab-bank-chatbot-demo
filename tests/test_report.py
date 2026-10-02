@@ -412,7 +412,6 @@ def test_correction_is_logged_without_the_value(bot):
     b.tap("human_handoff")
     b.say("Mary")
     b.say("0977123456")
-    b.say("a loan")
     b.say("sorry my number is actually 0966123456")
     assert b.session.flow_state["data"]["phone"] == "0966123456"
     con = sqlite3.connect(audit.DB_FILE)

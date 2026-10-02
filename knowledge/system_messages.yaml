@@ -20,10 +20,10 @@ messages:
   welcome:
     status: draft
     text: |
-      Hi! I'm AB Bank's automated assistant, not a person. How can I help you today?
+      👋 Welcome to AB Bank! I'm an automated assistant here to help with our products and services, and to connect you with our team. How can I help you today?
   disclosure:
     status: draft
-    text: I'm the AB Bank assistant — an automated helper, not a person.
+    text: I'm AB Bank's automated assistant.
   resume:
     status: draft
     text: Welcome back! What can I help with?
@@ -323,26 +323,35 @@ messages:
 
   # --- Callback (lead) flow -------------------------------------------------------------
   lead.topic_label: {status: draft, text: callback request}
+  lead.intro.agent:
+    status: draft
+    text: Of course. We're happy to help. Please share your details and an AB Bank Contact Centre representative will get in touch with you.
+  lead.intro.interest:
+    status: draft
+    fills: [topic]
+    text: Great! Share your details and our Contact Centre will contact you about {topic}.
+  lead.topic_general: {status: draft, text: General enquiry}
   lead.step.name:
     status: draft
-    text: |-
-      Of course — I'll arrange for our team to call you back.
-      What's your name?
+    text: What's your full name?
   lead.step.phone:
     status: draft
     text: What phone number should we call?
   lead.step.topic:
     status: draft
+    legal_note: >-
+      Not asked any more (2026-10-02): the topic comes from the product the
+      customer tapped "Yes, contact me" on, or the products they viewed.
     text: What would you like to discuss?
   lead.step.time:
     status: draft
-    text: When is best to call — morning or afternoon?
+    text: When is best to call — morning, afternoon or anytime?
   lead.finish_out_of_hours:
     status: draft
     fills: [ref, when]
     text: |-
-      Done — that's everything I need. Our team is away right now, so they'll call you {when}, as soon as they're back. Your reference is {ref}.
-      Is there anything else I can help with in the meantime?
+      Thank you. Our Contact Centre is closed right now, so a representative will contact you {when}. Your reference is {ref}.
+      Anything else I can help with?
   lead.retry.phone:
     status: draft
     text: That doesn't look like a valid number — please send it as 09XXXXXXX (10 digits), 260XXXXXXXXX (12 digits), or +260XXXXXXXXX, so our team can actually reach you.
@@ -371,7 +380,7 @@ messages:
     status: draft
     fills: [ref]
     text: |-
-      Done! Our team will call you within one working day. Your reference is {ref}.
+      Thank you. One of our Contact Centre representatives will contact you shortly. Your reference is {ref}.
       Anything else I can help with?
 
   # --- Marketing opt-out (MK2) ------------------------------------------------------------
@@ -448,6 +457,13 @@ messages:
   button.a_branch: {status: draft, text: "A branch"}
   button.about_etumba: {status: draft, text: "About eTumba"}
   button.afternoon: {status: draft, text: "Afternoon"}
+  button.anytime: {status: draft, text: "Anytime"}
+  button.menu_accounts: {status: draft, text: "🏦 Accounts"}
+  button.menu_loans: {status: draft, text: "💰 Loans"}
+  button.menu_invest: {status: draft, text: "💵 Invest"}
+  button.menu_digital: {status: draft, text: "📱 Digital Banking"}
+  button.menu_complaints: {status: draft, text: "💬 Complaints"}
+  button.talk_to_an_agent: {status: draft, text: "📞 Talk to an Agent"}
   button.an_etumba_agent: {status: draft, text: "An eTumba agent"}
   button.back_to_menu: {status: draft, text: "Back to menu"}
   button.branches_agents: {status: draft, text: "Branches & agents"}

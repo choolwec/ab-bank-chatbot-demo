@@ -190,7 +190,6 @@ def test_time_button_payload_is_stored_as_its_value(bot):
     b.tap("human_handoff")
     b.say("Mary")
     b.say("0977123456")
-    b.say("a loan")
     b.tap("time:Afternoon")
     assert b.session.flow_state["data"]["time"] == "Afternoon"
 

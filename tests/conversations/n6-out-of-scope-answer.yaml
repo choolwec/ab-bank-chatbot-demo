@@ -6,5 +6,5 @@ turns:
       strikes: 0
       text_contains: ["not something I can help with"]
       last_buttons_include: [human_handoff]
-  - say: loan
+  - say: a loan                 # a bare "loan" now opens the Loans menu
     expect: {action: did_you_mean, last_buttons_include: [human_handoff]}

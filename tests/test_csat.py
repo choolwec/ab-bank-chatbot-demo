@@ -228,7 +228,7 @@ def test_stale_tap_mid_flow_is_never_stored_as_an_answer(bot, rate):
     assert b.action == "csat:down"
     assert b.session.active_flow == "lead"
     assert "name" not in b.session.flow_state["data"]
-    assert "what's your name" in b.text.lower()
+    assert "what's your full name" in b.text.lower()
     assert b.buttons[0] == "human_handoff"
     b.say("Mary")
     assert b.session.flow_state["data"]["name"] == "Mary"

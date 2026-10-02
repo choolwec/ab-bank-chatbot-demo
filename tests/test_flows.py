@@ -23,7 +23,7 @@ def _all_text(data):
 def test_welcome_discloses_and_offers_menu(client):
     data = chat(client)
     text = data["replies"][0]["text"].lower()
-    assert "automated" in text and "not a person" in text
+    assert "automated assistant" in text
     buttons = data["replies"][-1]["buttons"]
     assert any(b["payload"] == "human_handoff" for b in buttons)
 
@@ -74,13 +74,12 @@ def test_callback_flow_promises_one_working_day(client):
     sid = new_session(client)
     chat(client, sid, payload="human_handoff")
     chat(client, sid, message="Choolwe")
-    chat(client, sid, message="0977123456")
-    chat(client, sid, message="Opening a business account")
+    chat(client, sid, message="0977123456")  # no "what would you like to discuss?"
     chat(client, sid, payload="Morning")
     chat(client, sid, payload="marketing_consent:no")  # MK2
     data = chat(client, sid, payload="confirm_yes")
     text = _all_text(data)
-    assert "one working day" in text
+    assert "will contact you shortly" in text
     assert re.search(r"CBK-\d{8}-[A-Z0-9]{4}", text)
     # the closing question gets an explicit, unambiguous button
     assert any(b["payload"] == "thanks_goodbye" for b in data["replies"][-1]["buttons"])
@@ -94,7 +93,7 @@ def test_callback_flow_rejects_invalid_phone_and_reprompts(client):
     assert "doesn't look like a valid number" in _all_text(data)
     # still on the phone step — a valid number now must be accepted
     data = chat(client, sid, message="0977123456")
-    assert "what would you like to discuss" in _all_text(data).lower()
+    assert "when is best to call" in _all_text(data).lower()
 
 
 @pytest.mark.parametrize(
@@ -106,7 +105,7 @@ def test_callback_flow_accepts_valid_phone_formats(client, phone):
     chat(client, sid, payload="human_handoff")
     chat(client, sid, message="Choolwe")
     data = chat(client, sid, message=phone)
-    assert "what would you like to discuss" in _all_text(data).lower()
+    assert "when is best to call" in _all_text(data).lower()
 
 
 def test_saying_no_after_callback_is_recognised_as_goodbye(client):
@@ -418,10 +417,9 @@ def test_callback_summary_reads_the_phone_back(bot):
     b.say("0977123456")
     assert "Got it: 0977 123 456." in b.text
     assert len(b.last[0]) == 1  # read-back rides on the next prompt
-    b.say("a loan")
     b.tap("Morning")
     b.tap("marketing_consent:yes")  # MK2
-    assert "Mary Banda · 0977 123 456 · a loan · Morning · News and offers: yes" in b.text
+    assert "Mary Banda · 0977 123 456 · General enquiry · Morning · News and offers: yes" in b.text
 
 
 def test_pre_c7_edit_button_still_works(bot):

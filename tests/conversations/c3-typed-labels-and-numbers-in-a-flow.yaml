@@ -3,8 +3,7 @@ turns:
   - payload: human_handoff
   - say: Mary Banda
   - say: "0977123456"
-  - say: a loan
-  - say: "2"                    # Morning / Afternoon / Back to menu
+  - say: "2"                    # Morning / Afternoon / Anytime / Back to menu
     expect: {flow_data_has: {time: Afternoon}, text_contains: [news and offers]}
   - say: "1"                    # MK2: Yes, send offers / No thanks / Back to menu
     expect: {flow_data_has: {marketing_consent: "yes"}, text_contains: [shall i send it]}

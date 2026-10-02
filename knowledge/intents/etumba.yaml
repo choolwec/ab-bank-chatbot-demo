@@ -1,6 +1,7 @@
 intents:
   - intent: etumba_what_is
     label: "What is eTumba?"
+    lead_topic: "eTumba registration"
     category: etumba
     status: draft
     phrases:
@@ -20,7 +21,7 @@ intents:
       - "ab bank mobile money"
       - "what can i do with etumba"
       - "tell me about the etumba wallet"
-    answer_short: "eTumba is our mobile wallet. Send money, buy airtime and pay bills from any phone: just dial {ussd_code}. No internet needed."
+    answer_short: "eTumba is AB Bank's digital wallet: buy airtime, pay bills, make transfers and save with Yaka Savings, from any phone ({ussd_code}). Would you like to register?"
     answer: |
       eTumba is AB Bank Zambia's mobile wallet. It lets you send and
       receive money, buy airtime on MTN, Airtel and Zamtel, pay ZESCO and
@@ -36,11 +37,13 @@ intents:
       loan_requirements: etumba_register
       business_account_requirements: etumba_register
       account_opening_how: etumba_register
+    on_yes: lead:etumba_what_is
+    on_no: digital_banking
     buttons:
-      - {label: "Register for eTumba", payload: "etumba_register"}
-      - {label: "eTumba fees", payload: "etumba_fees"}
+      - {label: "Yes, contact me", payload: "lead:etumba_what_is"}
+      - {label: "Register myself", payload: "etumba_register"}
       - {label: "Find an agent", payload: "agent_locator"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "Back", payload: "digital_banking"}
 
   - intent: etumba_register
     label: "Register for eTumba"
@@ -388,3 +391,49 @@ intents:
     buttons:
       - {label: "Using *888#", payload: "etumba_ussd"}
       - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: digital_banking
+    match: exact
+    label: "Digital banking"
+    category: etumba
+    status: draft
+    phrases:
+      - "digital banking"
+      - "digital"
+      - "mobile banking"
+      - "banking on my phone"
+    answer: |
+      Banking on the go? What would you like to know about?
+    buttons:
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Online Banking", payload: "online_banking"}
+      - {label: "Main menu", payload: "menu"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: online_banking
+    match: exact
+    label: "Online Banking"
+    lead_topic: "Internet Banking registration"
+    category: etumba
+    status: draft
+    phrases:
+      - "online banking"
+      - "internet banking"
+      - "myabz"
+      - "my abz"
+      - "register for internet banking"
+      - "register for online banking"
+      - "sign up for online banking"
+      - "i want internet banking"
+      - "i want online banking"
+    answer_short: "Internet Banking gives you secure access to your accounts anytime: check balances, see transactions and send money, up to K300,000 a day. Would you like to register?"
+    answer: |
+      AB Bank Internet Banking gives you secure access to your accounts anytime,
+      anywhere. You can check your account balance, view transactions, transfer
+      funds between AB Bank accounts, and send money to other banks across Zambia.
+      You can transfer up to K300,000 per day.
+    on_yes: lead:online_banking
+    on_no: digital_banking
+    buttons:
+      - {label: "Yes, contact me", payload: "lead:online_banking"}
+      - {label: "Back", payload: "digital_banking"}

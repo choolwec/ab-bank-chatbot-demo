@@ -7,7 +7,6 @@ def _callback(b, name="Mary Banda"):
     b.tap("human_handoff")
     b.say(name)
     b.say("0977123456")
-    b.say("a loan")
     b.tap("Morning")
     b.tap("confirm_yes")
 
@@ -20,7 +19,7 @@ def test_acknowledgements_rotate_deterministically(bot):
         b.say("Mary Banda")
         b.say("0977123456")
         seen = [b.text.split("\n")[0]]
-        b.say("a loan")
+        b.tap("time:Morning")
         seen.append(b.text.split("\n")[0])
         runs.append(seen)
     assert runs[0] == runs[1]  # same conversation -> same wording
@@ -54,7 +53,7 @@ def test_name_that_is_not_a_name_is_not_repeated(bot):
 
 def test_did_you_mean_names_the_category(bot):
     b = bot()
-    b.say("loan")
+    b.say("a loan")  # a bare "loan" opens the Loans menu
     assert b.action == "did_you_mean"
     assert "I can see this is about loans" in b.text
 

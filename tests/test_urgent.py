@@ -115,11 +115,11 @@ def test_soft_signal_mid_flow_no_resumes_the_flow(bot):
     b.tap("human_handoff")
     b.say("Mary")
     b.say("0977123456")
-    b.say("my money is gone")  # at the topic step
+    b.say("my money is gone")  # at the time step
     assert b.action == "urgent_confirm:fraud"
     b.tap(URGENT_NO)
     assert b.session.active_flow == "lead"
-    assert "what would you like to discuss" in b.text.lower()
+    assert "when is best to call" in b.text.lower()
 
 
 def test_pending_confirmation_expires_after_one_message(bot):
@@ -171,4 +171,4 @@ def test_stale_confirmation_button_mid_flow_keeps_the_flow(bot):
     b.say("Mary")
     b.tap(URGENT_YES)
     assert b.session.active_flow == "lead"
-    assert b.session.flow_state["data"] == {"name": "Mary"}
+    assert b.session.flow_state["data"] == {"name": "Mary", "topic": "General enquiry"}

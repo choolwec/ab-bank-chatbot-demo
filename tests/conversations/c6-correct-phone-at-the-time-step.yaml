@@ -3,13 +3,12 @@ turns:
   - payload: human_handoff
   - say: Mary Banda
   - say: "0977123456"
-  - say: a business loan
   - say: actually my number is 0966 123 456
     expect:
       flow_step: time
-      flow_data_has: {phone: "0966123456", topic: business loan}
-      text_contains: ["updated your phone to 0966 123 456", morning or afternoon]
+      flow_data_has: {phone: "0966123456", topic: General enquiry}
+      text_contains: ["updated your phone to 0966 123 456", "morning, afternoon or anytime"]
   - payload: Morning
     expect: {text_contains: [news and offers]}
   - payload: "marketing_consent:no"
-    expect: {text_contains: ["Mary Banda · 0966 123 456 · a business loan · Morning · News and offers: no"]}
+    expect: {text_contains: ["Mary Banda · 0966 123 456 · General enquiry · Morning · News and offers: no"]}

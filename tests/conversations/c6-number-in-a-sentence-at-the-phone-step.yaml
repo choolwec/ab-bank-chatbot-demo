@@ -3,4 +3,4 @@ turns:
   - payload: human_handoff
   - say: Mary
   - say: my number is 0977 123 456
-    expect: {flow_step: topic, flow_data_has: {phone: "0977123456"}}
+    expect: {flow_step: time, flow_data_has: {phone: "0977123456"}}

@@ -11,5 +11,5 @@ turns:
   - payload: human_handoff
   - say: Mary
   - say: "0977123456"
-  - say: Opening a business account
-    expect: {flow_step: time, flow_data_has: {topic: business account}}
+    # The callback topic is no longer asked (2026-10-02): nothing to digress from.
+    expect: {flow_step: time, flow_data_has: {topic: General enquiry}}

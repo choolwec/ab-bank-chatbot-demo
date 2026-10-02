@@ -1,4 +1,9 @@
-"""Callback capture ("talk to a person", §3.1A): name, phone, topic, time.
+"""Callback capture ("talk to a person", §3.1A): name, phone, time.
+
+The topic is never asked (team flow document, 2026-10-02): it is the product
+the customer tapped "Yes, contact me" on (`kind`), else the last product they
+looked at, else "General enquiry". Every product viewed goes on the ticket as
+`interests`, so the Contact Centre knows what to offer.
 
 Routed to staff with a realistic response-time promise — within one working
 day. The transcript rides along so the customer never repeats themselves.
@@ -73,6 +78,23 @@ def consent_answer(text):
     return None
 
 
+def _label(name):
+    from ..router import matcher  # the router imports the flows
+
+    intent = matcher.get(name) or {}
+    return intent.get("lead_topic") or intent.get("label") or name
+
+
+def _interest(session, kind):
+    """(topic, interests) for the ticket: the product asked about, else the
+    last one viewed, else a general enquiry; and every product viewed."""
+    viewed = [n for n in session.slots.get("interests", [])]
+    if kind and kind not in viewed:
+        viewed.append(kind)
+    topic = _label(kind) if kind else (_label(viewed[-1]) if viewed else msg("lead.topic_general"))
+    return topic, ", ".join(_label(n) for n in viewed)
+
+
 def _now_iso():
     return dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
 
@@ -101,13 +123,34 @@ class LeadFlow(FormFlow):
     def correctable(self):
         return frozenset({"phone"})  # consent is changed with its buttons
 
-    def message_keys(self):
-        return super().message_keys() + [
+    def _base_message_keys(self):
+        return [
             "lead.finish", "lead.finish_out_of_hours", "read_back",
             "lead.summary.marketing_consent_yes", "lead.summary.marketing_consent_no",
         ]
 
+    def start(self, session, kind=None, trigger=None):
+        replies, done = super().start(session, kind=kind, trigger=trigger)
+        topic, interests = _interest(session, kind)
+        data = session.flow_state["data"]
+        data["topic"] = topic
+        if interests:
+            data["interests"] = interests
+        return replies, done
+
+    def intro(self, session, kind):
+        if kind:
+            return [{"text": msg("lead.intro.interest", topic=_label(kind)), "buttons": []}]
+        return [{"text": msg("lead.intro.agent"), "buttons": []}]
+
+    def message_keys(self):
+        return super().message_keys() + self._base_message_keys() + [
+            "lead.intro.agent", "lead.intro.interest", "lead.topic_general",
+        ]
+
     def skip_step(self, session, field):
+        if field == "topic":
+            return True  # filled from what the customer looked at, never asked
         if field != CONSENT:
             return False
         return not config.marketing_consent_enabled() or bool(session.slots.get(OPT_OUT_SLOT))
@@ -144,6 +187,7 @@ class LeadFlow(FormFlow):
             prompt["buttons"] = [
                 button("morning", "time:Morning"),
                 button("afternoon", "time:Afternoon"),
+                button("anytime", "time:Anytime"),
                 CANCEL_BUTTON,
             ]
         elif self.steps[i] == CONSENT:

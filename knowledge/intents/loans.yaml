@@ -1,13 +1,13 @@
 intents:
   - intent: msme_loan
     label: "Business (MSME) loans"
+    lead_topic: "Business loan"
     short_label: "Business loans"
     category: loans
     status: draft
     phrases:
       - "business loan"
       - "busines loan"
-      - "loan for my business"
       - "msme loan"
       - "sme loan"
       - "i need money for my shop"
@@ -42,10 +42,10 @@ intents:
       business_account_requirements: loan_requirements
       account_opening_how: loan_apply_how
     buttons:
+      - {label: "Yes, contact me", payload: "lead:msme_loan"}
       - {label: "Loan requirements", payload: "loan_requirements"}
       - {label: "How to apply", payload: "loan_apply_how"}
-      - {label: "SME overdraft", payload: "sme_overdraft"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "Back", payload: "loans_overview"}
 
   - intent: agri_loan
     label: "Loans for farming businesses"
@@ -89,6 +89,7 @@ intents:
 
   - intent: personal_loan
     label: "Personal loans (government employees)"
+    lead_topic: "Personal loan"
     short_label: "Personal loans"
     category: loans
     status: draft
@@ -122,12 +123,13 @@ intents:
       from your employer, 2 latest pay slips, and 2 months' bank
       statements.
     buttons:
+      - {label: "Yes, contact me", payload: "lead:personal_loan"}
       - {label: "How to apply", payload: "loan_apply_how"}
-      - {label: "Find a branch", payload: "branch_locator"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "Back", payload: "loans_overview"}
 
   - intent: sme_overdraft
     label: "SME overdraft"
+    lead_topic: "SME Overdraft"
     category: loans
     status: draft
     phrases:
@@ -146,7 +148,7 @@ intents:
       - "can i get an overdraft"
       - "overdraft for my company"
       - "overdraft limit"
-    answer_short: "An SME overdraft is typically up to 30% of your average monthly turnover. You need business registration and collateral; the arrangement fee is 5%."
+    answer_short: "An SME overdraft gives your business extra cash flow, typically up to 30% of your average monthly turnover. Would you like us to contact you?"
     answer: |
       SME overdraft requirements:
       - Valid business registration and operating licences
@@ -159,9 +161,11 @@ intents:
       account_opening_requirements: loan_requirements
       business_account_requirements: loan_requirements
       account_opening_how: loan_apply_how
+    on_yes: lead:sme_overdraft
+    on_no: loans_overview
     buttons:
-      - {label: "Business loans", payload: "msme_loan"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "Yes, contact me", payload: "lead:sme_overdraft"}
+      - {label: "Back", payload: "loans_overview"}
 
   - intent: loan_requirements
     label: "Loan requirements"
@@ -299,3 +303,97 @@ intents:
       - {label: "Loan requirements", payload: "loan_requirements"}
       - {label: "Find a branch", payload: "branch_locator"}
       - {label: "Request a callback", payload: "request_callback"}
+
+  - intent: loans_overview
+    match: exact
+    label: "Loans"
+    category: loans
+    status: draft
+    phrases:
+      - "loans"
+      - "loan"
+      - "business financing"
+      - "financing"
+    answer: |
+      Looking for business financing? We support working capital, expansion and asset purchases. How can we help your business today?
+    buttons:
+      - {label: "Business Loan", payload: "business_loan_options"}
+      - {label: "SME Overdraft", payload: "sme_overdraft"}
+      - {label: "Personal loan", payload: "personal_loan"}
+      - {label: "Main menu", payload: "menu"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: business_loan_options
+    match: exact
+    label: "Business loans"
+    category: loans
+    status: draft
+    phrases:
+      - "business loan options"
+      - "types of business loans"
+    answer: |
+      Looking for financing to start, grow or support your business? Choose the product you're interested in:
+    buttons:
+      - {label: "Trader Mobility Loan", payload: "trader_mobility_loan"}
+      - {label: "Micro Loan", payload: "micro_loan"}
+      - {label: "SME Loan", payload: "sme_loan"}
+      - {label: "Back", payload: "loans_overview"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: trader_mobility_loan
+    label: "Trader Mobility Loan"
+    lead_topic: "Trader Mobility Loan"
+    category: loans
+    status: draft
+    phrases:
+      - "trader mobility loan"
+      - "loan for a motorbike"
+      - "motorbike loan"
+      - "tricycle loan"
+      - "finance a tricycle"
+      - "three wheeler loan"
+      - "walking tractor loan"
+      - "loan to buy a motorbike for my business"
+    answer: |
+      Our Trader Mobility Loan finances motorbikes, tricycles, three-wheelers and walking tractors, so your business can reach more customers and make more deliveries. Ready to make your next move?
+    on_yes: lead:trader_mobility_loan
+    on_no: business_loan_options
+    buttons:
+      - {label: "Yes, contact me", payload: "lead:trader_mobility_loan"}
+      - {label: "Back", payload: "business_loan_options"}
+
+  - intent: micro_loan
+    label: "Micro Loan"
+    lead_topic: "Micro Loan"
+    category: loans
+    status: draft
+    phrases:
+      - "micro loan"
+      - "microloan"
+      - "loan for market traders"
+      - "small loan for my shop"
+      - "loan for my stall"
+    answer: |
+      Our Micro Loan is for small businesses, market traders and shop owners who want to grow, manage cash flow or invest, with flexible repayments. Ready to take the next step?
+    on_yes: lead:micro_loan
+    on_no: business_loan_options
+    buttons:
+      - {label: "Yes, contact me", payload: "lead:micro_loan"}
+      - {label: "Back", payload: "business_loan_options"}
+
+  - intent: sme_loan
+    label: "SME Loan"
+    lead_topic: "SME Loan"
+    category: loans
+    status: draft
+    phrases:
+      - "loan to expand my business"
+      - "loan to buy equipment"
+      - "loan to increase stock"
+    answer: |
+      Our SME Loan helps small and medium businesses invest in growth, buy equipment, increase stock or strengthen operations. Ready to grow your business?
+    on_yes: lead:sme_loan
+    on_no: business_loan_options
+    buttons:
+      - {label: "Yes, contact me", payload: "lead:sme_loan"}
+      - {label: "Back", payload: "business_loan_options"}

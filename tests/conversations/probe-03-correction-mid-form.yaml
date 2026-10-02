@@ -7,7 +7,7 @@ turns:
   - say: sorry my number is actually 0966123456
     expect:
       active_flow: lead
-      flow_step: topic
+      flow_step: time
       flow_data_has: {phone: "0966123456"}
-      flow_data_lacks: {topic: sorry}
+      flow_data_lacks: {time: sorry}
       text_contains: ["0966 123 456"]

@@ -34,8 +34,8 @@ def test_short_answer_first_then_details(bot):
     b = bot()
     b.tap("savings_account")
     assert b.text == _render(SHORT["savings_account"]["answer_short"])
-    assert b.buttons[0] == DETAILS_PREFIX + "savings_account"
-    assert "Request a callback" in [x["label"] for x in b.last[0][-1]["buttons"]]
+    # The lead button first, then "More details".
+    assert b.buttons[:2] == ["lead:savings_account", DETAILS_PREFIX + "savings_account"]
 
     b.tap(DETAILS_PREFIX + "savings_account")
     assert b.action == "details"
@@ -48,7 +48,7 @@ def test_typed_question_gets_the_short_answer(bot):
     b.say("how do i open a savings acount")
     assert b.action == "answer"
     assert len(b.text.split()) <= 32
-    assert b.buttons[0].startswith(DETAILS_PREFIX)
+    assert any(p.startswith(DETAILS_PREFIX) for p in b.buttons[:2])
 
 
 def test_channel_variant_still_wins_on_whatsapp(bot):
@@ -82,14 +82,14 @@ def test_small_talk_only_on_the_whole_message():
     top = M.match("how are your loans priced")[0][0]
     assert top not in SMALL_TALK
     for intent in SMALL_TALK.values():
-        assert intent["category"] == "smalltalk"
+        assert intent["phrases"], intent["intent"]  # an exact intent needs its phrases
 
 
 def test_greeting_is_short_and_still_discloses(bot):
     b = bot()
     b.say("hello")
     assert b.last[1].get("intent") == "greeting"
-    assert "automated assistant" in b.text and "not a person" in b.text
+    assert "automated assistant" in b.text and "not a person" not in b.text
     assert len(b.text.split()) <= 20
 
 

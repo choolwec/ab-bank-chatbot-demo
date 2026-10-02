@@ -86,6 +86,29 @@
   font-weight: 400;
 }
 
+.abz-tools {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.abz-clear {
+  border: 1px solid #ffffff;
+  border-radius: 1rem;
+  background: transparent;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.2rem 0.65rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.abz-clear:hover { background: rgba(255, 255, 255, 0.15); }
+.abz-clear:disabled { opacity: 0.6; cursor: default; }
+
 .abz-close {
   border: 0;
   background: transparent;

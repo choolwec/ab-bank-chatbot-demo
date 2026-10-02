@@ -160,6 +160,23 @@ not incidental:
   The next message can then be "yes", "2", or a typed button label. Numbered
   picks need at least 2 real options, so "2" at a free-text step stays an
   answer. Any other message clears the expectation.
+- Short answers first (2026-10-02): an intent with `answer_short` shows it
+  with a **More details** button (`details:<intent>`, action `details`) that
+  sends the full `answer`. A channel's `answer_by_channel` variant still wins.
+  C10 two-question replies and C6 digressions use the short text too.
+  `tests/test_short_answers.py` requires a short version for any answer over
+  40 words (at most 32 words, no `[CONFIRM`). `admin.legal_export` prints both.
+- Clear chat (`restart` payload): the widget's **Clear** button and typed
+  whole-message "clear chat" / "start over" / "restart" / "new chat" reset the
+  flow, context and transcript (consent, opt-out and campaign source stay) and
+  reply with the welcome, `action=restart`; the widget empties its log on that
+  action. Inside a fraud report or complaint it asks first
+  (`restart_confirm`, `flow_state["confirm_cancel"] = "restart"`).
+- Small talk ("how are you", "I'm fine", "what's your name", "ok", "haha",
+  "nice to meet you", "are you there") lives in `smalltalk.yaml` intents with
+  `match: exact`: answered only when the WHOLE normalised message is one of
+  the phrases, and kept out of the scored TF-IDF index so it can never take a
+  real question or move the E3 gates.
 - Every reply is guaranteed at least one button before `handle()` returns —
   a hard "no dead ends" invariant enforced in code, not a per-answer
   convention to remember.

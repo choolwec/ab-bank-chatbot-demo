@@ -67,6 +67,7 @@ intents:
       - "are you open now"
       - "are you open on public holidays"
       - "working hours on saturday"
+    answer_short: "Branches: Monday-Friday 08:00-15:00, Saturday 09:00-12:30. Closed Sundays and public holidays. eTumba ({ussd_code}) works 24 hours a day."
     answer: |
       Branches: Monday-Friday 08:00-15:00, Saturday 09:00-12:30. Closed
       Sundays and public holidays.
@@ -102,6 +103,7 @@ intents:
       - "what is your email"
       - "whatsapp contact"
       - "telephone number"
+    answer_short: "Call {contact_phone}, WhatsApp {whatsapp_number}, or email {contact_email}."
     answer: |
       You can reach AB Bank Zambia on:
       Contact Centre: {contact_phone}

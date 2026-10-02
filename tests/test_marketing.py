@@ -370,8 +370,8 @@ def test_whatsapp_token_is_recorded_and_stripped_before_matching(meta_env):
 def test_whatsapp_token_alone_is_a_greeting(meta_env):
     _wa_say(meta_env, "ref:qr-lusaka")
     texts = meta_env.sent_texts("whatsapp")
-    assert any("automated helper" in t for t in texts)
-    assert not any("didn't quite catch" in t for t in texts)
+    assert any("automated assistant" in t for t in texts)
+    assert not any("didn't catch" in t for t in texts)
 
 
 def test_whatsapp_source_reaches_the_callback_ticket(meta_env):
@@ -499,12 +499,12 @@ def test_talk_to_a_person_keeps_its_live_agent_meaning(bot, monkeypatch, channel
 
 
 @pytest.mark.parametrize("channel", ["web", "whatsapp", "messenger"])
-@pytest.mark.parametrize("typed", ["Request a callback", "request callback", "5"])
+@pytest.mark.parametrize("typed", ["Request a callback", "request callback", "6"])
 def test_typed_label_or_number_picks_the_callback(bot, monkeypatch, channel, typed):
     _inbox_everywhere(monkeypatch)
     b = bot(channel=channel)
-    b.tap("account_types_overview")  # five buttons, the fifth "Request a callback"
-    assert b.buttons[4] == CALLBACK
+    b.tap("account_types_overview")  # "More details" + five buttons, the sixth "Request a callback"
+    assert b.buttons[5] == CALLBACK
     b.say(typed)
     assert b.session.active_flow == "lead", b.last
     assert b.last[1].get("intent") == "request_callback"

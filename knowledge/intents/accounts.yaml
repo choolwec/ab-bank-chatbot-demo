@@ -22,6 +22,7 @@ intents:
       - "which account should i open"
       - "account types"
       - "what kind of accounts are there"
+    answer_short: "We have everyday current accounts (Tamanga, Tamanga Plus), a business account (Mukula Plus), savings accounts, Kids Savings and fixed term deposits. Which one interests you?"
     answer: |
       We offer these main account types:
       - Tamanga — everyday current account (ZMW 36/month)
@@ -64,6 +65,7 @@ intents:
       - "i want to start saving"
       - "account to keep my money and earn interest"
       - "can i withdraw anytime from savings"
+    answer_short: "Our Savings account earns 5% interest a year, with no monthly fees and a ZMW 100 minimum balance. Open one at any branch."
     answer: |
       Our Savings account lets you deposit and withdraw at any time:
       - Minimum balance: ZMW 100
@@ -111,6 +113,7 @@ intents:
       - "euro account"
       - "account to receive my salary"
       - "salary account"
+    answer_short: "Tamanga is our everyday current account: free to open, no minimum balance, and ZMW 36 a month. Available in ZMW, USD or EURO."
     answer: |
       Tamanga is our everyday current account, available in ZMW, USD, or
       EURO:
@@ -156,6 +159,7 @@ intents:
       - "upgrade to tamanga plus"
       - "tamanga plus benefits"
       - "account with internet banking"
+    answer_short: "Tamanga Plus adds a cheque book and Online Banking (MyABZ) to Tamanga, for ZMW 135 a month. A branch can upgrade your Tamanga account."
     answer: |
       Tamanga Plus has everything Tamanga has, plus a cheque book and
       Online Banking (MyABZ) access. Monthly maintenance fee: ZMW 135.
@@ -199,6 +203,7 @@ intents:
       - "business acc"
       - "account for my small business"
       - "account for a club or association"
+    answer_short: "Mukula Plus is our business current account, for companies, sole traders and clubs/NGOs/churches. No minimum balance; ZMW 200 a month."
     answer: |
       Mukula Plus is our corporate/business current account — for limited
       companies, sole traders/partnerships, and clubs/NGOs/churches/
@@ -242,6 +247,7 @@ intents:
       - "business account documents"
       - "board resolution for opening an account"
       - "what does a sole trader need to open an account"
+    answer_short: "You need original registration and tax documents, plus ID for the owner or each signatory. The exact list depends on whether you're a company, sole trader or club/NGO."
     answer: |
       Requirements vary by entity type:
       - Limited company: certificate of share capital, certificate of
@@ -280,6 +286,7 @@ intents:
       - "save for a goal"
       - "goal savings account"
       - "savings plan minimum deposit"
+    answer_short: "The Savings Plan account earns up to 7% a year. You can deposit any time but not withdraw, so it's good for a savings goal. Start with ZMW 150."
     answer: |
       The Savings Plan account lets you deposit any time, but withdrawals
       are blocked — good for a savings goal you don't want to dip into:
@@ -320,6 +327,7 @@ intents:
       - "bank account for my kids"
       - "junior savings account"
       - "kids savings interest"
+    answer_short: "Kids Savings is for children under 16, opened by a guardian. It earns 7% a year with no monthly charges, from a ZMW 10 minimum balance."
     answer: |
       Kids Savings is a joint account opened for a minor (under 16) by
       their guardian:
@@ -357,6 +365,7 @@ intents:
       - "fix money for 90 days"
       - "where can i invest money"
       - "minimum amount for a fixed deposit"
+    answer_short: "A Term Deposit fixes your money for 30-365 days at about 9.3%-16% a year. Minimum ZMW 10,000, and you need a Savings or Current account first."
     answer: |
       A Term Deposit Account (TDA) fixes your money for a chosen term to
       earn a higher interest rate:
@@ -396,6 +405,7 @@ intents:
       - "couple account"
       - "two people one account"
       - "joint account requirements"
+    answer_short: "Joint AND: all holders must sign to transact. Joint OR: any holder can transact alone. All holders must come to the branch to open it."
     answer: |
       We offer two types of joint account:
       - Joint AND — all signatories must be present to transact (except
@@ -434,6 +444,7 @@ intents:
       - "expatriate account"
       - "what does a foreigner need to open an account"
       - "can i open an account with a passport"
+    answer_short: "Yes. Bring your passport with visa, a valid Zambian permit, and proof of address in Zambia to any branch."
     answer: |
       Yes — foreign nationals can open an account. Visit any branch with:
       - A valid passport (with visa)
@@ -467,6 +478,7 @@ intents:
       - "reference form for account opening"
       - "do i need a tpin to open an account"
       - "do i need proof of residence"
+    answer_short: "Bring to any branch: your original ID (NRC, passport or driving licence), proof of residence, TPIN certificate, and a signed reference form."
     answer: |
       To open a personal account, visit any branch with:
       - Original valid ID (NRC, Passport, or Driving Licence)
@@ -509,6 +521,7 @@ intents:
       - "opening an account"
       - "can i open an account on my phone"
       - "how do i become a customer"
+    answer_short: "Visit any branch with your documents. It's usually done the same day. Accounts can't be opened online."
     answer: |
       Accounts are opened at any branch only — there's no online/remote
       account opening. Bring the right documents and it's usually done
@@ -543,6 +556,7 @@ intents:
       - "statement of account"
       - "i need a stamped bank statement"
       - "get statement"
+    answer_short: "Tamanga Plus and Mukula Plus customers get statements on Online Banking (MyABZ). For other accounts, visit a branch or call {contact_phone}."
     answer: |
       - Mukula Plus & Tamanga Plus customers: get statements anytime via
         Online Banking (MyABZ) at https://ob.abbank.co.zm/landing/auth

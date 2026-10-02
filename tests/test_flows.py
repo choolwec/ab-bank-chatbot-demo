@@ -406,7 +406,7 @@ def test_fraud_has_no_confirm_step_and_finish_shows_the_summary(bot):
     b.say("eTumba")
     b.say("0977123456")
     assert b.session.active_flow is None  # ticket raised, no "Shall I send it?"
-    assert "What you told me: they sent K500 from my wallet · yesterday · eTumba · 0977 123 456" in b.text
+    assert "You told me: they sent K500 from my wallet · yesterday · eTumba · 0977 123 456" in b.text
     assert "Got it: 0977 123 456." in b.text
     assert len(b.last[0]) == 1  # read-back and finish share one bubble
 

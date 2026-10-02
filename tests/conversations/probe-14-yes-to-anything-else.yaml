@@ -11,4 +11,4 @@ turns:
   - payload: confirm_yes
     expect: {ticket_created: callback}
   - say: "yes"
-    expect: {action: menu, strikes: 0, text_lacks: [didn't quite catch]}
+    expect: {action: menu, strikes: 0, text_lacks: [didn't catch that]}

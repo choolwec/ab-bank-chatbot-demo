@@ -42,11 +42,16 @@ def build_doc() -> str:
                 f"- Trigger phrases ({len(phrases)}): "
                 + ", ".join(f'"{p}"' for p in phrases)
             )
+            short = (item.get("answer_short") or "").strip()
+            if short:
+                sections.append('\nShort answer (shown first, with a "More details" button):\n')
+                sections.append("> " + short.replace("\n", "\n> "))
             answer = (item.get("answer") or "").strip()
             if answer:
                 for hit in CONFIRM_RE.findall(answer):
                     confirms.append((item["intent"], hit))
-                sections.append("\nCustomer-facing answer:\n")
+                label = "Full answer (after \"More details\")" if short else "Customer-facing answer"
+                sections.append(f"\n{label}:\n")
                 sections.append("> " + answer.replace("\n", "\n> "))
             for ch, variant in (item.get("answer_by_channel") or {}).items():
                 sections.append(f'\nOn {ch} this answer reads instead:\n')

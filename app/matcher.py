@@ -81,6 +81,10 @@ class Matcher:
 
     def reload(self) -> None:
         self.intents: dict[str, dict] = {}
+        # `match: exact` intents (small talk: "how are you", "ok") answer only
+        # the whole message, and stay out of the scored index so they never
+        # pull a real question their way or shift its weights.
+        self._exact: dict[str, str] = {}
         phrases: list[str] = []
         owners: list[str] = []
         for path in sorted(config.INTENTS_DIR.glob("*.yaml")):
@@ -92,6 +96,10 @@ class Matcher:
                     raise ValueError(f"duplicate intent id: {name} ({path.name})")
                 item["_source"] = path.name
                 self.intents[name] = item
+                if item.get("match") == "exact":
+                    for p in item.get("phrases", []):
+                        self._exact[normalise(str(p))] = name
+                    continue
                 for p in item.get("phrases", []):
                     phrases.append(normalise(str(p)))
                     owners.append(name)
@@ -184,6 +192,8 @@ class Matcher:
         q = normalise(drop_negated_clauses(text))
         if not q:
             return []
+        if q in self._exact:
+            return [(self._exact[q], 1.0)]
         char = self._char_scores(q)
         if self.mode == "char":
             return sorted(char.items(), key=lambda kv: -kv[1])[:top_n]

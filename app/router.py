@@ -50,8 +50,14 @@ COMMANDS = {
         "cancel_flow",
     ),
     **dict.fromkeys(
-        ["menu", "main menu", "start again", "start over", "restart", "0", "home"],
+        ["menu", "main menu", "0", "home"],
         "menu",
+    ),
+    **dict.fromkeys(
+        ["start again", "start over", "restart", "clear", "clear chat",
+         "clear the chat", "clear this chat", "clear conversation", "new chat",
+         "new conversation", "start a new chat", "reset", "reset chat"],
+        "restart",  # RESTART
     ),
     **dict.fromkeys(
         [
@@ -104,6 +110,12 @@ REQUEST_CALLBACK = "request_callback"
 CANCEL_YES = "cancel_yes"
 CANCEL_NO = "cancel_no"
 OPT_OUT = "marketing_opt_out"
+# "Clear chat": the widget's header button and typed "start over" / "clear
+# chat". It wipes the conversation, never a report without asking first.
+RESTART = "restart"
+RESTART_YES = "restart_yes"
+# "More details" under a short answer: the intent's full answer.
+DETAILS_PREFIX = "details:"
 
 
 def _urgent_confirm(kind, sub):
@@ -363,6 +375,10 @@ def _route(session, text, payload):
         )
     if payload == CANCEL_NO:
         return _continue_flow(session)
+    if payload == RESTART and session.active_flow in ("fraud", "complaint"):
+        return _confirm_restart(session)
+    if payload in (RESTART, RESTART_YES):
+        return _restart(session)
     if payload == OPT_OUT:
         return _opt_out(session)
     # "Talk to a person" always works, even mid-flow (§1 rule 1)
@@ -432,10 +448,11 @@ def _route(session, text, payload):
             return replies, dict(meta, expected_pick=picked)
 
     # 1d. Answer to "Your report isn't sent yet. Stop anyway?"
-    if session.active_flow and session.flow_state.pop("confirm_cancel", False) and text:
+    pending_cancel = session.flow_state.pop("confirm_cancel", False) if session.active_flow else False
+    if pending_cancel and text:
         answer = guards.yes_no(text)
         if answer is True:
-            return _route(session, None, CANCEL_YES)
+            return _route(session, None, RESTART_YES if pending_cancel == RESTART else CANCEL_YES)
         if answer is False:
             return _continue_flow(session)
         # Anything else: they carried on with the report -- treat it as input.
@@ -467,6 +484,11 @@ def _route(session, text, payload):
     # 3. Quick-reply payload → direct intent
     if payload == MORE_PAYLOAD:
         return _more_options(session)
+    if payload and payload.startswith(DETAILS_PREFIX):
+        intent = matcher.get(payload[len(DETAILS_PREFIX):])
+        if intent:
+            replies, meta = _answer(session, intent, 1.0, full=True)
+            return replies, dict(meta, action="details")
     if payload and payload.startswith(CITY_PREFIX):
         # A city button tapped after the locator ended (WhatsApp keeps old
         # buttons tappable): look it up anyway rather than a fallback.
@@ -589,7 +611,7 @@ def _clause_answer(session, clause):
         return intent["intent"], found["text"], found["buttons"]
     if intent.get("flow") or not intent.get("answer"):
         return None
-    return intent["intent"], intent["answer"].strip(), intent.get("buttons", [])
+    return intent["intent"], short_answer(intent).strip(), intent.get("buttons", [])
 
 
 def _two_questions(session, text):
@@ -855,7 +877,7 @@ def _digression(flow, session, text):
             return None
     prompt = flow.resume(session)[-1]
     back = msg("back_to_flow", flow=flow.topic_label, prompt=prompt["text"])
-    reply = dict(prompt, text=intent["answer"].strip() + "\n\n" + back)
+    reply = dict(prompt, text=short_answer(intent).strip() + "\n\n" + back)
     return [reply], {"action": f"digression:{flow.name}", "intent": intent["intent"],
                      "confidence": round(top_score, 3)}
 
@@ -1024,6 +1046,47 @@ def _continue_flow(session):
     )
 
 
+def short_answer(intent, channel=None):
+    """The text shown first: `answer_short` when the intent has one, unless
+    the channel has its own variant of the answer (W9)."""
+    by_channel = (intent.get("answer_by_channel") or {}).get(channel)
+    return by_channel or intent.get("answer_short") or intent.get("answer") or ""
+
+
+def _confirm_restart(session):
+    session.flow_state["confirm_cancel"] = RESTART
+    flow = FLOWS[session.active_flow]
+    return (
+        [
+            {
+                "text": msg("restart_confirm", flow=flow.topic_label),
+                "buttons": [
+                    button("yes_start_over", RESTART_YES),
+                    button("no_continue", CANCEL_NO),
+                ],
+                "yes": RESTART_YES,
+                "no": CANCEL_NO,
+            }
+        ],
+        {"action": "restart_confirm"},
+    )
+
+
+def _restart(session):
+    """A fresh conversation in the same session: the flow, context and
+    transcript go (a later ticket starts from here); consent, opt-out and
+    campaign source stay."""
+    session.active_flow = None
+    session.flow_state = {}
+    session.strikes = 0
+    session.transcript = []
+    session.last_replies = []
+    session.last_answer_intent = None
+    for key in ("context", "last_intent", "topic", "pending_urgent"):
+        session.slots.pop(key, None)
+    return [{"text": msg("welcome"), "buttons": list(MENU_BUTTONS)}], {"action": "restart"}
+
+
 def _start_urgent(session, kind, sub, trigger=None):
     session.strikes = 0
     flow = FLOWS["fraud" if kind == "fraud" else "complaint"]
@@ -1062,7 +1125,7 @@ def _resolve_urgent(session, pending, confirmed):
     return replies, meta
 
 
-def _answer(session, intent, score, text=None, keep_context=False):
+def _answer(session, intent, score, text=None, keep_context=False, full=False):
     session.strikes = 0
     meta = {"intent": intent["intent"], "confidence": round(float(score), 3)}
 
@@ -1087,6 +1150,10 @@ def _answer(session, intent, score, text=None, keep_context=False):
     if not answer:
         return [{"text": msg("fallback"), "buttons": list(MENU_BUTTONS)}], meta
     buttons = [dict(b) for b in intent.get("buttons", [])]
+    if not full and short_answer(intent, session.channel) != answer:
+        # Short first; the full answer is one tap away.
+        answer = short_answer(intent, session.channel)
+        buttons.insert(0, button("more_details", DETAILS_PREFIX + intent["intent"]))
     meta["action"] = "out_of_scope" if intent["intent"] == OUT_OF_SCOPE else "answer"
     reply = {"text": answer.strip(), "buttons": buttons}
     # An answer that ends in a yes/no question declares what each means (C3).

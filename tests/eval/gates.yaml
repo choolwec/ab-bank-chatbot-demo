@@ -27,13 +27,16 @@
 #               tests/eval/): right_direct 0.527 -> 0.670, oos_direct 0.100 ->
 #               0.067, one_tap 0.923 -> 0.945, oos_large_direct 0.155 -> 0.138,
 #               b77_right_direct 0.053 -> 0.078, all tightened; the rest equal.
+#   2026-10-02  small talk answered on the whole message only (match: exact,
+#               outside the scored index); "how are you" moved from greeting
+#               to its own intent: oos_large_direct 0.138 -> 0.135, tightened.
 gates:
   right_direct_min: 0.670
   wrong_direct_max: 0.044
   oos_direct_max: 0.067
   one_tap_min: 0.945
   # N2: the >= 300 out-of-scope set (tests/eval/oos.yaml)
-  oos_large_direct_max: 0.138
+  oos_large_direct_max: 0.135
   # N1: BANKING77 (CC BY 4.0) mapped onto our intents (tests/eval/banking77.yaml)
   b77_right_direct_min: 0.078
   b77_wrong_direct_max: 0.008

@@ -71,4 +71,4 @@ def test_fraud_always_shows_the_emergency_route(bot, monkeypatch):
     _out_of_hours(monkeypatch, at(2026, 9, 27, 2))  # Sunday 02:00
     b = bot()
     b.say("someone stole money from my etumba")
-    assert "call us immediately on" in b.text
+    assert "If money is at risk, call" in b.text

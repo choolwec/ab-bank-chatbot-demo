@@ -4,4 +4,4 @@ turns:
     expect:
       action: answer
       replies_max: 1
-      text_contains: [opened at any branch, and on your other question, loan officer]
+      text_contains: [visit any branch, and on your other question, loan officer]

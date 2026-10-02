@@ -5,4 +5,4 @@ turns:
   - say: huh?
     expect: {action: clarify, strikes: 1}
   - say: repeat
-    expect: {action: repeat, strikes: 1, text_contains: [didn't quite catch]}
+    expect: {action: repeat, strikes: 1, text_contains: [didn't catch that]}

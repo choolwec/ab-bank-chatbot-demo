@@ -3,7 +3,7 @@ id: c2-agent-inside-locator-is-an-answer
 turns:
   - payload: branch_locator
   - say: agent
-    expect: {active_flow: null, text_contains: [agent networks]}
+    expect: {active_flow: null, text_contains: [agents countrywide]}
   - payload: agent_locator
   - payload: branch_locator
   - say: Kitwe

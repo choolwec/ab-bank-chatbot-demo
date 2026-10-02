@@ -24,6 +24,7 @@ intents:
       - "how much can i borrow for my business"
       - "loan to buy stock for my shop"
       - "small business loan"
+    answer_short: "Business loans need 12+ months of trading, a guarantor and collateral, in a town we serve. Interest is 3%-8% a month over 4-30 months."
     answer: |
       Business (Micro & SME) loans are available if your business:
       - Has been operating for at least 12 months
@@ -70,6 +71,7 @@ intents:
       - "loan for my poultry"
       - "loan for crops"
       - "loan for cattle"
+    answer_short: "Farmers apply for our Business (Micro & SME) loan on the same terms: 12+ months trading, collateral and a guarantor."
     answer: |
       We don't have a separate agriculture-specific loan product — a
       farming business applies under our general Business (Micro & SME)
@@ -108,6 +110,7 @@ intents:
       - "loan against my salary"
       - "personal loans"
       - "personal loan without collateral"
+    answer_short: "Personal loans are for government employees only: ZMW 1,000-500,000 at up to 3.75% a month, no collateral, ready within 24 hours of full documents."
     answer: |
       Personal loans are available to government employees only:
       - Amount: ZMW 1,000 - ZMW 500,000
@@ -143,6 +146,7 @@ intents:
       - "can i get an overdraft"
       - "overdraft for my company"
       - "overdraft limit"
+    answer_short: "An SME overdraft is typically up to 30% of your average monthly turnover. You need business registration and collateral; the arrangement fee is 5%."
     answer: |
       SME overdraft requirements:
       - Valid business registration and operating licences
@@ -180,6 +184,7 @@ intents:
       - "how do i qualify for a loan"
       - "am i eligible for a loan"
       - "loan eligibility"
+    answer_short: "For a business loan: age 21-65, original ID, a business running 12+ months, proof of residence, a guarantor and collateral."
     answer: |
       For a business loan you'll typically need:
       - Age 21-65, valid & original ID (NRC, Driving Licence, or Passport)
@@ -243,6 +248,7 @@ intents:
       - "collateral"
       - "can i use land as collateral"
       - "can i use household goods as collateral"
+    answer_short: "Collateral can be household goods, fixed assets, or a building, land or vehicle. Your Business Officer assesses it at your premises."
     answer: |
       Collateral can include household goods, fixed assets, and/or a
       mortgage (building, land, or motor vehicle). It's assessed at your
@@ -278,6 +284,7 @@ intents:
       - "i would like a loan"
       - "ndifuna loan"
       - "ndefwaya loan"
+    answer_short: "Visit a branch or request a callback, and a loan officer will assess your needs. Business loans take about 7 working days; personal loans, 24 hours."
     answer: |
       Applying is straightforward:
       1. Visit your nearest branch, or request a callback and we'll contact you

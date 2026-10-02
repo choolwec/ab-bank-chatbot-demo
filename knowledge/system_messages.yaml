@@ -20,7 +20,7 @@ messages:
   welcome:
     status: draft
     text: |
-      Hello! I'm the AB Bank assistant — an automated helper, not a person. I can help with branches and agents, opening an account, eTumba, and loans, or connect you to our team. What can I help with?
+      Hi! I'm AB Bank's automated assistant, not a person. How can I help you today?
   disclosure:
     status: draft
     text: I'm the AB Bank assistant — an automated helper, not a person.
@@ -40,6 +40,10 @@ messages:
     status: draft
     fills: [flow]
     text: Your {flow} isn't sent yet. Stop anyway?
+  restart_confirm:
+    status: draft
+    fills: [flow]
+    text: Your {flow} isn't sent yet. Clear the chat and start over anyway?
   carry_on:
     status: draft
     text: Okay, let's carry on.
@@ -50,7 +54,7 @@ messages:
   # --- Understanding ------------------------------------------------------------
   fallback:
     status: draft
-    text: I didn't quite catch that. You can try different words, pick an option below, or ask for a person at any time.
+    text: Sorry, I didn't catch that. Try other words, or pick an option below.
   two_strike:
     status: draft
     text: I'm sorry — I'm not getting this right. Rather than keep guessing, let me connect you with a person who can help.
@@ -248,15 +252,14 @@ messages:
   fraud.intro.lost_card:
     status: draft
     text: |-
-      I'm sorry to hear that — let's secure your card straight away.
-      Call us now on {emergency_phone} to block your card immediately.
-      I'll also take a few details so our team can follow up with you.
+      I'm sorry to hear that. Call {emergency_phone} now to block your card.
+      I'll also take a few details for our team.
   fraud.intro.fraud:
     status: draft
     text: |-
-      I'm sorry this has happened. You've done the right thing by reporting it, and I'm treating it as urgent.
-      If money is at risk right now, call us immediately on {emergency_phone}.
-      I'll take a few details for our fraud team, and a person will follow up with you.
+      I'm sorry this happened. I'm treating it as urgent.
+      If money is at risk, call {emergency_phone} now.
+      I'll take a few details for our fraud team.
   fraud.prefill.both:
     status: draft
     fills: [when, channel]
@@ -291,10 +294,9 @@ messages:
     status: draft
     fills: [ref, summary]
     text: |-
-      Thank you. I've raised an urgent case for our team — your reference is {ref}. A member of staff will contact you as a priority.
-      What you told me: {summary}
-      This case stays open until a person from the bank has resolved it with you — I won't close it myself.
-      For immediate help at any time, call {emergency_phone}.
+      Thank you. Your urgent case reference is {ref}, and our staff will contact you as a priority.
+      You told me: {summary}
+      Only a person from the bank can close this case. For immediate help, call {emergency_phone}.
 
   # --- Complaint flow -----------------------------------------------------------------
   complaint.topic_label: {status: draft, text: complaint}
@@ -316,8 +318,8 @@ messages:
     status: draft
     fills: [ref]
     text: |-
-      Your complaint has been logged with reference {ref} and goes straight to our complaints team, who handle it under the Bank of Zambia's complaints-handling requirements. [CONFIRM: response-time commitment to quote here.]
-      Please keep your reference number — any member of staff can look it up.
+      Your complaint is logged. Reference: {ref}. Our complaints team will handle it under Bank of Zambia rules. [CONFIRM: response-time commitment to quote here.]
+      Any member of staff can look it up with this reference.
 
   # --- Callback (lead) flow -------------------------------------------------------------
   lead.topic_label: {status: draft, text: callback request}
@@ -369,8 +371,8 @@ messages:
     status: draft
     fills: [ref]
     text: |-
-      Done — that's everything I need. Our team will call you within one working day. Your reference is {ref}.
-      Is there anything else I can help with in the meantime?
+      Done! Our team will call you within one working day. Your reference is {ref}.
+      Anything else I can help with?
 
   # --- Marketing opt-out (MK2) ------------------------------------------------------------
   marketing.opt_out:
@@ -394,7 +396,7 @@ messages:
   locator.agents:
     status: draft
     fills: [networks]
-    text: "You can put money into or take money out of your eTumba wallet at any AB Bank branch, and at these agent networks countrywide: {networks}. Look for their signage at shops and kiosks near you. [CONFIRM: guidance for finding a specific nearby agent.]"
+    text: "Cash in or out of eTumba at any AB Bank branch, or at {networks} agents countrywide. Look for their signs at shops and kiosks. [CONFIRM: guidance for finding a specific nearby agent.]"
   locator.found:
     status: draft
     fills: [lines]
@@ -470,6 +472,8 @@ messages:
   button.yes_report_it: {status: draft, text: "Yes, report it"}
   button.yes_send_offers: {status: draft, text: "Yes, send offers"}
   button.yes_stop: {status: draft, text: "Yes, stop"}
+  button.yes_start_over: {status: draft, text: "Yes, start over"}
+  button.more_details: {status: draft, text: "More details"}
   button.yes_that_s_right: {status: draft, text: "Yes, that's right"}
   button.more: {status: draft, text: "More…"}
   button.choose_an_option: {status: draft, text: "Choose an option"}

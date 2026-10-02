@@ -17,6 +17,12 @@
 #              matches the generic intent gets the specific one (C9)
 #   answer_by_channel: (optional) {whatsapp|messenger|web: text} -- a channel
 #              variant of the answer, same facts (W9)
+#   match:     (optional) "exact" -- small talk that answers only when the
+#              WHOLE message is one of its phrases; kept out of the scored
+#              matcher so it never captures a real question
+#   answer_short: (optional) the short answer shown first, with a "More
+#              details" button for the full `answer`. Same facts as the
+#              answer, never new ones; no [CONFIRM placeholders
 #   on_yes / on_no: (optional) the payload a typed "yes" / "no" means, when
 #              the answer ends in a yes/no question ("anything else?")
 #
@@ -40,7 +46,6 @@ intents:
       - "good afternoon"
       - "good evening"
       - "muli bwanji"
-      - "how are you"
       - "hi there"
       - "good morning ba"
       - "hi good afternoon"
@@ -48,10 +53,7 @@ intents:
       - "hello ab bank"
       - "mwabuka shani"
       - "mulishani"
-    answer: |
-      Hello! I'm the AB Bank assistant — an automated helper, not a person.
-      I can help with branches and agents, opening an account, eTumba, and
-      loans, or connect you to our team. What can I help with?
+    answer: "Hi! I'm AB Bank's automated assistant, not a person. How can I help you today?"
     buttons:
       - {label: "Branches & agents", payload: "branch_locator"}
       - {label: "Open an account", payload: "account_types_overview"}
@@ -97,8 +99,7 @@ intents:
       - "noted thanks"
       - "thanks for the help"
     answer: |
-      You're welcome. Is there anything else I can help with? If not, thank
-      you for chatting with AB Bank — goodbye for now.
+      You're welcome! Anything else I can help with? If not, goodbye for now.
     on_yes: menu
     buttons:
       - {label: "Main menu", payload: "menu"}
@@ -128,15 +129,190 @@ intents:
       - "is this an automated chat"
       - "show me the menu"
       - "what services can you help with"
+    answer: "I'm an automated assistant, not a person. I can help with branches, accounts, eTumba and loans, take fraud reports and complaints, or arrange a callback. I never ask for PINs or passwords."
+    buttons:
+      - {label: "Branches & agents", payload: "branch_locator"}
+      - {label: "Open an account", payload: "account_types_overview"}
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Loans", payload: "msme_loan"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: how_are_you
+    match: exact
+    label: "How are you?"
+    category: smalltalk
+    status: draft
+    phrases:
+      - "how are you"
+      - "how are you doing"
+      - "how r u"
+      - "how are u"
+      - "how is it going"
+      - "hows it going"
+      - "how's your day"
+      - "how is your day going"
+      - "how are things"
+      - "how have you been"
+      - "are you okay"
+      - "you good"
+      - "how are you today"
     answer: |
-      I'm an automated assistant (not a person). I can:
-      - find branches and eTumba agents
-      - explain our accounts and what you need to open one
-      - explain eTumba and {ussd_code}
-      - explain MSME and agri loans and how to apply
-      - take complaints and fraud reports, and arrange a callback from our team
-      I can't check balances, move money, or handle PINs and passwords — for
-      your security, I never ask for those.
+      I'm doing well, thank you for asking! How can I help you today?
+    buttons:
+      - {label: "Branches & agents", payload: "branch_locator"}
+      - {label: "Open an account", payload: "account_types_overview"}
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Loans", payload: "msme_loan"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: small_talk_fine
+    match: exact
+    label: "I'm fine"
+    category: smalltalk
+    status: draft
+    phrases:
+      - "i'm fine"
+      - "im fine"
+      - "i am fine"
+      - "fine thanks"
+      - "fine thank you"
+      - "i'm okay"
+      - "i am okay"
+      - "i'm well"
+      - "i am well thank you"
+      - "doing well"
+      - "fine and you"
+      - "good and you"
+      - "i'm fine and you"
+      - "not bad"
+      - "pretty good"
+    answer: |
+      Glad to hear it! What can I help you with today?
+    buttons:
+      - {label: "Branches & agents", payload: "branch_locator"}
+      - {label: "Open an account", payload: "account_types_overview"}
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Loans", payload: "msme_loan"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: bot_name
+    match: exact
+    label: "Your name"
+    category: smalltalk
+    status: draft
+    phrases:
+      - "what is your name"
+      - "what's your name"
+      - "whats your name"
+      - "do you have a name"
+      - "your name"
+      - "who am i talking to"
+      - "who am i chatting with"
+      - "who made you"
+      - "who built you"
+      - "who created you"
+    answer: |
+      I'm AB Bank's automated assistant. I don't have a name, but I'm here to help with your banking questions.
+    buttons:
+      - {label: "Branches & agents", payload: "branch_locator"}
+      - {label: "Open an account", payload: "account_types_overview"}
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Loans", payload: "msme_loan"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: acknowledgement
+    match: exact
+    label: "Okay"
+    category: smalltalk
+    status: draft
+    phrases:
+      - "ok"
+      - "okay"
+      - "alright"
+      - "all right"
+      - "cool"
+      - "great"
+      - "got it"
+      - "i see"
+      - "sure"
+      - "sawa"
+      - "okay great"
+      - "oh okay"
+      - "understood"
+      - "perfect"
+    answer: |
+      Great! What else can I help you with?
+    buttons:
+      - {label: "Branches & agents", payload: "branch_locator"}
+      - {label: "Open an account", payload: "account_types_overview"}
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Loans", payload: "msme_loan"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: compliment
+    match: exact
+    label: "Compliment"
+    category: smalltalk
+    status: draft
+    phrases:
+      - "you are helpful"
+      - "you're helpful"
+      - "great job"
+      - "well done"
+      - "good job"
+      - "you are smart"
+      - "good bot"
+      - "you are amazing"
+      - "that was helpful"
+      - "this is great"
+      - "nice work"
+      - "you are the best"
+      - "haha"
+      - "lol"
+    answer: |
+      Thank you, that's kind of you! Anything else I can help with?
+    buttons:
+      - {label: "Branches & agents", payload: "branch_locator"}
+      - {label: "Open an account", payload: "account_types_overview"}
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Loans", payload: "msme_loan"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: nice_to_meet_you
+    match: exact
+    label: "Nice to meet you"
+    category: smalltalk
+    status: draft
+    phrases:
+      - "nice to meet you"
+      - "pleased to meet you"
+      - "nice meeting you"
+      - "good to meet you"
+      - "glad to meet you"
+    answer: |
+      Nice to meet you too! How can I help today?
+    buttons:
+      - {label: "Branches & agents", payload: "branch_locator"}
+      - {label: "Open an account", payload: "account_types_overview"}
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Loans", payload: "msme_loan"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: are_you_there
+    match: exact
+    label: "Are you there?"
+    category: smalltalk
+    status: draft
+    phrases:
+      - "are you there"
+      - "anyone there"
+      - "is anyone there"
+      - "is anybody there"
+      - "hello are you there"
+      - "you there"
+      - "are you still there"
+    answer: |
+      Yes, I'm here! What can I help you with?
     buttons:
       - {label: "Branches & agents", payload: "branch_locator"}
       - {label: "Open an account", payload: "account_types_overview"}
@@ -163,6 +339,7 @@ intents:
       - "is ab bank registered with bank of zambia"
       - "what does ab bank do"
       - "tell me more about your bank"
+    answer_short: "AB Bank is a licensed Zambian commercial bank, regulated by the Bank of Zambia. We serve individuals, businesses and organisations."
     answer: |
       AB Bank is a licensed local commercial bank operating in Zambia,
       regulated by the Bank of Zambia. We provide banking and credit

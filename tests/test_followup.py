@@ -84,7 +84,7 @@ def test_templates_are_neutral_and_link_free():
 def test_contact_details_on_whatsapp_does_not_say_whatsapp_us(bot):
     web = bot()
     web.tap("contact_details")
-    assert "WhatsApp:" in web.text
+    assert "WhatsApp 0769651262" in web.text
     wa = bot(channel="whatsapp")
     wa.tap("contact_details")
     assert "WhatsApp:" not in wa.text and "already chatting" in wa.text

@@ -99,6 +99,7 @@ intents:
       - "fraud number"
       - "after hours number"
       - "24/7 number"
+    answer_short: "For a lost card or money taken, call {emergency_phone} now. Or report it to me and I'll raise an urgent case."
     answer: |
       For anything urgent — a lost or stolen card, or money taken without
       your permission — call {emergency_phone} straight away.
@@ -134,6 +135,7 @@ intents:
       - "wrong pin too many times"
       - "forgot etumba password"
       - "change password"
+    answer_short: "I never handle PINs or passwords, and no real staff member will ask for them. If someone else knows yours, call {emergency_phone} now."
     answer: |
       For your security, I never handle PINs or passwords in chat — and no
       genuine member of staff will ever ask you for them.

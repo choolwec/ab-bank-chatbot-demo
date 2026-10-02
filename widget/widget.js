@@ -94,8 +94,16 @@
     title.appendChild(badge);
     els.close = h("button", "abz-close", { type: "button", "aria-label": "Close chat" });
     els.close.textContent = "×";
+    // Clear chat: the server starts a fresh conversation (and asks first if
+    // a fraud report or complaint isn't sent yet); the log empties on its
+    // "restart" reply.
+    els.clear = h("button", "abz-clear", { type: "button", "aria-label": "Clear chat and start over" });
+    els.clear.textContent = "Clear";
+    var tools = h("div", "abz-tools");
+    tools.appendChild(els.clear);
+    tools.appendChild(els.close);
     header.appendChild(title);
-    header.appendChild(els.close);
+    header.appendChild(tools);
 
     els.log = h("div", "abz-log", {
       role: "log",
@@ -144,6 +152,11 @@
 
     els.launcher.addEventListener("click", toggle);
     els.close.addEventListener("click", close);
+    els.clear.addEventListener("click", function () {
+      els.quick.innerHTML = "";
+      post({ session_id: sessionId, payload: "restart" });
+      els.input.focus();
+    });
     els.panel.addEventListener("keydown", function (e) {
       if (e.key === "Escape") close();
     });
@@ -181,6 +194,7 @@
   function setBusy(busy) {
     els.input.disabled = busy;
     els.send.disabled = busy;
+    els.clear.disabled = busy;
   }
 
   var typingEl = null;
@@ -238,6 +252,9 @@
       })
       .then(function (data) {
         hideTyping();
+        if (data.meta && data.meta.action === "restart") {
+          while (els.log.firstChild) els.log.removeChild(els.log.firstChild);
+        }
         sessionId = data.session_id;
         try { sessionStorage.setItem("abz_chat_session", sessionId); } catch (e) {}
         // After a page reload the server replays the earlier (masked)

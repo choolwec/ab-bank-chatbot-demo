@@ -32,6 +32,7 @@ intents:
       - "the app is slow"
       - "internet banking not working"
       - "app failing to load"
+    answer_short: "Sorry about that. Check your data connection, or use {ussd_code} instead of the app while it's down."
     answer: |
       Sounds like a technical/service problem rather than a forgotten PIN —
       sorry about that.

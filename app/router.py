@@ -85,6 +85,14 @@ COMMANDS = {
          "no marketing please", "no more marketing"],
         "marketing_opt_out",
     ),
+    # "Tell me more" after a short answer: its full answer.
+    **dict.fromkeys(
+        ["tell me more", "tell me more please", "more info", "more information", "more details",
+         "details", "full details", "explain more", "elaborate", "more", "read more",
+         "can you tell me more", "give me more details", "i want more details",
+         "i want to know more", "want to know more", "learn more"],
+        "more_details",
+    ),
     # C4: repairing the bot's own turn. Never a strike.
     **dict.fromkeys(
         ["repeat", "repeat that", "say again", "say that again", "come again",
@@ -97,7 +105,7 @@ COMMANDS = {
          "please explain", "explain please", "can you explain", "huh", "eh",
          "example", "for example", "an example", "meaning", "not clear",
          "i'm confused", "im confused", "confused", "simpler please",
-         "in simple words", "say it simply"],
+         "in simple words", "say it simply", "what", "eish what"],
         "clarify",
     ),
 }
@@ -304,6 +312,8 @@ _NUMBER_WORDS = {
     "six": 6, "seven": 7, "eight": 8, "nine": 9,
     "first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5,
 }
+_PICK_FILLER = frozenset({"the", "one", "please", "pls", "i", "want", "choose", "pick", "take"})
+_ORDINAL_RE = re.compile(r"^([1-9])(?:st|nd|rd|th)$")
 _NUMBER_RE = re.compile(r"^(?:(?:option|number|no)\s*)?([1-9])$")
 LABEL_MATCH_MIN = 90
 
@@ -328,21 +338,56 @@ def _remember_expecting(session, replies, meta=None):
         reply.pop("no", None)
 
 
-def _expected_payload(expecting, text):
-    """The payload `text` picks from the last reply, or None."""
+# Natural answers to "Would you like us to help you get started?" (C3).
+_INTERESTED_RE = re.compile(
+    r"^(?:yes\s+|yeah\s+|ok\s+|okay\s+)?(?:"
+    r"(?:i'?m|i\s+am|im)\s+(?:very\s+|really\s+)?interested|"
+    r"(?:please\s+)?(?:contact|call)\s+me|get\s+in\s+touch|"
+    r"sign\s+me\s+up|count\s+me\s+in|(?:let'?s|lets)\s+do\s+it|go\s+ahead|"
+    r"i\s+want\s+(?:it|that|this|one|to\s+(?:open|apply|register|start|invest))|"
+    r"i(?:'d|\s+would)\s+like\s+(?:that|it|one|to\s+(?:open|apply|register|start|invest))|"
+    r"that\s+would\s+be\s+(?:great|nice|good)|why\s+not"
+    r")\b")
+_SOFT_NO = frozenset({
+    "maybe later", "later", "not now", "not yet", "not today", "no not now", "maybe another time",
+    "another time", "some other time", "i'll think about it", "ill think about it", "let me think about it",
+    "i will think about it", "not interested", "i'm not interested", "im not interested",
+    "no i'm not interested", "no im not interested", "not really", "no not really", "i'm ok", "im ok",
+    "i'm okay", "nope not now", "no maybe later",
+})
+_BACK_WORDS = frozenset({"back", "go back", "back please", "previous", "take me back", "return", "go back please"})
+
+
+def _expected_payload(expecting, text, in_flow=False):
+    """The payload `text` picks from the last reply, or None. Outside a form,
+    "I'm interested" is a yes and "maybe later" a no to a product's question;
+    inside one (the consent question above all) only a plain yes/no counts."""
     if not expecting:
         return None
     answer = guards.yes_no(text)
+    t = guards.normalise(text)
+    if answer is None and not in_flow and expecting.get("yes") and _INTERESTED_RE.match(t):
+        answer = True
+    if answer is None and not in_flow and expecting.get("no") and t in _SOFT_NO:
+        answer = False
     if answer is True and expecting.get("yes"):
         return expecting["yes"]
     if answer is False and expecting.get("no"):
         return expecting["no"]
     options = expecting.get("options") or []
+    if t in _BACK_WORDS:
+        back = next((p for label, p in options if guards.normalise(label).startswith("back")), None)
+        return back or "menu"
     if sum(p not in _CONTROL_PAYLOADS for _, p in options) < 2:
         return None  # a free-text step: "2" is an answer, not a pick
     t = guards.normalise(text)
-    m = _NUMBER_RE.match(t)
-    n = int(m.group(1)) if m else _NUMBER_WORDS.get(t)
+    picked = " ".join(w for w in t.split() if w not in _PICK_FILLER) or t  # "the first one" -> "first"
+    picked = _ORDINAL_RE.sub(r"\1", picked)  # "2nd" -> "2"
+    m = _NUMBER_RE.match(picked)
+    n = int(m.group(1)) if m else _NUMBER_WORDS.get(picked)
+    if picked == "last" and options:
+        real = [p for _, p in options if p not in _CONTROL_PAYLOADS and p not in ("human_handoff", "menu")]
+        return real[-1] if real else None
     if n:
         return options[n - 1][1] if n <= len(options) else None
     best, best_score = None, 0
@@ -350,7 +395,20 @@ def _expected_payload(expecting, text):
         score = fuzz.ratio(t, guards.normalise(label))
         if score > best_score:
             best, best_score = payload, score
-    return best if best_score >= LABEL_MATCH_MIN else None
+    if best_score >= LABEL_MATCH_MIN:
+        return best
+    # "savings" for [Savings Account]: the words typed are part of exactly
+    # one option's label.
+    words = set(t.split()) - _FILLER_WORDS
+    if words and len(t.split()) <= 3 and not t.endswith("?"):
+        hits = [p for label, p in options
+                if p not in _CONTROL_PAYLOADS and words <= set(guards.normalise(label).split())]
+        if len(hits) == 1:
+            return hits[0]
+    return None
+
+
+_FILLER_WORDS = frozenset({"the", "a", "an", "please", "pls", "one", "option"})
 
 
 def _route(session, text, payload):
@@ -445,6 +503,12 @@ def _route(session, text, payload):
             return _repeat(session)
         if command == "clarify":
             return _clarify(session)
+        if command == "more_details":
+            if any(p == MORE_PAYLOAD for _, p in (expecting or {}).get("options", [])):
+                return _more_options(session)  # "More…" in a WhatsApp list
+            if not session.active_flow:
+                return _more_details(session)
+            command = None  # inside a form "details" may be an answer
         if command:
             if command == "menu" and session.active_flow in ("fraud", "complaint"):
                 command = "cancel_flow"  # never drop a report without asking
@@ -452,7 +516,7 @@ def _route(session, text, payload):
 
     # 1c'. "yes", "2", or a typed button label answering the last reply (C3).
     if text and not payload:
-        picked = _expected_payload(expecting, text)
+        picked = _expected_payload(expecting, text, in_flow=bool(session.active_flow))
         if picked:
             replies, meta = _route(session, None, picked)
             return replies, dict(meta, expected_pick=picked)
@@ -769,6 +833,117 @@ def _did_you_mean_text(suggested):
     return msg("did_you_mean")
 
 
+_TOWN_QUESTION_RE = re.compile(
+    r"\b(?:branch|branches|office|offices|bank)\b.{0,30}?\b(?:in|at|near|around)\s+([a-z][a-z'-]{2,})"
+    r"|\b(?:in|at)\s+([a-z][a-z'-]{2,})\b.{0,20}?\b(?:branch|branches|office)\b",
+    re.IGNORECASE)
+_NOT_A_TOWN = frozenset({"the", "my", "your", "town", "zambia", "general", "person", "all", "any", "which"})
+
+
+def _branch_in_unlisted_town(session, text):
+    """ "do you have a branch in kabwe": a town with no listed branch gets a
+    straight answer and the list of towns, not a "did you mean" guess."""
+    if branches_mentioned(text):
+        return None
+    m = _TOWN_QUESTION_RE.search(text)
+    town = (m.group(1) or m.group(2)).lower() if m else None
+    if not town or town in _NOT_A_TOWN:
+        return None
+    replies = FLOWS["locator"].lookup(session, town)
+    return replies, {"action": "branch_not_listed", "intent": "branch_locator"}
+
+
+_BRANCH_DETAIL_RE = re.compile(
+    r"\b(?:time|open|opens|opening|close|closes|closing|hours|address|located|location|where|phone|number|"
+    r"contact|directions|find|branch|branches)\b", re.IGNORECASE)
+
+
+def _named_branch_detail(session, text):
+    """ "what time does the ndola branch close": the Ndola branch's line
+    (address, phone, hours) rather than a guess between hours and branches."""
+    matches = branches_mentioned(text)
+    if not matches or not _BRANCH_DETAIL_RE.search(text) or len(text.split()) > 14:
+        return None
+    return [FLOWS["locator"].found_reply(session, matches)], {"action": "branch_lookup", "intent": "branch_locator"}
+
+
+# "what's the interest rate?" right after a product: its full details hold
+# the answer (rate, fees, minimum, age, term...), better than a guess.
+_PRODUCT_ATTRIBUTE_RE = re.compile(
+    r"\b(?:interest|rate|rates|fee|fees|charge|charges|cost|costs|price|minimum|min|maximum|max|balance|"
+    r"deposit|age|old|young|years|months|term|tenure|period|long|withdraw\w*|limit|currency|currencies|"
+    r"benefits?|requirements?|qualify|eligible|eligibility|how\s+much)\b", re.IGNORECASE)
+
+
+# Product names as customers type them, longest first, for "what is the
+# minimum balance for tamanga" (a product named with a question about it).
+_PRODUCT_NAMES = [
+    (re.compile(r"\btamanga\s+plus\b", re.I), "tamanga_plus_account"),
+    (re.compile(r"\bsavings?\s+plan\b", re.I), "savings_plan_account"),
+    (re.compile(r"\bkids?\s+savings?\b|\bchild(?:ren)?'?s?\s+(?:savings?|account)\b", re.I), "kids_savings_account"),
+    (re.compile(r"\b(?:term|fixed)\s+deposits?\b|\btda\b", re.I), "term_deposit_account"),
+    (re.compile(r"\b(?:trader\s+mobility|motorbike|tricycle)\b", re.I), "trader_mobility_loan"),
+    (re.compile(r"\bmicro\s*loans?\b", re.I), "micro_loan"),
+    (re.compile(r"\bsme\s+loans?\b", re.I), "sme_loan"),
+    (re.compile(r"\boverdrafts?\b", re.I), "sme_overdraft"),
+    (re.compile(r"\bpersonal\s+loans?\b", re.I), "personal_loan"),
+    (re.compile(r"\b(?:mukula|business\s+account)\b", re.I), "business_account"),
+    (re.compile(r"\b(?:internet|online)\s+banking\b|\bmyabz\b", re.I), "online_banking"),
+    (re.compile(r"\byaka\b", re.I), "yaka_savings"),
+    (re.compile(r"\btamanga\b|\bcurrent\s+account\b", re.I), "current_account"),
+    (re.compile(r"\bsavings?\s+account\b", re.I), "savings_account"),
+]
+
+
+def _named_product(text):
+    for pattern, name in _PRODUCT_NAMES:
+        if pattern.search(text):
+            return name
+    return None
+
+
+def _about_last_product(session, text):
+    """The product named in the message, else the one just shown."""
+    if len(text.split()) > 12 or not _PRODUCT_ATTRIBUTE_RE.search(text):
+        return None
+    named = _named_product(text)
+    context = session.slots.get("context") or {}
+    if named:
+        intent = matcher.get(named)
+    else:
+        name = context.get("intent")
+        intent = matcher.get(name) if name else None
+        if not intent or context.get("age", 99) > CONTEXT_TURNS or len(text.split()) > CONTEXT_MAX_WORDS:
+            return None
+    if not intent or not (intent.get("answer_short") or named):
+        return None
+    replies, meta = _answer(session, intent, 1.0, full=True, keep_context=not named)
+    return replies, dict(meta, action="details", context_question=True)
+
+
+_PRAISE_RE = re.compile(
+    r"\b(?:staff|service|team|you|bank|branch|bot|assistant|people|everyone|lady|man|teller|agent)\b"
+    r".{0,40}\b(?:great|excellent|amazing|wonderful|awesome|fantastic|brilliant|superb|so\s+helpful|"
+    r"very\s+helpful|really\s+helpful|helpful|kind|friendly|the\s+best|good\s+job|well\s+done)\b"
+    r"|\b(?:thank|thanks)\b.{0,30}\b(?:staff|service|team|help)\b.{0,20}\b(?:great|excellent|amazing|wonderful)\b",
+    re.IGNORECASE)
+
+
+_NEGATED_RE = re.compile(r"(?i)\b" + guards.NEGATOR + r"\b|\bwasn'?t\b|\bweren'?t\b|\bisn'?t\b|\baren'?t\b")
+
+
+def _praise(text, ranked):
+    """ "your staff were great": a thank-you, not a guess at a product."""
+    if not _PRAISE_RE.search(text) or _NEGATED_RE.search(text) or text.rstrip().endswith("?"):
+        return None
+    if ranked and ranked[0][1] >= config.HIGH_CONFIDENCE:
+        return None
+    return (
+        [{"text": short_answer(matcher.get("compliment")).strip(), "buttons": list(MENU_BUTTONS)}],
+        {"action": "answer", "intent": "compliment"},
+    )
+
+
 def _free_text(session, text, urgent_flows=True):
     """Matcher + confidence gate. `urgent_flows=False` is used after the
     customer has said "no, it's not fraud": an intent that would start the
@@ -780,13 +955,26 @@ def _free_text(session, text, urgent_flows=True):
             if matcher.get(n).get("flow") not in ("fraud", "complaint")
         ]
     shadow.observe(session, text, ranked)  # N4: logs only, never changes the reply
+    unknown_town = _branch_in_unlisted_town(session, text)
+    if unknown_town:
+        return unknown_town
+    praise = _praise(text, ranked)
+    if praise:
+        return praise
     boosted = _context_follow_up(session, text, ranked)
     if boosted:
         return boosted
     both = _two_questions(session, text)
     if both:
         return both
+    named_branch = _named_branch_detail(session, text)
+    if named_branch:
+        return named_branch
     top_name, top_score = ranked[0] if ranked else (None, 0.0)
+    if top_score < config.HIGH_CONFIDENCE:
+        about_it = _about_last_product(session, text)
+        if about_it:
+            return about_it
 
     if top_name and top_score >= config.HIGH_CONFIDENCE:
         intent = matcher.get(top_name)
@@ -988,6 +1176,18 @@ def _repeat(session):
     if not session.last_replies:
         return [{"text": msg("menu"), "buttons": list(MENU_BUTTONS)}], {"action": "repeat"}
     return copy.deepcopy(session.last_replies), {"action": "repeat"}
+
+
+def _more_details(session):
+    """ "Tell me more": the full answer behind the last short one, or an
+    honest "that's all I have" with a way to someone who knows more."""
+    intent = matcher.get(session.last_answer_intent) if session.last_answer_intent else None
+    if intent and intent.get("answer_short"):
+        replies, meta = _answer(session, intent, 1.0, full=True)
+        return replies, dict(meta, action="details")
+    buttons = [b for b in (intent or {}).get("buttons", []) if b["payload"].startswith(LEAD_PREFIX)]
+    buttons += [button("talk_to_a_person", "human_handoff"), button("main_menu", "menu")]
+    return [{"text": msg("no_more_details"), "buttons": buttons}], {"action": "no_more_details"}
 
 
 def _clarify(session):

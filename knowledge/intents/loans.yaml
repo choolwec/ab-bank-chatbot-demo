@@ -24,6 +24,11 @@ intents:
       - "how much can i borrow for my business"
       - "loan to buy stock for my shop"
       - "small business loan"
+    exact_phrases:
+      - "loan interest rate"
+      - "interest rate on loans"
+      - "loan interest"
+      - "what is the interest on a business loan"
     answer_short: "Business loans need 12+ months of trading, a guarantor and collateral, in a town we serve. Interest is 3%-8% a month over 4-30 months."
     answer: |
       Business (Micro & SME) loans are available if your business:
@@ -97,7 +102,6 @@ intents:
       - "personal loan"
       - "consumer loan"
       - "loan for government employees"
-      - "civil servant loan"
       - "salary loan"
       - "personal loan interest rate"
       - "how much personal loan can i get"
@@ -111,6 +115,13 @@ intents:
       - "loan against my salary"
       - "personal loans"
       - "personal loan without collateral"
+      - "i work for the government and want a loan"
+      - "loan for government workers"
+      - "civil servant loan"
+    exact_phrases:
+      - "i work for the government and want a loan"
+      - "loan for government workers"
+      - "civil servant loan"
     answer_short: "Personal loans are for government employees only: ZMW 1,000-500,000 at up to 3.75% a month, no collateral, ready within 24 hours of full documents."
     answer: |
       Personal loans are available to government employees only:
@@ -252,6 +263,9 @@ intents:
       - "collateral"
       - "can i use land as collateral"
       - "can i use household goods as collateral"
+    exact_phrases:
+      - "loan without collateral"
+      - "do i need collateral for a loan"
     answer_short: "Collateral can be household goods, fixed assets, or a building, land or vehicle. Your Business Officer assesses it at your premises."
     answer: |
       Collateral can include household goods, fixed assets, and/or a
@@ -315,6 +329,12 @@ intents:
       - "loan"
       - "business financing"
       - "financing"
+      - "can i get a loan"
+      - "do you give loans"
+      - "loan please"
+      - "what loans do you have"
+      - "types of loans"
+      - "how much can i borrow"
     answer: "Looking for business financing?\nWe have financing solutions to support your business needs, from working capital to expansion and asset acquisition.\nHow can we help your business today?"
     buttons:
       - {label: "Business Loan", payload: "business_loan_options"}
@@ -355,6 +375,22 @@ intents:
       - "three wheeler loan"
       - "walking tractor loan"
       - "loan to buy a motorbike for my business"
+      - "buy a motorbike for my business"
+      - "motorbike for deliveries"
+      - "finance a motorbike"
+      - "tricycle for my business"
+      - "loan to buy a tricycle"
+    exact_phrases:
+      - "i want to buy a tricycle for my business"
+      - "loan for a tricycle"
+      - "tricycle"
+      - "motorbike"
+      - "loan for a three wheeler"
+      - "buy a motorbike for my business"
+      - "motorbike for deliveries"
+      - "finance a motorbike"
+      - "tricycle for my business"
+      - "loan to buy a tricycle"
     answer: "Looking to keep your business moving?\nOur Trader Mobility Loan helps you finance motorbikes, tricycles, three-wheelers, and walking tractors, giving your business the mobility it needs to reach more customers, make more deliveries, and seize new opportunities.\nReady to make your next move?"
     on_yes: lead:trader_mobility_loan
     on_no: business_loan_options

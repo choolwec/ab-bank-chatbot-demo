@@ -31,7 +31,7 @@ def test_heldout_never_copied_into_intent_phrases():
     phrases = {
         str(p).lower().strip()
         for intent in matcher.intents.values()
-        for p in intent.get("phrases", [])
+        for p in list(intent.get("phrases", [])) + list(intent.get("exact_phrases", []))
     }
     heldout = load_heldout()
     from admin.eval_report import load_oos

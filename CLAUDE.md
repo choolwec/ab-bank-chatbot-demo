@@ -201,6 +201,27 @@ not incidental:
   and `online_banking` use `match: exact`: answered only when the WHOLE normalised message is one of
   the phrases, and kept out of the scored TF-IDF index so it can never take a
   real question or move the E3 gates.
+- Natural conversation (2026-10-02, `docs/conversation-probe-2026-10-02.md`,
+  locked in by `tests/test_natural_conversation.py`, 423 cases): outside a
+  form, "I'm interested" / "contact me" is a yes and "maybe later" / "not now"
+  a no to a product's question (`_INTERESTED_RE`, `_SOFT_NO`; never inside a
+  form, so the consent question still needs a plain answer); "go back" picks
+  the Back button; "the first one", "2nd", "the last one" pick options;
+  typed words that are part of exactly one button label pick it. "Tell me
+  more" (`more_details` command) sends the full answer behind the last short
+  one. A short question about an attribute (interest, fee, age, minimum...)
+  of the product just shown or named in the message gets its full details
+  (`_about_last_product`, `_PRODUCT_NAMES`). "branch in kabwe" (unlisted
+  town) says so and lists the towns (`_branch_in_unlisted_town`); "what time
+  does the ndola branch close" gives that branch's line
+  (`_named_branch_detail`, after C10). Praise ("your staff were great") is
+  thanked (`_praise`). Lead form: the name is pulled out of "my name is..."
+  and anything not a name is asked again (`lead.is_name`); call times are
+  normalised ("after 2pm" -> Afternoon); at the summary "change my number"
+  goes straight to that field (`base._FIELD_WORDS`); phone numbers are
+  canonical ("+260..." -> "0977...") in `clean_phone`. A person asking for a
+  PIN/OTP is a hard fraud signal (`SCAM_CALL_RE`); failed or missing
+  transactions are a soft complaint signal (`COMPLAINT_SOFT_RE`).
 - Every reply is guaranteed at least one button before `handle()` returns —
   a hard "no dead ends" invariant enforced in code, not a per-answer
   convention to remember.
@@ -297,6 +318,16 @@ are a strict list in `tests/test_embeddings.py`; the one left is a bare
 24/09/2026 calibration. Launch in hybrid mode is recommended once shadow mode
 (`SHADOW_MATCHER=true`, on for staging in `render.yaml`) has had a weekly
 `admin.shadow_report` review (`docs/metrics-matcher-2026-09-24.md`).
+
+**Before scoring (2026-10-02).** `matcher.normalise` maps text-speak and
+common misspellings word by word (`_SPELLING`: u, ur, hw, wat, pls, thnx,
+acc, tamnga, lsk...), for phrases and messages alike. `match()` then strips
+`[... REDACTED]` placeholders, sets aside a leading greeting or politeness
+("hi there", "please"; an addressee like "there" or "sir" only after a
+greeting) and a "my name is X and" introduction (`strip_social`), and reads
+"tell me about X" / "what about X" as X when X is exactly a phrase
+(`topic_of`). Any intent may list `exact_phrases`: whole-message wordings
+kept out of the scored index (conflicts across intents raise at load).
 
 **Negation (both modes).** `matcher.drop_negated_clauses()` drops a clause
 matching `guards.NEGATED_REQUEST_RE` (negated wanting or asking: "I don't

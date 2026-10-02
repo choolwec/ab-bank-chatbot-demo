@@ -212,6 +212,17 @@ intents:
       - "business acc"
       - "account for my small business"
       - "account for a club or association"
+      - "we are a church"
+      - "account for an ngo"
+      - "account for our club"
+      - "account for our association"
+      - "our organisation needs an account"
+    exact_phrases:
+      - "we are a church"
+      - "account for an ngo"
+      - "account for our club"
+      - "account for our association"
+      - "our organisation needs an account"
     answer_short: "Growing your business? Let's help you bank with confidence.\nOur Mukula Plus Corporate Current Account is designed for limited companies, sole traders, partnerships, NGOs, churches, clubs and associations. Open your account in ZMW, USD or EUR and enjoy banking solutions tailored to your business needs.\nWould you like us to help you get started?"
     answer: |
       Mukula Plus is our corporate/business current account — for limited
@@ -326,7 +337,6 @@ intents:
     phrases:
       - "kids savings"
       - "childrens account"
-      - "savings account for my child"
       - "minor account"
       - "account for my kid"
       - "savings for my son"
@@ -341,6 +351,17 @@ intents:
       - "bank account for my kids"
       - "junior savings account"
       - "kids savings interest"
+      - "account for my son"
+      - "account for my daughter"
+      - "savings account for my child"
+    exact_phrases:
+      - "i want to open an account for my son"
+      - "i want to open an account for my daughter"
+      - "i want to open an account for my child"
+      - "open an account for my child"
+      - "account for my son"
+      - "account for my daughter"
+      - "savings account for my child"
     answer_short: "Saving for your child's future?\nOur Kids Savings Account is designed for children under 16. It's a great way to help your child develop healthy savings habits from an early age while earning 7% interest per annum to grow their savings over time.\nReady to start saving for your child's future?"
     answer: |
       Kids Savings is a joint account opened for a minor (under 16) by
@@ -496,6 +517,15 @@ intents:
       - "reference form for account opening"
       - "do i need a tpin to open an account"
       - "do i need proof of residence"
+      - "can i open an account with just my nrc"
+      - "is an nrc enough to open an account"
+    exact_phrases:
+      - "what documents do i need to open an account"
+      - "documents needed to open an account"
+      - "requirements to open an account"
+      - "what documents are required to open an account"
+      - "can i open an account with just my nrc"
+      - "is an nrc enough to open an account"
     answer_short: "Bring to any branch: your original ID (NRC, passport or driving licence), proof of residence, TPIN certificate, and a signed reference form."
     answer: |
       To open a personal account, visit any branch with:
@@ -657,6 +687,10 @@ intents:
       - "savings accounts"
       - "savings"
       - "i want to save"
+      - "what savings accounts do you have"
+      - "types of savings accounts"
+      - "which savings account is best"
+      - "savings products"
     answer: "Looking to grow your savings?\nAB Bank offers a range of savings solutions to help you save for everyday needs, future goals, or your child's future.\nWhich savings solution would you like to explore?"
     buttons:
       - {label: "Savings Account", payload: "savings_account"}

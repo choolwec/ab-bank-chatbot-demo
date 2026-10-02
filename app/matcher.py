@@ -20,8 +20,75 @@ from . import config, guards
 _PUNCT_RE = re.compile(r"[^\w\s']+")
 
 
+# Text-speak and common misspellings, word by word, for phrases and
+# messages alike ("hw r u", "wats ur number", "tnx", "open acc pls").
+_SPELLING = {
+    "u": "you", "ur": "your", "r": "are", "hw": "how", "wat": "what", "wot": "what", "wht": "what",
+    "wats": "whats", "whts": "whats", "pls": "please", "plz": "please", "plse": "please", "plis": "please",
+    "thnx": "thanks", "thnks": "thanks", "tnx": "thanks", "thx": "thanks", "thanx": "thanks", "ty": "thanks",
+    "tq": "thanks", "sum1": "someone", "sm1": "someone", "smone": "someone", "acc": "account",
+    "acct": "account", "accnt": "account", "acount": "account", "accout": "account", "acoount": "account",
+    "accounr": "account", "accs": "accounts", "acounts": "accounts", "tamnga": "tamanga", "tamaga": "tamanga",
+    "tamanaga": "tamanga", "etumbaa": "etumba", "savngs": "savings", "savigs": "savings", "lon": "loan",
+    "lones": "loans", "abt": "about", "wen": "when", "whr": "where", "wer": "where", "hv": "have",
+    "cn": "can", "2day": "today", "2moro": "tomorrow", "tmrw": "tomorrow", "ppl": "people", "coz": "because",
+    "bcoz": "because", "2": "to", "4": "for", "lsk": "lusaka", "brnch": "branch", "branc": "branch", "nmbr": "number", "numba": "number",
+}
+
+
 def normalise(text: str) -> str:
-    return " ".join(_PUNCT_RE.sub(" ", (text or "").lower()).split())
+    words = _PUNCT_RE.sub(" ", (text or "").lower()).split()
+    return " ".join(_SPELLING.get(w, w) for w in words)
+
+
+# Greetings and politeness around a request ("hi, where is the kitwe branch
+# please"). They are set aside before matching, so "hi how are you" is small
+# talk and "hello i need a loan" is a loan question. A message that is ONLY a
+# greeting is the greeting intent (its own phrases).
+_GREETING = (r"(?:hi+|hello+|helo|hallo|hey+|hie|howdy|greetings|dear|yo|"
+             r"good\s+(?:morning|afternoon|evening|day)|morning|afternoon|evening)")
+# After a greeting only: "hi there", "hello sir" -- "there is an odd
+# withdrawal" keeps its "there".
+_ADDRESSEE = r"(?:there|sir|madam|mam|maam|boss|ba|bro|team|bot|ab\s+bank|abbank|guys)"
+_POLITE = r"(?:please|pls|plz|kindly|excuse\s+me|sorry\s+to\s+bother(?:\s+you)?)"
+_LEAD_SOCIAL_RE = re.compile(
+    rf"^(?:(?:{_GREETING}(?:\s+{_ADDRESSEE})*|{_POLITE})\s+)+")
+_TRAIL_SOCIAL_RE = re.compile(
+    r"(?:\s+(?:please|pls|plz|sir|madam|mam|boss|ba|bot|team))+$")
+
+
+# "tell me about tamanga", "what about the savings plan", "info on etumba":
+# a lead-in before a topic. What is left is looked up as a WHOLE phrase only.
+_TOPIC_LEAD_RE = re.compile(
+    r"^(?:(?:can\s+you\s+|could\s+you\s+|please\s+)?(?:tell|show)\s+me\s+(?:more\s+)?about|"
+    r"(?:i\s+(?:want|would\s+like|wanna)\s+to\s+know|i\s+need\s+(?:info|information))\s+(?:more\s+)?about|"
+    r"(?:more\s+)?(?:info|information|details)\s+(?:on|about)|what\s+about|how\s+about|explain|"
+    r"what\s+is|what\s+s|whats|what\s+are)\s+(?:the\s+|your\s+|a\s+|an\s+)?")
+
+
+def topic_of(q: str) -> str:
+    """ "tell me about the tamanga plus" -> "tamanga plus"; else ""."""
+    core = _TOPIC_LEAD_RE.sub("", q, count=1).strip()
+    return core if core != q else ""
+
+
+# "my name is mary and i want to open a savings account": the introduction
+# goes, the request stays. Only with "and" or a comma after the name, so
+# "i am a market trader..." keeps its meaning.
+_INTRO_RE = re.compile(
+    r"^(?:my\s+name\s+is|my\s+names\s+is|this\s+is|i\s+am|i'?m|im)\s+[a-z'-]+(?:\s+[a-z'-]+)?\s+and\s+")
+
+
+def strip_social(q: str) -> str:
+    """ "hi there how are you" -> "how are you"; "" when it was all greeting."""
+    q = _LEAD_SOCIAL_RE.sub("", q + " ").strip()
+    q = _INTRO_RE.sub("", q + " ").strip()
+    return _TRAIL_SOCIAL_RE.sub("", q).strip()
+
+
+_REDACTED_RE = re.compile(
+    r"(?i)(?:\b(?:my\s+)?(?:account|acc|card|nrc|pin|password)\s*(?:number|no\.?|#)?\s*(?:is|:)?\s*)?"
+    r"\[[A-Z ]*REDACTED\]")
 
 
 # C10's clause splitter (router._two_questions uses it too).
@@ -96,9 +163,17 @@ class Matcher:
                     raise ValueError(f"duplicate intent id: {name} ({path.name})")
                 item["_source"] = path.name
                 self.intents[name] = item
+                # `exact_phrases`: more whole-message wordings for any intent,
+                # outside the scored index (they never shift its weights).
+                exact = list(item.get("exact_phrases", []))
                 if item.get("match") == "exact":
-                    for p in item.get("phrases", []):
-                        self._exact[normalise(str(p))] = name
+                    exact += item.get("phrases", [])
+                for p in exact:
+                    key = normalise(str(p))
+                    if self._exact.get(key, name) != name:
+                        raise ValueError(f"exact phrase {p!r} is claimed by {self._exact[key]} and {name}")
+                    self._exact[key] = name
+                if item.get("match") == "exact":
                     continue
                 for p in item.get("phrases", []):
                     phrases.append(normalise(str(p)))
@@ -107,6 +182,9 @@ class Matcher:
             raise RuntimeError(f"no intent phrases found under {config.INTENTS_DIR}")
         self._phrases = phrases
         self._owners = owners
+        self._phrase_owner: dict[str, str] = {}
+        for p, o in zip(phrases, owners):
+            self._phrase_owner.setdefault(p, o)
         self._vec = TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5))
         self._matrix = self._vec.fit_transform(phrases)
         self._embedder = None
@@ -189,11 +267,25 @@ class Matcher:
         return {"char": self._char_scores(q), "emb": self._emb_scores(q) if self.mode == "hybrid" else {}}
 
     def match(self, text: str, top_n: int = 5) -> list[tuple[str, float]]:
+        text = _REDACTED_RE.sub(" ", text or "")  # "my account number is [ACCOUNT REDACTED] i want a loan"
         q = normalise(drop_negated_clauses(text))
         if not q:
             return []
         if q in self._exact:
             return [(self._exact[q], 1.0)]
+        core = strip_social(q)
+        if core != q:
+            if not core:
+                return [("greeting", 1.0)] if "greeting" in self.intents else []
+            if core in self._exact:
+                return [(self._exact[core], 1.0)]
+            if len(core.split()) >= 2:  # "good morning bank" stays as typed
+                q = core
+        topic = topic_of(q) if q not in self._phrase_owner else ""
+        if topic:
+            owner = self._exact.get(topic) or self._phrase_owner.get(topic)
+            if owner:
+                return [(owner, 1.0)]
         char = self._char_scores(q)
         if self.mode == "char":
             return sorted(char.items(), key=lambda kv: -kv[1])[:top_n]

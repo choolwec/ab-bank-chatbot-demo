@@ -39,7 +39,7 @@ def find_branches(needle: str) -> list[dict]:
 def branches_mentioned(text: str) -> list[dict]:
     """Branches whose town or own name appears in `text` as whole words:
     "where is the kitwe branch", "is there a branch in chilenje"."""
-    lowered = (text or "").lower()
+    lowered = re.sub(r"\blsk\b", "lusaka", (text or "").lower())  # "lsk" is how many write Lusaka
     found = []
     for b in _load()["branches"]:
         short = re.sub(r"(?i)\s+(?:premium\s+)?(?:satellite\s+|promotional\s+)?(?:branch|office).*$", "", b["name"]).strip().lower()

@@ -130,3 +130,7 @@ complaint | the teller was rude to me
 complaint | this is unacceptable, i have waited two hours
 complaint | i want to dispute a charge
 complaint | complaint
+fraud | i got a call from someone saying they are from ab bank asking for my pin
+fraud | a man called me asking for my otp
+fraud | someone on whatsapp wanted my etumba pin
+fraud | they called saying they are from customer care and asked me to send them my pin

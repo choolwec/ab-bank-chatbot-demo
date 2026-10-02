@@ -42,6 +42,9 @@ messages:
     status: draft
     fills: [flow]
     text: Your {flow} isn't sent yet. Stop anyway?
+  no_more_details:
+    status: draft
+    text: That's everything I have on this here. Our team can tell you more and answer any questions.
   restart_confirm:
     status: draft
     fills: [flow]
@@ -354,6 +357,9 @@ messages:
     text: |-
       Thank you. Our Contact Centre is closed right now, so a representative will contact you {when}. Your reference is {ref}.
       Anything else I can help with?
+  lead.retry.name:
+    status: draft
+    text: I just need your name, so our team knows who to ask for when they call. What's your full name?
   lead.retry.phone:
     status: draft
     text: That doesn't look like a valid number — please send it as 09XXXXXXX (10 digits), 260XXXXXXXXX (12 digits), or +260XXXXXXXXX, so our team can actually reach you.

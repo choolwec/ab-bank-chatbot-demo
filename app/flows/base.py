@@ -29,13 +29,32 @@ DONE_BUTTON = button("no_that_s_all", "thanks_goodbye")
 PHONE_RE = re.compile(r"^(?:0\d{9}|260\d{9}|\+260\d{9})$")
 
 
+# Typed at the summary: which field to change ("my number is wrong").
+_CHANGE_WORDS_RE = re.compile(r"\b(?:change|wrong|incorrect|edit|update|fix|correct|mistake|not\s+right)\b", re.IGNORECASE)
+_FIELD_WORDS = {
+    "phone": r"\b(?:number|phone|cell|mobile|contact\s+number)\b",
+    "contact": r"\b(?:number|phone|email|contact)\b",
+    "name": r"\bname\b",
+    "time": r"\b(?:time|when|morning|afternoon)\b",
+    "marketing_consent": r"\b(?:offers|news|marketing|messages)\b",
+    "details": r"\b(?:details|description|what\s+happened|story)\b",
+    "topic": r"\b(?:topic|subject|about)\b",
+}
+
+
 def is_valid_zambian_phone(text: str) -> bool:
     cleaned = re.sub(r"[ \-]", "", text or "")
     return bool(PHONE_RE.fullmatch(cleaned))
 
 
 def clean_phone(text: str) -> str:
-    return re.sub(r"[ \-]", "", text or "")
+    """One canonical form for a Zambian number: "0977123456" (also from
+    "+260 977 123 456" and "260977123456")."""
+    cleaned = re.sub(r"[ \-]", "", text or "")
+    if PHONE_RE.fullmatch(cleaned):
+        digits = cleaned.lstrip("+")
+        return "0" + digits[3:] if digits.startswith("260") else digits
+    return cleaned
 
 
 def format_phone(text: str) -> str:
@@ -344,6 +363,17 @@ class FormFlow:
             state.pop("changing", None)
             state["editing"] = payload[len(CHANGE_PREFIX):]
             return [self._prompt(self.steps.index(state["editing"]), session)], False
+        # "change my number", "the name is wrong": straight to that field.
+        if text and _CHANGE_WORDS_RE.search(text):
+            data = state.get("data", {})
+            for field, pattern in _FIELD_WORDS.items():
+                if (field in self.steps and field in data and not self.skip_step(session, field)
+                        and re.search(pattern, text, re.IGNORECASE)):
+                    state.pop("changing", None)
+                    state["editing"] = field
+                    return [self._prompt(self.steps.index(field), session)], False
+            state["changing"] = True
+            return [self._change_prompt(session)], False
         # Anything else: ask the same question again, no dead end.
         return self.resume(session), False
 

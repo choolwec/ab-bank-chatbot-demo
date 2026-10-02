@@ -128,7 +128,7 @@ Follow-up buttons: Yes, I'm interested · Back
 ### Business account (Mukula Plus)  `business_account`
 
 - Status: **draft**
-- Trigger phrases (21): "business account", "busness account", "account for my business", "msme account", "company account", "account for my shop", "sme account", "business banking", "open account for business", "corporate account", "mukula plus", "what is mukula plus", "mukula plus account", "account for my company", "open a company account", "bank account for my ngo", "church bank account", "account for a sole trader", "business acc", "account for my small business", "account for a club or association"
+- Trigger phrases (26): "business account", "busness account", "account for my business", "msme account", "company account", "account for my shop", "sme account", "business banking", "open account for business", "corporate account", "mukula plus", "what is mukula plus", "mukula plus account", "account for my company", "open a company account", "bank account for my ngo", "church bank account", "account for a sole trader", "business acc", "account for my small business", "account for a club or association", "we are a church", "account for an ngo", "account for our club", "account for our association", "our organisation needs an account"
 
 Short answer (shown first, with a "More details" button):
 
@@ -207,7 +207,7 @@ Follow-up buttons: Yes, contact me · Back
 ### Kids Savings account  `kids_savings_account`
 
 - Status: **draft**
-- Trigger phrases (17): "kids savings", "childrens account", "savings account for my child", "minor account", "account for my kid", "savings for my son", "savings for my daughter", "under 16 bank account", "guardian savings account", "child savings account requirements", "account for children", "kids account", "open an account for my baby", "child account", "bank account for my kids", "junior savings account", "kids savings interest"
+- Trigger phrases (19): "kids savings", "childrens account", "minor account", "account for my kid", "savings for my son", "savings for my daughter", "under 16 bank account", "guardian savings account", "child savings account requirements", "account for children", "kids account", "open an account for my baby", "child account", "bank account for my kids", "junior savings account", "kids savings interest", "account for my son", "account for my daughter", "savings account for my child"
 
 Short answer (shown first, with a "More details" button):
 
@@ -294,7 +294,7 @@ Follow-up buttons: Types of accounts · Find a branch · Talk to a person
 ### What you need to open an account  `account_opening_requirements`
 
 - Status: **draft**
-- Trigger phrases (16): "what do i need to open an account", "requirements to open account", "documents for opening account", "requirements for opening acount", "what documents do i need", "do i need my nrc", "kyc requirements", "what should i bring to open account", "papers needed to open account", "requirements to open a bank account", "requirements for opening an account", "which documents are required to open an account", "account opening requirements", "reference form for account opening", "do i need a tpin to open an account", "do i need proof of residence"
+- Trigger phrases (18): "what do i need to open an account", "requirements to open account", "documents for opening account", "requirements for opening acount", "what documents do i need", "do i need my nrc", "kyc requirements", "what should i bring to open account", "papers needed to open account", "requirements to open a bank account", "requirements for opening an account", "which documents are required to open an account", "account opening requirements", "reference form for account opening", "do i need a tpin to open an account", "do i need proof of residence", "can i open an account with just my nrc", "is an nrc enough to open an account"
 
 Short answer (shown first, with a "More details" button):
 
@@ -393,7 +393,7 @@ Follow-up buttons: Find a branch · Talk to a person
 ### Savings options  `savings_options`
 
 - Status: **draft**
-- Trigger phrases (4): "savings options", "savings accounts", "savings", "i want to save"
+- Trigger phrases (8): "savings options", "savings accounts", "savings", "i want to save", "what savings accounts do you have", "types of savings accounts", "which savings account is best", "savings products"
 
 Customer-facing answer:
 
@@ -670,7 +670,7 @@ Follow-up buttons: eTumba · Online Banking · Main menu · Talk to a person
 ### Online Banking  `online_banking`
 
 - Status: **draft**
-- Trigger phrases (9): "online banking", "internet banking", "myabz", "my abz", "register for internet banking", "register for online banking", "sign up for online banking", "i want internet banking", "i want online banking"
+- Trigger phrases (16): "online banking", "internet banking", "myabz", "my abz", "register for internet banking", "register for online banking", "sign up for online banking", "i want internet banking", "i want online banking", "how do i register for internet banking", "how do i register for online banking", "how do i get internet banking", "internet banking registration", "online banking registration", "how to register for internet banking", "i want to register for internet banking"
 
 Customer-facing answer:
 
@@ -782,7 +782,7 @@ Follow-up buttons: Business loan details · Loan requirements · Talk to a perso
 ### Personal loans (government employees)  `personal_loan`
 
 - Status: **draft**
-- Trigger phrases (17): "personal loan", "consumer loan", "loan for government employees", "civil servant loan", "salary loan", "personal loan interest rate", "how much personal loan can i get", "personal loan requirements", "loan for public service worker", "government worker loan", "loan for civil servants", "i am a teacher can i get a loan", "government employee loan", "payslip loan", "loan against my salary", "personal loans", "personal loan without collateral"
+- Trigger phrases (19): "personal loan", "consumer loan", "loan for government employees", "salary loan", "personal loan interest rate", "how much personal loan can i get", "personal loan requirements", "loan for public service worker", "government worker loan", "loan for civil servants", "i am a teacher can i get a loan", "government employee loan", "payslip loan", "loan against my salary", "personal loans", "personal loan without collateral", "i work for the government and want a loan", "loan for government workers", "civil servant loan"
 
 Short answer (shown first, with a "More details" button):
 
@@ -907,7 +907,7 @@ Follow-up buttons: Loan requirements · Find a branch · Request a callback
 ### Loans  `loans_overview`
 
 - Status: **draft**
-- Trigger phrases (4): "loans", "loan", "business financing", "financing"
+- Trigger phrases (10): "loans", "loan", "business financing", "financing", "can i get a loan", "do you give loans", "loan please", "what loans do you have", "types of loans", "how much can i borrow"
 
 Customer-facing answer:
 
@@ -933,7 +933,7 @@ Follow-up buttons: Trader Mobility Loan · Micro Loan · SME Loan · Back · Tal
 ### Trader Mobility Loan  `trader_mobility_loan`
 
 - Status: **draft**
-- Trigger phrases (8): "trader mobility loan", "loan for a motorbike", "motorbike loan", "tricycle loan", "finance a tricycle", "three wheeler loan", "walking tractor loan", "loan to buy a motorbike for my business"
+- Trigger phrases (13): "trader mobility loan", "loan for a motorbike", "motorbike loan", "tricycle loan", "finance a tricycle", "three wheeler loan", "walking tractor loan", "loan to buy a motorbike for my business", "buy a motorbike for my business", "motorbike for deliveries", "finance a motorbike", "tricycle for my business", "loan to buy a tricycle"
 
 Customer-facing answer:
 
@@ -1046,7 +1046,7 @@ Follow-up buttons: Request a callback · Find a branch · Opening hours
 ### Complaints & feedback  `complaints_feedback`
 
 - Status: **draft**
-- Trigger phrases (7): "complaints and feedback", "complaints & feedback", "feedback", "give feedback", "compliment", "suggestion", "complaints"
+- Trigger phrases (15): "complaints and feedback", "complaints & feedback", "feedback", "give feedback", "compliment", "suggestion", "complaints", "i want to give feedback", "i have a suggestion", "i have feedback", "how do i give feedback", "where can i give feedback", "i want to compliment your staff", "i want to praise your staff", "suggestion box"
 
 Customer-facing answer:
 
@@ -1121,7 +1121,7 @@ Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Ba
 ### How are you?  `how_are_you`
 
 - Status: **draft**
-- Trigger phrases (13): "how are you", "how are you doing", "how r u", "how are u", "how is it going", "hows it going", "how's your day", "how is your day going", "how are things", "how have you been", "are you okay", "you good", "how are you today"
+- Trigger phrases (24): "how are you", "how are you doing", "how r u", "how are u", "how is it going", "hows it going", "how's your day", "how is your day going", "how are things", "how have you been", "are you okay", "you good", "how are you today", "how are you doing today", "hows your day going", "how is your day", "how's your day going", "how r you", "hw are you", "how was your day", "how is everything", "how are things going", "are you well", "how is your day going today"
 
 Customer-facing answer:
 
@@ -1132,7 +1132,7 @@ Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Ba
 ### I'm fine  `small_talk_fine`
 
 - Status: **draft**
-- Trigger phrases (15): "i'm fine", "im fine", "i am fine", "fine thanks", "fine thank you", "i'm okay", "i am okay", "i'm well", "i am well thank you", "doing well", "fine and you", "good and you", "i'm fine and you", "not bad", "pretty good"
+- Trigger phrases (27): "i'm fine", "im fine", "i am fine", "fine thanks", "fine thank you", "i'm okay", "i am okay", "i'm well", "i am well thank you", "doing well", "fine and you", "good and you", "i'm fine and you", "not bad", "pretty good", "i am fine thanks", "im fine thanks", "i'm fine thank you", "fine", "good thanks", "i am good", "i'm good thank you", "very well thank you", "i am doing well", "i'm doing well", "doing fine", "all good"
 
 Customer-facing answer:
 
@@ -1143,7 +1143,7 @@ Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Ba
 ### Your name  `bot_name`
 
 - Status: **draft**
-- Trigger phrases (10): "what is your name", "what's your name", "whats your name", "do you have a name", "your name", "who am i talking to", "who am i chatting with", "who made you", "who built you", "who created you"
+- Trigger phrases (15): "what is your name", "what's your name", "whats your name", "do you have a name", "your name", "who am i talking to", "who am i chatting with", "who made you", "who built you", "who created you", "whats ur name", "what is ur name", "ur name", "what are you called", "what should i call you"
 
 Customer-facing answer:
 
@@ -1154,7 +1154,7 @@ Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Ba
 ### Okay  `acknowledgement`
 
 - Status: **draft**
-- Trigger phrases (14): "ok", "okay", "alright", "all right", "cool", "great", "got it", "i see", "sure", "sawa", "okay great", "oh okay", "understood", "perfect"
+- Trigger phrases (33): "ok", "okay", "alright", "all right", "cool", "great", "got it", "i see", "sure", "sawa", "okay great", "oh okay", "understood", "perfect", "ok noted", "noted", "ok got it", "ok cool", "nice", "wow", "oh nice", "interesting", "ok then", "alright then", "okay cool", "ok sure", "sounds good", "yes", "yeah", "yep", "yes please", "ya", "yah"
 
 Customer-facing answer:
 
@@ -1165,7 +1165,7 @@ Follow-up buttons: 🏦 Accounts · 💰 Loans · 💵 Invest · 📱 Digital Ba
 ### Compliment  `compliment`
 
 - Status: **draft**
-- Trigger phrases (14): "you are helpful", "you're helpful", "great job", "well done", "good job", "you are smart", "good bot", "you are amazing", "that was helpful", "this is great", "nice work", "you are the best", "haha", "lol"
+- Trigger phrases (25): "you are helpful", "you're helpful", "great job", "well done", "good job", "you are smart", "good bot", "you are amazing", "that was helpful", "this is great", "nice work", "you are the best", "haha", "lol", "you are very helpful", "very helpful", "that was very helpful", "that helps", "you're great", "you are great", "well done bot", "haha nice", "hahaha", "lol ok", "you are smart bot"
 
 Customer-facing answer:
 
@@ -1332,7 +1332,7 @@ Submitted to Meta under these names; `{{1}}` is the case reference.
 > Hello, this is AB Bank. Your callback request {{1}} is booked, and our team will call you within one working day.
 
 
-## System messages (167 texts)
+## System messages (169 texts)
 
 Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts, retries, confirmations. Source: `knowledge/system_messages.yaml`. `{placeholders}` are filled in by the bot (contact details from `app/config.py`, or the values listed).
 
@@ -1380,6 +1380,12 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 - Filled in by the bot: `{flow}`
 
 > Your {flow} isn't sent yet. Stop anyway?
+
+### `no_more_details`
+
+- Status: **draft**
+
+> That's everything I have on this here. Our team can tell you more and answer any questions.
 
 ### `restart_confirm`
 
@@ -1978,6 +1984,12 @@ Built-in wording that is not an intent answer: welcome, fallbacks, flow prompts,
 
 > Thank you. Our Contact Centre is closed right now, so a representative will contact you {when}. Your reference is {ref}.
 > Anything else I can help with?
+
+### `lead.retry.name`
+
+- Status: **draft**
+
+> I just need your name, so our team knows who to ask for when they call. What's your full name?
 
 ### `lead.retry.phone`
 

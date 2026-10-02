@@ -354,7 +354,7 @@ def test_fraud_contact_is_read_back_formatted(bot):
     b.say("12345")  # rejected first
     b.say("260 977 123 456")
     assert "Got it: 0977 123 456." in b.text
-    assert _ticket_fields(_ref(b.text))["contact"] == "260977123456"
+    assert _ticket_fields(_ref(b.text))["contact"] == "0977123456"  # one canonical form in every flow
 
 
 def test_fraud_contact_accepts_email(bot):

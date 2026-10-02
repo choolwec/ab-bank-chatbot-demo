@@ -16,6 +16,7 @@ MARKETING_CONSENT_ENABLED is off or the customer opted out this session
 """
 
 import datetime as dt
+import re
 
 from .. import audit, campaign, config, guards
 from ..messages import button, msg
@@ -78,6 +79,66 @@ def consent_answer(text):
     return None
 
 
+# The name step: "my name is Mary Banda" -> "Mary Banda"; a greeting, "ok",
+# a question or a sentence is not a name and is asked again.
+_NAME_LEAD_RE = re.compile(
+    r"^(?:(?:hi|hello|hey)[\s,]+)?(?:my\s+name\s+is|my\s+names\s+is|my\s+name'?s|name\s*(?:is|:)?|"
+    r"i\s+am|i'?m|im|it'?s|its|it\s+is|this\s+is|call\s+me|they\s+call\s+me|you\s+can\s+call\s+me)\s+",
+    re.IGNORECASE)
+_NAME_WORD_RE = re.compile(r"^[^\W\d_][^\W\d_'.-]*(?:['.-][^\W\d_]+)*\.?$")
+_NOT_A_NAME = frozenset({
+    "hi", "hello", "hey", "hie", "helo", "ok", "okay", "yes", "no", "yeah", "sure", "thanks", "thank", "you",
+    "please", "help", "menu", "why", "what", "who", "how", "where", "when", "sorry", "good", "morning",
+    "afternoon", "evening", "fine", "nope", "cancel", "stop", "back", "loan", "loans", "account", "bank",
+    "the", "is", "my", "a", "i", "me", "not", "dont", "don't", "want", "need", "name", "agent", "person",
+    "agents", "branch", "branches", "office", "atm", "card", "etumba", "number", "phone",
+})
+_TIME_WORDS = (
+    (re.compile(r"\b(?:any\s*time|whenever|any|doesn'?t\s+matter|dont\s+mind|don'?t\s+mind|either)\b", re.I), "Anytime"),
+    (re.compile(r"\b(?:morning|a\.?m\.?)\b", re.I), "Morning"),
+    (re.compile(r"\b(?:afternoon|after\s+lunch|p\.?m\.?)\b", re.I), "Afternoon"),
+)
+
+
+def extract_name(text):
+    name = _NAME_LEAD_RE.sub("", (text or "").strip()).strip(" .,!")
+    if name and name == name.lower():
+        name = " ".join(w.capitalize() for w in name.split())
+    return name
+
+
+def is_name(text):
+    name = extract_name(text)
+    words = name.split()
+    if not 1 <= len(words) <= 5 or len(name) > 60 or (text or "").strip().endswith("?"):
+        return False
+    if not all(_NAME_WORD_RE.match(w) for w in words):
+        return False
+    return not any(w.lower().strip(".") in _NOT_A_NAME for w in words)
+
+
+_CLOCK_RE = re.compile(r"\b(\d{1,2})(?::\d{2})?\s*(am|pm|hrs)\b|\b(\d{1,2}):\d{2}\b", re.I)
+
+
+def call_time(text):
+    """ "in the morning" -> "Morning", "any time" -> "Anytime", "after 2pm" ->
+    "Afternoon"; else as typed."""
+    m = _CLOCK_RE.search(text or "")
+    if m:
+        hour = int(m.group(1) or m.group(3))
+        suffix = (m.group(2) or "").lower()
+        if suffix == "pm" and hour != 12:
+            hour += 12
+        if 6 <= hour < 12:
+            return "Morning"
+        if 12 <= hour < 17:
+            return "Afternoon"
+    for pattern, slot in _TIME_WORDS:
+        if pattern.search(text or ""):
+            return slot
+    return (text or "").strip()
+
+
 def _label(name):
     from ..router import matcher  # the router imports the flows
 
@@ -115,6 +176,7 @@ class LeadFlow(FormFlow):
     require_confirmation = True
     steps = ["name", "phone", "topic", "time", CONSENT]
     validators = {
+        "name": is_name,
         "phone": is_valid_zambian_phone,
         CONSENT: lambda text: consent_answer(text) is not None,
     }
@@ -159,6 +221,10 @@ class LeadFlow(FormFlow):
         # One canonical form for the contact centre: "0977123456".
         if field == CONSENT:
             return "yes" if consent_answer(value) else "no"
+        if field == "name":
+            return extract_name(value)
+        if field == "time":
+            return call_time(value)
         return clean_phone(value) if field == "phone" else value
 
     def stored(self, session, field, value):

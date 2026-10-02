@@ -22,6 +22,17 @@ intents:
       - "ab bank mobile money"
       - "what can i do with etumba"
       - "tell me about the etumba wallet"
+    exact_phrases:
+      - "etumba"
+      - "whats etumba"
+      - "what's etumba"
+      - "tell me about etumba"
+      - "what is e tumba"
+      - "can i pay water bills"
+      - "pay water bills"
+      - "pay bills with etumba"
+      - "can i pay bills with etumba"
+      - "pay my water bill"
     answer_short: "eTumba is AB Bank's digital wallet. You can buy airtime, pay bills, make transfers, and save on active accounts and Yaka Savings.\nWould you like to register for eTumba?"
     answer: |
       eTumba is AB Bank Zambia's mobile wallet. It lets you send and
@@ -66,6 +77,11 @@ intents:
       - "create etumba account"
       - "download etumba app"
       - "can i register etumba without a bank account"
+    exact_phrases:
+      - "etumba app"
+      - "download etumba"
+      - "etumba registration"
+      - "register etumba"
     answer_short: "Download the eTumba app, or dial {ussd_code} and follow the prompts. To link it to your AB Bank account, visit a branch with your ID."
     answer: |
       Two ways to register: download the eTumba app from the Google Play
@@ -100,6 +116,11 @@ intents:
       - "star 888"
       - "etumba shortcode"
       - "how to use etumba without internet"
+    exact_phrases:
+      - "buy airtime with etumba"
+      - "how do i buy airtime"
+      - "how do i buy airtime with etumba"
+      - "buy airtime"
     answer_short: "Dial {ussd_code} to open the eTumba menu. You can register, check your balance, send money, buy airtime and pay bills."
     answer: |
       Dial {ussd_code} on your phone to open the eTumba menu. From there
@@ -382,6 +403,10 @@ intents:
       - "etumba bal"
       - "check my etumba bal"
       - "balance inquiry"
+    exact_phrases:
+      - "check my etumba balance"
+      - "etumba balance"
+      - "how do i check my etumba balance"
     answer_short: "Dial {ussd_code} or open the eTumba app to check your balance. For your security, I can't see it here."
     answer: |
       Check your own balance directly on your phone — dial {ussd_code} and
@@ -428,6 +453,13 @@ intents:
       - "sign up for online banking"
       - "i want internet banking"
       - "i want online banking"
+      - "how do i register for internet banking"
+      - "how do i register for online banking"
+      - "how do i get internet banking"
+      - "internet banking registration"
+      - "online banking registration"
+      - "how to register for internet banking"
+      - "i want to register for internet banking"
     answer: "Bank conveniently with AB Bank Internet Banking.\nAB Bank Internet Banking gives you secure access to your accounts anytime, anywhere. You can check your account balance, view transactions, transfer funds between AB Bank accounts, and send money to other banks across Zambia. You can also make transfers of up to K300,000 per day, helping you manage your finances with ease.\nWould you like to register for Internet Banking?"
     on_yes: lead:online_banking
     on_no: digital_banking

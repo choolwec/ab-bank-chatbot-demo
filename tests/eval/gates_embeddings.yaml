@@ -10,11 +10,13 @@
 #               right_direct 0.758 -> 0.835, wrong_direct 0.044 -> 0.022,
 #               oos_direct 0.133 -> 0.067, one_tap 0.934 -> 0.956,
 #               b77_right_direct 0.231 -> 0.432, all tightened; the rest equal.
+#   2026-10-02  natural-conversation round (see gates.yaml): right_direct
+#               0.835 -> 0.846, one_tap 0.956 -> 0.967, tightened.
 gates:
-  right_direct_min: 0.835
+  right_direct_min: 0.846
   wrong_direct_max: 0.022
   oos_direct_max: 0.067
-  one_tap_min: 0.956
+  one_tap_min: 0.967
   oos_large_direct_max: 0.066
   b77_right_direct_min: 0.432
   b77_wrong_direct_max: 0.031

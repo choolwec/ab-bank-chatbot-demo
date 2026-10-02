@@ -30,11 +30,16 @@
 #   2026-10-02  small talk answered on the whole message only (match: exact,
 #               outside the scored index); "how are you" moved from greeting
 #               to its own intent: oos_large_direct 0.138 -> 0.135, tightened.
+#   2026-10-02  natural-conversation round (greetings set aside before matching,
+#               "tell me about X" read as X, text-speak normalised, exact_phrases;
+#               no held-out phrasing copied, the leak test now covers
+#               exact_phrases): right_direct 0.670 -> 0.681, wrong_direct
+#               0.044 -> 0.033, one_tap 0.945 -> 0.956, all tightened.
 gates:
-  right_direct_min: 0.670
-  wrong_direct_max: 0.044
+  right_direct_min: 0.681
+  wrong_direct_max: 0.033
   oos_direct_max: 0.067
-  one_tap_min: 0.945
+  one_tap_min: 0.956
   # N2: the >= 300 out-of-scope set (tests/eval/oos.yaml)
   oos_large_direct_max: 0.135
   # N1: BANKING77 (CC BY 4.0) mapped onto our intents (tests/eval/banking77.yaml)

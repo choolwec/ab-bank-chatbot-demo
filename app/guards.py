@@ -194,7 +194,7 @@ SOMEONE_USED_RE = re.compile(
 # from the bank", "i gave my pin to a caller", "my card was used in a shop i
 # have never been to".
 SCAM_CALL_RE = re.compile(
-    r"(?i)\b(?:said|says|claimed|claiming|told\s+me)\s+(?:that\s+)?(?:he|she|they|it)\s+(?:was|were|is|are)\s+"
+    r"(?i)\b(?:said|says|saying|claimed|claiming|claims|told\s+me)\s+(?:that\s+)?(?:he|she|they|it)\s+(?:was|were|is|are)\s+"
     r"(?:from|with|calling\s+from)\s+(?:the\s+|ab\s+)?(?:bank|etumba|ab\s+bank|head\s+office|customer\s+care)\b"
     r"|\b(?:pretend\w*|posing|posed)\s+(?:to\s+be|as)\s+(?:\w+\s+){0,3}(?:bank|etumba|staff|agent|customer\s+care)\b"
     r"|\b(?:gave|give|giving|shared|sharing|told|sent|send)\s+(?:him|her|them|someone|somebody|a\s+caller|the\s+caller|"
@@ -202,6 +202,12 @@ SCAM_CALL_RE = re.compile(
     r"(?:to|with)\b"
     r"|\b(?:cards?|accounts?|e-?tumba|wallet)\s+(?:was|were|has\s+been|got|is\s+being)\s+used\s+"
     r"(?:\w+\s+){0,6}(?:never|not\s+me|without\s+me|without\s+my)\b"
+    # A PERSON asking for a PIN is a scam attempt ("the app asks for my pin" is not).
+    r"|\b(?:someone|somebody|some\s+one|a\s+(?:man|woman|lady|guy|person|caller|stranger)|the\s+caller|caller|"
+    r"they|he|she|people)\s+(?:\w+\s+){0,8}?(?:ask(?:ing|ed|s)?|want(?:ing|ed|s)?|request(?:ing|ed|s)?|demand\w*)\s+"
+    r"(?:me\s+)?(?:for\s+|to\s+(?:give|send|share)\s+(?:them\s+|him\s+|her\s+)?)?(?:my\s+|the\s+)?"
+    r"(?:(?:e-?tumba|card|atm|bank|account|mobile\s+money|online\s+banking)\s+)?"
+    r"(?:pin|otp|one\s+time\s+pin|password|passcode|verification\s+code|card\s+number|cvv)\b"
 )
 # Consistent with theft, but innocent readings exist -> ask.
 SOFT_EMPTIED_RE = re.compile(
@@ -247,6 +253,13 @@ COMPLAINT_HARD_PHRASES = [
 COMPLAINT_SOFT_RE = re.compile(
     r"(?i)\b(?:complain\w*|compliant|disput\w*|unacceptable|rude|"
     r"disrespectful|appalling)\b"
+    # A transaction that went wrong: offer to log it, don't guess an answer.
+    r"|\b(?:transaction|transfer|payment|deposit|withdrawal)s?\s+(?:\w+\s+){0,2}(?:failed|did\s*n'?t\s+go\s+through|"
+    r"not\s+(?:gone|going)\s+through|reversed|stuck|pending)\b"
+    r"|\bfailed\s+(?:transaction|transfer|payment|deposit|withdrawal)s?\b"
+    r"|\bmoney\s+(?:\w+\s+){0,2}(?:not|never)\s+(?:received|arrived|reflected|reflecting|came|showing)\b"
+    r"|\b(?:did\s*n'?t|did\s+not|never|have\s*n'?t|have\s+not)\s+(?:receive[d]?|get|got)\s+(?:the\s+|my\s+)?(?:money|funds|payment|transfer)\b"
+    r"|\b(?:deducted|debited)\s+but\b|\bnot\s+reflect(?:ed|ing)\b"
 )
 
 # --- Negation -------------------------------------------------------------

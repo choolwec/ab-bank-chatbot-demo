@@ -859,9 +859,10 @@ def _did_you_mean_text(suggested):
 # the urgent scan runs first, so "someone stole my motorbike" or "I lost my
 # card" stay reports.
 _KEYWORD_INTENTS = [
-    # Product owner, 02/10/2026: any mention of a bike, tricycle or walking
-    # tractor offers the Trader Mobility Loan.
-    (re.compile(r"\b(?:motor\s*bikes?|motor\s*cycles?|motorcycles?|bikes?|bicycles?|scooters?|tricycles?|"
+    # Product owner, 02/10/2026: any mention of a motorbike, tricycle or
+    # walking tractor offers the Trader Mobility Loan ("bike" means a
+    # motorbike here; bicycles are not financed).
+    (re.compile(r"\b(?:motor\s*bikes?|motor\s*cycles?|motorcycles?|bikes?|scooters?|tricycles?|"
                 r"tri-?cycles?|three[\s-]?wheelers?|3[\s-]?wheelers?|tuk[\s-]?tuks?|bajaj|kabaza|"
                 r"(?:walking\s+)?tractors?|boda[\s-]?bodas?)\b", re.I), "trader_mobility_loan"),
     # AB Bank does not offer cards (product owner, 02/10/2026).
@@ -1325,7 +1326,10 @@ def _opt_out(session):
     text = msg("marketing.opt_out")
     if session.active_flow:
         flow = FLOWS[session.active_flow]
-        prompt = flow.resume(session)[-1]
+        resumed = flow.resume(session)
+        if not session.active_flow:  # that was the last question: the callback went
+            return [dict(resumed[-1], text=text + "\n\n" + resumed[-1]["text"])], {"action": "marketing_opt_out"}
+        prompt = resumed[-1]
         back = msg("back_to_flow", flow=flow.topic_label, prompt=prompt["text"])
         return [dict(prompt, text=text + "\n\n" + back)], {"action": "marketing_opt_out"}
     return [{"text": text, "buttons": list(MENU_BUTTONS)}], {"action": "marketing_opt_out"}

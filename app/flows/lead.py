@@ -173,7 +173,7 @@ def record_opt_out(session):
 
 class LeadFlow(FormFlow):
     name = "lead"
-    require_confirmation = True
+    require_confirmation = False  # PO, 02/10/2026: no "Here's what I'll send" step
     steps = ["name", "phone", "topic", "time", CONSENT]
     validators = {
         "name": is_name,

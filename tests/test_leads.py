@@ -22,8 +22,7 @@ def _finish(b):
     b.say("0977123456")
     assert "when is best to call" in b.text.lower()  # straight to the time
     b.tap("time:Anytime")
-    b.tap("marketing_consent:no")
-    b.tap("confirm_yes")
+    b.tap("marketing_consent:no")  # the last question sends it
     assert "will contact you shortly" in b.text or "will contact you" in b.text
 
 

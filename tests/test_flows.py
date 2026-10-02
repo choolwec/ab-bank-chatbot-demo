@@ -76,8 +76,7 @@ def test_callback_flow_promises_one_working_day(client):
     chat(client, sid, message="Choolwe")
     chat(client, sid, message="0977123456")  # no "what would you like to discuss?"
     chat(client, sid, payload="Morning")
-    chat(client, sid, payload="marketing_consent:no")  # MK2
-    data = chat(client, sid, payload="confirm_yes")
+    data = chat(client, sid, payload="marketing_consent:no")  # MK2: the last question sends it
     text = _all_text(data)
     assert "will contact you shortly" in text
     assert re.search(r"CBK-\d{8}-[A-Z0-9]{4}", text)
@@ -113,10 +112,8 @@ def test_saying_no_after_callback_is_recognised_as_goodbye(client):
     chat(client, sid, payload="human_handoff")
     chat(client, sid, message="Choolwe")
     chat(client, sid, message="0977123456")
-    chat(client, sid, message="Opening a business account")
     chat(client, sid, payload="Morning")
-    chat(client, sid, payload="marketing_consent:no")  # MK2
-    chat(client, sid, payload="confirm_yes")
+    chat(client, sid, payload="marketing_consent:no")  # MK2: sends the callback
     data = chat(client, sid, message="no")
     assert data["meta"]["action"] == "answer"
     assert data["meta"]["intent"] == "thanks_goodbye"
@@ -410,7 +407,7 @@ def test_fraud_has_no_confirm_step_and_finish_shows_the_summary(bot):
     assert len(b.last[0]) == 1  # read-back and finish share one bubble
 
 
-def test_callback_summary_reads_the_phone_back(bot):
+def test_callback_reads_the_phone_back_and_sends_without_a_summary(bot):
     b = bot()
     b.tap("human_handoff")
     b.say("Mary Banda")
@@ -418,8 +415,10 @@ def test_callback_summary_reads_the_phone_back(bot):
     assert "Got it: 0977 123 456." in b.text
     assert len(b.last[0]) == 1  # read-back rides on the next prompt
     b.tap("Morning")
-    b.tap("marketing_consent:yes")  # MK2
-    assert "Mary Banda · 0977 123 456 · General enquiry · Morning · News and offers: yes" in b.text
+    b.tap("marketing_consent:yes")  # MK2: the last question
+    # PO, 02/10/2026: no "Here's what I'll send" step: the callback is sent.
+    assert "CBK-" in b.text and "here's what i'll send" not in b.text.lower()
+    assert b.session.active_flow is None
 
 
 def test_pre_c7_edit_button_still_works(bot):

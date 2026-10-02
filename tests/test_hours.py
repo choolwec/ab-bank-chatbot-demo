@@ -50,8 +50,7 @@ def test_callback_out_of_hours_promises_the_next_working_day(bot, monkeypatch):
     b.say("Mary")
     b.say("0977123456")
     b.tap("time:Morning")
-    b.tap("marketing_consent:no")  # MK2
-    b.tap("confirm_yes")
+    b.tap("marketing_consent:no")  # MK2: sends the callback
     assert "contact you on Monday" in b.text and "shortly" not in b.text
 
 

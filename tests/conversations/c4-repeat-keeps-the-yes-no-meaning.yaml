@@ -3,10 +3,10 @@ turns:
   - payload: human_handoff
   - say: Mary Banda
   - say: "0977123456"
-  - say: a loan
   - say: morning
-  - say: "no"                   # MK2 consent question
-  - say: repeat
-    expect: {action: repeat, text_contains: [shall i send it]}
-  - say: "yes"
+  - say: "no"                   # MK2 consent question: sends the callback
     expect: {ticket_created: callback}
+  - say: repeat
+    expect: {action: repeat, text_contains: [anything else]}
+  - say: "yes"                  # still the "anything else?" yes: the menu
+    expect: {action: menu}

@@ -5,10 +5,8 @@ turns:
   - payload: human_handoff
   - say: Mary Banda
   - say: "0977123456"
-  - say: Opening a business account
   - payload: Morning
-  - payload: "marketing_consent:no"   # MK2 consent question
-  - payload: confirm_yes
+  - payload: "marketing_consent:no"   # MK2 consent question: sends the callback
     expect: {ticket_created: callback}
   - say: "yes"
     expect: {action: menu, strikes: 0, text_lacks: [didn't catch that]}

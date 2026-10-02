@@ -4,8 +4,7 @@ turns:
   - say: Mary Banda
   - say: "0977123456"
   - say: morning
-  - say: "no"                   # MK2: news and offers? (not the summary's yes)
-  - say: "yes"
+  - say: "no"                   # MK2: news and offers? The last question: sends it
     expect: {ticket_created: callback, text_contains: [anything else]}
   - say: what are your opening hours  # moves on; the "anything else?" is gone
     expect: {intent: opening_hours}

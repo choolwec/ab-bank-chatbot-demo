@@ -291,7 +291,11 @@ class FormFlow:
                 if self.require_confirmation:
                     state["confirming"] = True
                     return [self._confirmation_prompt(session)]
-                i = len(self.steps) - 1
+                # Nothing left to ask and no summary step: send it now.
+                finished = self.finish(session)
+                session.active_flow = None
+                session.flow_state = {}
+                return finished
         return [self._prompt(i, session)]
 
     def store_value(self, field, value):

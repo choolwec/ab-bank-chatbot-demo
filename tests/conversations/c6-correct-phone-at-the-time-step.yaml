@@ -11,4 +11,4 @@ turns:
   - payload: Morning
     expect: {text_contains: [news and offers]}
   - payload: "marketing_consent:no"
-    expect: {text_contains: ["Mary Banda · 0966 123 456 · General enquiry · Morning · News and offers: no"]}
+    expect: {ticket_created: callback}

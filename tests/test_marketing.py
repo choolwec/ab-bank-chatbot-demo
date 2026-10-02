@@ -65,34 +65,36 @@ def test_consent_is_asked_after_time_with_the_opt_out_stated(bot):
     assert b.session.flow_state["step"] == 4
 
 
-def test_consent_yes_is_stored_with_a_timestamp_and_shown_in_the_summary(bot):
+def test_consent_answer_sends_the_callback_with_a_timestamp(bot, isolated_data):
+    # PO, 02/10/2026: no "Here's what I'll send" step after the consent question.
     b = bot()
     _to_summary(b, consent="yes")
-    data = b.session.flow_state["data"]
-    assert data["marketing_consent"] == "yes"
-    assert data["marketing_consent_at"].endswith("+00:00")
-    assert "Mary Banda · 0977 123 456 · General enquiry · Morning · News and offers: yes" in b.text
+    fields = _tickets()[-1][1]
+    assert fields["marketing_consent"] == "yes"
+    assert fields["marketing_consent_at"].endswith("+00:00")
+    assert "CBK-" in b.text and "here's what i'll send" not in b.text.lower()
+    assert b.session.active_flow is None
 
 
 @pytest.mark.parametrize("typed, stored", [("yes", "yes"), ("no", "no"), ("I agree", "yes"), ("no thanks", "no")])
-def test_consent_can_be_typed(bot, typed, stored):
+def test_consent_can_be_typed(bot, isolated_data, typed, stored):
     b = bot()
     _to_summary(b)
     b.say(typed)
-    assert b.session.flow_state["data"]["marketing_consent"] == stored
-    assert "shall i send it" in b.text.lower()
+    assert _tickets()[-1][1]["marketing_consent"] == stored
+    assert "shall i send it" not in b.text.lower()
 
 
 @pytest.mark.parametrize("typed", [
     "sure", "ok", "yeah", "Yes please!", "yes please, send them", "sure go ahead", "absolutely",
     "sounds good", "agreed", "👍", "👍🏾", "inde",
 ])
-def test_anything_that_means_yes_is_consent(bot, typed):
+def test_anything_that_means_yes_is_consent(bot, isolated_data, typed):
     # D16 (PO, 24/09/2026): any yes is a yes.
     b = bot()
     _to_summary(b)
     b.say(typed)
-    assert b.session.flow_state["data"]["marketing_consent"] == "yes"
+    assert _tickets()[-1][1]["marketing_consent"] == "yes"
 
 
 @pytest.mark.parametrize("typed", ["maybe", "ok but no offers", "yes but not by sms", "not now", "sure, later"])
@@ -111,57 +113,18 @@ def test_an_unclear_consent_answer_is_asked_again(bot):
     assert "tap yes or no" in b.text.lower()
 
 
-def test_an_unclear_consent_answer_keeps_the_yes_no_buttons(bot):
+def test_an_unclear_consent_answer_keeps_the_yes_no_buttons(bot, isolated_data):
     b = bot()
     _to_summary(b)
     b.say("maybe later")
     assert b.buttons == ["marketing_consent:yes", "marketing_consent:no", "cancel_flow"]
     b.say("yes")
-    assert b.session.flow_state["data"]["marketing_consent"] == "yes"
-
-
-def test_after_an_opt_out_consent_cannot_be_changed_back(bot):
-    b = bot()
-    _to_summary(b, consent="yes")
-    b.say("unsubscribe")
-    b.tap("confirm_change")
-    assert "change:marketing_consent" not in b.buttons
-    b.tap("change:marketing_consent")  # an old button is not honoured either
-    b.tap("marketing_consent:yes")
-    assert b.session.flow_state["data"]["marketing_consent"] == "no"
-
-
-def test_opting_out_while_changing_consent_never_records_yes(bot, isolated_data):
-    b = bot()
-    _to_summary(b, consent="yes")
-    b.tap("confirm_change")
-    b.tap("change:marketing_consent")
-    b.say("unsubscribe")
-    assert "shall i send it" in b.text.lower()
-    assert "news and offers from ab bank?" not in b.text.lower()
-    b.say("yes")  # the summary's yes: send it
-    assert _tickets()[-1][1]["marketing_consent"] == "no"
-
-
-def test_consent_can_be_changed_from_the_summary(bot):
-    b = bot()
-    _to_summary(b, consent="yes")
-    first_at = b.session.flow_state["data"]["marketing_consent_at"]
-    b.tap("confirm_change")
-    assert "change:marketing_consent" in b.buttons
-    b.tap("change:marketing_consent")
-    assert "news and offers" in b.text
-    b.tap("marketing_consent:no")  # the self-describing id is understood when editing too
-    data = b.session.flow_state["data"]
-    assert data["marketing_consent"] == "no"
-    assert data["marketing_consent_at"] >= first_at
-    assert "News and offers: no" in b.text
+    assert _tickets()[-1][1]["marketing_consent"] == "yes"
 
 
 def test_consent_yes_reaches_the_ticket_and_the_jira_label(bot, jira_mock):
     b = bot()
     _to_summary(b, consent="yes")
-    b.tap("confirm_yes")
     kind, fields = _tickets()[-1]
     assert kind == "callback"
     assert fields["marketing_consent"] == "yes" and fields["marketing_consent_at"]
@@ -173,7 +136,6 @@ def test_consent_yes_reaches_the_ticket_and_the_jira_label(bot, jira_mock):
 def test_consent_no_gets_no_marketing_label(bot, jira_mock):
     b = bot()
     _to_summary(b, consent="no")
-    b.tap("confirm_yes")
     issue = jira_export.read_mock_issues()[0]
     assert jira_export.CONSENT_LABEL not in issue["labels"]
     assert "- marketing_consent: no" in issue["description"]
@@ -182,31 +144,29 @@ def test_consent_no_gets_no_marketing_label(bot, jira_mock):
 def test_flag_off_skips_the_question_and_says_not_asked(bot, jira_mock, monkeypatch):
     monkeypatch.setenv("MARKETING_CONSENT_ENABLED", "false")
     b = bot()
-    _to_summary(b)
-    assert "shall i send it" in b.text.lower()
-    assert "news and offers" not in b.text.lower()
-    b.tap("confirm_change")
-    assert "change:marketing_consent" not in b.buttons
-    b.tap("confirm_yes")
+    _to_summary(b)  # the time was the last question: the callback is sent
+    assert "news and offers" not in b.text.lower() and "CBK-" in b.text
     assert _tickets()[-1][1]["marketing_consent"] == "not_asked"
     assert jira_export.CONSENT_LABEL not in jira_export.read_mock_issues()[0]["labels"]
 
 
-def test_flag_turned_off_mid_question_moves_on_to_the_summary(bot, monkeypatch):
+def test_flag_turned_off_mid_question_sends_the_callback(bot, isolated_data, monkeypatch):
     b = bot()
     _to_summary(b)
     monkeypatch.setenv("MARKETING_CONSENT_ENABLED", "false")
     b.say("repeat")  # repeat resends the old reply; a page reload resumes
     replies, _ = b.router.resume(b.session)
-    assert "shall i send it" in replies[-1]["text"].lower()
+    assert "CBK-" in replies[-1]["text"] and b.session.active_flow is None
+    assert _tickets()[-1][1]["marketing_consent"] == "not_asked"
 
 
-def test_the_consent_question_is_not_a_correction_target(bot):
+def test_a_correction_at_the_consent_question_keeps_it_asked(bot):
     b = bot()
-    _to_summary(b, consent="yes")
+    _to_summary(b)
     b.say("actually my number is 0966 123 456")
     assert b.session.flow_state["data"]["phone"] == "0966123456"
-    assert b.session.flow_state["data"]["marketing_consent"] == "yes"
+    assert "marketing_consent" not in b.session.flow_state["data"]
+    assert "news and offers" in b.text
 
 
 # --- MK2: opting out ----------------------------------------------------------------
@@ -245,31 +205,20 @@ def test_cancel_my_card_is_still_a_card_report(bot):
 def test_opted_out_customers_are_never_asked(bot, isolated_data):
     b = bot()
     b.say("unsubscribe")
-    _to_summary(b)
-    assert "shall i send it" in b.text.lower()
-    assert "marketing_consent" not in b.session.flow_state["data"]
-    b.tap("confirm_yes")
+    _to_summary(b)  # never asked: the time was the last question
+    assert "news and offers" not in b.text.lower() and "CBK-" in b.text
     fields = _tickets()[-1][1]
     assert fields["marketing_consent"] == "no"
     assert fields["marketing_consent_at"] == b.session.slots["marketing_opt_out"]
 
 
-def test_opting_out_at_the_consent_question_moves_on_to_the_summary(bot):
+def test_opting_out_at_the_consent_question_still_sends_the_callback(bot, isolated_data):
     b = bot()
     _to_summary(b)
     b.say("unsubscribe")
     assert b.action == "marketing_opt_out"
-    assert b.session.flow_state["data"]["marketing_consent"] == "no"
-    assert "shall i send it" in b.text.lower()
-    assert b.session.active_flow == "lead"  # the callback is not dropped
-
-
-def test_opting_out_after_saying_yes_overrides_it(bot):
-    b = bot()
-    _to_summary(b, consent="yes")
-    b.say("stop offers")
-    assert b.session.flow_state["data"]["marketing_consent"] == "no"
-    assert "News and offers: no" in b.text
+    assert "CBK-" in b.text  # the callback is not dropped
+    assert _tickets()[-1][1]["marketing_consent"] == "no"
 
 
 def test_opting_out_mid_fraud_report_keeps_the_report(bot):

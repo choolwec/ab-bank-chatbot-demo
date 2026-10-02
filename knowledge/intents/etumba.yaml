@@ -466,3 +466,32 @@ intents:
     buttons:
       - {label: "Yes, contact me", payload: "lead:online_banking"}
       - {label: "Back", payload: "digital_banking"}
+
+  - intent: transfer_other_banks
+    match: exact
+    label: "Transfers to other banks"
+    short_label: "Bank transfers"
+    category: etumba
+    status: draft
+    phrases:
+      - "transfer money to another bank"
+      - "send money to another bank"
+      - "how do i transfer to another bank"
+      - "interbank transfer"
+      - "transfer to zanaco"
+      - "send money to stanbic"
+      - "transfer to fnb"
+      - "rtgs"
+      - "eft"
+      - "bank transfer"
+      - "transfer to another bank"
+      - "can i send money to another bank"
+      - "how do i send money to other banks"
+    answer: |
+      You can send money to other banks yourself, through eTumba (dial
+      {ussd_code}) or Online Banking. For amounts above K20,000, please use
+      Online Banking.
+    buttons:
+      - {label: "Online Banking", payload: "online_banking"}
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Talk to a person", payload: "human_handoff"}

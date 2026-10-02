@@ -181,6 +181,7 @@ def test_branch_finder_reads_the_town_from_a_sentence(bot, typed):
 
 
 def test_the_documents_wording_is_used_in_full():
-    assert matcher.get("micro_loan")["answer"].startswith("Need financing to support your small business?")
+    assert matcher.get("micro_loan")["answer_short"].startswith("Need financing to support your small business?")
+    assert "K1,000 to K350,000" in matcher.get("micro_loan")["answer"]  # the researched details
     assert "K300,000 per day" in matcher.get("online_banking")["answer"]
     assert matcher.get("savings_plan_account")["answer_short"].endswith("Ready to start saving towards your goal?")

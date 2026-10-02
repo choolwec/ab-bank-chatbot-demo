@@ -716,3 +716,103 @@ intents:
       - {label: "Term Deposit", payload: "term_deposit_account"}
       - {label: "Main menu", payload: "menu"}
       - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: cards_not_offered
+    match: exact
+    label: "Bank cards"
+    category: accounts
+    status: draft
+    legal_note: >-
+      Product owner, 02/10/2026: AB Bank does not offer debit, Visa or ATM
+      cards. Remove if that changes.
+    phrases:
+      - "debit card"
+      - "visa card"
+      - "atm card"
+      - "do you have bank cards"
+      - "do you offer debit cards"
+      - "can i get a visa card"
+      - "credit card"
+      - "mastercard"
+      - "apply for a bank card"
+      - "how do i get a debit card"
+      - "i want a debit card"
+      - "do you have visa cards"
+      - "do you have atm cards"
+      - "how do i get an atm card"
+      - "cards"
+    answer: |
+      AB Bank doesn't offer debit, Visa or ATM cards. You can pay, send money
+      and buy airtime with eTumba ({ussd_code}) or Online Banking, and take
+      cash out at any branch or eTumba agent.
+    buttons:
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Online Banking", payload: "online_banking"}
+      - {label: "Find an agent", payload: "agent_locator"}
+      - {label: "Talk to a person", payload: "human_handoff"}
+
+  - intent: account_changes
+    match: exact
+    label: "Close an account or update my details"
+    short_label: "Account changes"
+    lead_topic: "Account changes / KYC update"
+    category: accounts
+    status: draft
+    phrases:
+      - "close my account"
+      - "how do i close my account"
+      - "change my phone number on my account"
+      - "update my phone number"
+      - "update my details"
+      - "update my address"
+      - "change my name on my account"
+      - "update my kyc"
+      - "kyc details"
+      - "change the email on my account"
+      - "i want to close my account"
+      - "close account"
+      - "change my number"
+      - "change my phone number"
+      - "i changed my number"
+      - "i have a new phone number"
+      - "update kyc"
+      - "kyc"
+      - "my nrc has changed"
+      - "change my details"
+    answer: |
+      To close an account, or to change your phone number or other personal
+      (KYC) details, please visit any AB Bank branch with your original ID.
+      Or we can have someone from our team call you. Would you like a call?
+    on_yes: lead:account_changes
+    on_no: menu
+    buttons:
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "Yes, call me", payload: "lead:account_changes"}
+      - {label: "Main menu", payload: "menu"}
+
+  - intent: deposit_money
+    match: exact
+    label: "Depositing money"
+    category: accounts
+    status: draft
+    phrases:
+      - "deposit money"
+      - "how do i deposit money into my account"
+      - "where can i deposit money"
+      - "deposit cash"
+      - "put money in my account"
+      - "send money from mobile money to my ab bank account"
+      - "airtel money to my bank account"
+      - "deposit"
+      - "how do i deposit"
+      - "i want to deposit money"
+      - "how can i deposit money"
+      - "mtn money to my bank account"
+      - "mobile money to bank"
+    answer: |
+      You can deposit money at any AB Bank branch, or send it straight from
+      your mobile money account to your AB Bank account.
+    buttons:
+      - {label: "Find a branch", payload: "branch_locator"}
+      - {label: "eTumba", payload: "etumba_what_is"}
+      - {label: "Talk to a person", payload: "human_handoff"}

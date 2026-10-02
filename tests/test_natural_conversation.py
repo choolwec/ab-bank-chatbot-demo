@@ -193,11 +193,11 @@ SINGLES3 = [
  ("nearest atm", ("etumba_cash_in_out",DYM,"branch_locator","agent_locator")), ("how do i reset my etumba pin", ("credential_trouble",)),
  ("my card is blocked", (*FRAUD, "credential_trouble", DYM, "out_of_scope")), ("is my money safe with you", ("about_ab_bank",DYM)),
  ("are you open now", ("opening_hours",)), ("can i open an account today", ("account_opening_how","account_opening_requirements")),
- ("i want to deposit money", ("etumba_cash_in_out",DYM,"branch_locator","out_of_scope")),
- ("how do i transfer money to another bank", ("online_banking",DYM,"out_of_scope")),
- ("how do i get a debit card", (*OOS, "current_account", "tamanga_plus_account", "action:urgent_confirm")),
- ("do you have visa cards", (*OOS, "current_account")), ("can i get a cheque book", ("tamanga_plus_account","business_account",DYM,*OOS)),
- ("how do i close my account", (*OOS, "human_handoff")), ("i want to change my phone number on my account", (*OOS, "human_handoff")),
+ ("i want to deposit money", ("deposit_money",)),
+ ("how do i transfer money to another bank", ("transfer_other_banks",)),
+ ("how do i get a debit card", ("cards_not_offered",)),
+ ("do you have visa cards", ("cards_not_offered",)), ("can i get a cheque book", ("tamanga_plus_account","business_account",DYM,*OOS)),
+ ("how do i close my account", ("account_changes",)), ("i want to change my phone number on my account", ("account_changes",)),
  ("what is the minimum balance for tamanga", ("current_account","fees_tamanga")), ("does savings account have charges", ("savings_account","fees_charges")),
  ("how many withdrawals can i make", ("savings_account",DYM)), ("can i withdraw from savings plan", ("savings_plan_account",)),
  ("what is the interest on term deposit", ("term_deposit_account",)), ("minimum amount for term deposit", ("term_deposit_account",)),
@@ -330,8 +330,38 @@ CONVOS2 = [
 ]
 
 
-ALL_SINGLES = SINGLES + SINGLES2 + SINGLES3
-ALL_CONVOS = CONVOS + CONVOS2
+# --- round 4 (02/10/2026, product owner's rules): mobility loan on any bike,
+# no cards, KYC at a branch, transfers, deposits, natural greetings
+MOB = "trader_mobility_loan"
+SINGLES4 = [
+ ("i want to buy a motorbike", MOB), ("do you finance bikes", MOB), ("I deliver vegetables with my bicycle", MOB),
+ ("tricycle", MOB), ("can i get a tuk tuk on loan", MOB), ("i need a walking tractor for my farm", MOB),
+ ("loan for a three wheeler", MOB), ("my business needs a motorcycle for deliveries", MOB), ("bajaj loan", MOB),
+ ("someone stole my motorbike", ("flow:fraud", "action:urgent")),
+ ("how do i get a debit card", "cards_not_offered"), ("do you have atm cards", "cards_not_offered"),
+ ("can i get a visa card", "cards_not_offered"), ("where can i use my card", "cards_not_offered"),
+ ("i lost my card", ("flow:fraud", "action:urgent")), ("my card was stolen", ("flow:fraud", "action:urgent")),
+ ("how do i close my account", "account_changes"), ("i changed my phone number", "account_changes"),
+ ("i want to update my address", "account_changes"), ("my nrc has changed", "account_changes"),
+ ("update kyc", "account_changes"), ("change my name on my account", "account_changes"), ("i have a new number", "account_changes"),
+ ("how do i send money to zanaco", "transfer_other_banks"), ("i want to transfer 50000 to another bank", "transfer_other_banks"),
+ ("can i send money to stanbic", "transfer_other_banks"), ("rtgs", "transfer_other_banks"),
+ ("how do i deposit money", "deposit_money"), ("can i deposit from airtel money", "deposit_money"),
+ ("send from mtn momo to my ab bank account", "deposit_money"), ("where can i deposit cash", "deposit_money"),
+ ("how much can i borrow on a micro loan", ("micro_loan", "text:K350,000")), ("what is the sme loan amount", ("sme_loan",)),
+ ("do you have farming loans", "agri_loan"), ("what documents for a micro loan", ("micro_loan", "loan_requirements")),
+ ("hi", ("greeting", lambda b: "Welcome to AB Bank" not in b.text)), ("hello", ("greeting", lambda b: "Welcome" not in b.text)),
+ ("good morning", lambda b: b.text.startswith("Good morning!")), ("good evening", lambda b: b.text.startswith("Good evening!")),
+]
+CONVOS4 = [
+ ("greeting later is 'hi again'", [("say", "hi"), ("say", "what is etumba"), ("say", "hello", lambda b: "again" in b.text.lower())]),
+ ("bike mention mid-chat", [("tap", "savings_account"), ("say", "i also want a motorbike for my shop", MOB), ("say", "yes", "flow:lead")]),
+ ("account change then call", [("say", "i want to close my account"), ("say", "yes", "flow:lead"),
+                                ("say", "Mary", lambda b: True), ("say", "0977123456", lambda b: b.session.flow_state["data"]["topic"] == "Account changes / KYC update")]),
+]
+
+ALL_SINGLES = SINGLES + SINGLES2 + SINGLES3 + SINGLES4
+ALL_CONVOS = CONVOS + CONVOS2 + CONVOS4
 
 
 @pytest.mark.parametrize("text, expect", ALL_SINGLES, ids=[t for t, _ in ALL_SINGLES])

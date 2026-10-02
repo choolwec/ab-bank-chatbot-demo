@@ -11,7 +11,7 @@ import re
 from rapidfuzz import fuzz
 
 from . import audit, config, guards, shadow, urgent_model
-from .messages import button, has, msg, strip_draft_notes
+from .messages import button, has, msg, strip_draft_notes, variant
 from .flows import FLOWS
 from .flows.lead import record_opt_out
 from .flows.locator import CITY_PREFIX, branches_mentioned
@@ -269,11 +269,31 @@ def handle(session, text=None, payload=None, merge=None, prior_findings=None,
         replies.append({"text": msg("pii_warning"), "buttons": []})
 
     routed, meta = _route(session, masked if text else None, payload)
-    if first_contact and meta.get("intent") != "greeting":
+    if meta.get("intent") == "greeting" and text and routed:
+        routed[-1] = dict(routed[-1], text=_natural_greeting(session, masked))
+    if first_contact:
+        # Every first message on a messaging channel says it's automated
+        # (§3.4); the greeting itself stays a plain "Hi!".
         replies.insert(0, {"text": msg("disclosure"), "buttons": []})
     replies.extend(routed)
     replies = _maybe_ask_csat(session, replies, meta)
     return respond(session, replies, meta, merge)
+
+
+_TIME_OF_DAY_RE = re.compile(r"\b(?:good\s+)?(morning|afternoon|evening)\b", re.IGNORECASE)
+
+
+def _natural_greeting(session, text):
+    """ "hi" -> "Hi! How can I help you today?" (rotating), "good morning" ->
+    "Good morning! ...", and "Hi again!" once the conversation is under way --
+    never the whole welcome again."""
+    earlier = sum(1 for t in session.transcript[:-1] if t["role"] == "user")
+    if earlier:
+        return variant("greeting.again", earlier)
+    m = _TIME_OF_DAY_RE.search(text or "")
+    if m:
+        return msg("greeting.timed", part=m.group(1).lower())
+    return variant("greeting.reply", len(session.transcript))
 
 
 def respond(session, replies, meta, merge=None):
@@ -483,7 +503,8 @@ def _route(session, text, payload):
     # 1b. Urgent topics bypass everything, from any flow (§1 rule 3)
     if text:
         urgent = guards.urgent_scan(text)
-        if urgent is None and not guards.urgent_negated(text) and urgent_model.flags(text):
+        if (urgent is None and not guards.urgent_negated(text) and not _CARD_PRODUCT_QUESTION_RE.search(text)
+                and urgent_model.flags(text)):
             # N7: the model's second net -- it can only ASK, never start a flow.
             urgent = guards.UrgentSignal("fraud", guards._fraud_sub(text), "soft")
         if urgent and session.active_flow not in ("fraud", "complaint"):
@@ -833,6 +854,52 @@ def _did_you_mean_text(suggested):
     return msg("did_you_mean")
 
 
+# Topics recognised by a word anywhere in the message, outside the scored
+# matcher (so they never shift its weights). Urgent reports never get here:
+# the urgent scan runs first, so "someone stole my motorbike" or "I lost my
+# card" stay reports.
+_KEYWORD_INTENTS = [
+    # Product owner, 02/10/2026: any mention of a bike, tricycle or walking
+    # tractor offers the Trader Mobility Loan.
+    (re.compile(r"\b(?:motor\s*bikes?|motor\s*cycles?|motorcycles?|bikes?|bicycles?|scooters?|tricycles?|"
+                r"tri-?cycles?|three[\s-]?wheelers?|3[\s-]?wheelers?|tuk[\s-]?tuks?|bajaj|kabaza|"
+                r"(?:walking\s+)?tractors?|boda[\s-]?bodas?)\b", re.I), "trader_mobility_loan"),
+    # AB Bank does not offer cards (product owner, 02/10/2026).
+    (re.compile(r"\b(?:debit|visa|atm|credit|bank|master\s*card|mastercard|plastic|virtual)\s+cards?\b"
+                r"|\b(?:get|apply\s+for|order|have|offer|issue|want|need)\s+(?:a\s+|an\s+|my\s+)?(?:new\s+)?cards?\b"
+                r"|\bmastercard\b|\buse\s+(?:my\s+|a\s+)?cards?\b", re.I), "cards_not_offered"),
+    (re.compile(r"\bclos(?:e|ing)\s+(?:my\s+|an\s+|the\s+|our\s+)?(?:\w+\s+)?accounts?\b"
+                r"|\b(?:change|changed|changing|update|updating|edit|correct|new)\s+(?:my\s+|the\s+|a\s+)?(?:phone\s+|mobile\s+|cell\s+)?"
+                r"(?:number|phone\s+number|address|name|surname|email|details|kyc|nrc|id)\b"
+                r"(?:\s+(?:on|in|for)\s+(?:my|the)\s+(?:\w+\s+)?account)?"
+                r"|\bkyc\b", re.I), "account_changes"),
+    (re.compile(r"\b(?:transfer|transfers|transferring|send|sending|move|pay)\b.{0,40}\b(?:another|other|different)\s+banks?\b"
+                r"|\b(?:transfer|send|sending|pay)\b.{0,40}\b(?:zanaco|stanbic|fnb|absa|atlas\s+mara|indo\s*zambia|"
+                r"access\s+bank|ecobank|citibank|investrust|natsave|zicb|first\s+capital|bank\s+of\s+china|"
+                r"united\s+bank|first\s+alliance|standard\s+chartered)\b"
+                r"|\b(?:interbank|inter-bank|rtgs|eft)\b", re.I), "transfer_other_banks"),
+    (re.compile(r"\b(?:deposit|depositing|put|bank)\s+(?:some\s+)?(?:money|cash|funds)\b"
+                r"|\b(?:mobile\s+money|airtel\s+money|mtn\s+(?:money|momo)|momo|zamtel\s+kwacha)\b.{0,30}\b(?:to|into)\s+"
+                r"(?:my\s+)?(?:ab\s+bank\s+|bank\s+)?account\b|\bwhere\s+(?:can|do)\s+i\s+deposit\b"
+                r"|\bdeposit\w*\b.{0,30}\b(?:mobile\s+money|airtel|mtn|momo|zamtel)\b", re.I), "deposit_money"),
+]
+
+
+# "how do I get a debit card" is a product question (we don't offer cards),
+# not a lost card: the model's soft "lost or stolen?" question is skipped.
+_CARD_PRODUCT_QUESTION_RE = re.compile(
+    r"\b(?:get|apply\s+for|order|offer|issue|have|want|need)\s+(?:a\s+|an\s+)?(?:new\s+)?"
+    r"(?:debit\s+|visa\s+|atm\s+|credit\s+|bank\s+)?cards?\b|\bdo\s+you\s+(?:have|offer|issue)\b.{0,20}\bcards?\b",
+    re.IGNORECASE)
+
+
+def _keyword_intent(text):
+    for pattern, name in _KEYWORD_INTENTS:
+        if pattern.search(text) and matcher.get(name):
+            return name
+    return None
+
+
 _TOWN_QUESTION_RE = re.compile(
     r"\b(?:branch|branches|office|offices|bank)\b.{0,30}?\b(?:in|at|near|around)\s+([a-z][a-z'-]{2,})"
     r"|\b(?:in|at)\s+([a-z][a-z'-]{2,})\b.{0,20}?\b(?:branch|branches|office)\b",
@@ -872,7 +939,8 @@ def _named_branch_detail(session, text):
 _PRODUCT_ATTRIBUTE_RE = re.compile(
     r"\b(?:interest|rate|rates|fee|fees|charge|charges|cost|costs|price|minimum|min|maximum|max|balance|"
     r"deposit|age|old|young|years|months|term|tenure|period|long|withdraw\w*|limit|currency|currencies|"
-    r"benefits?|requirements?|qualify|eligible|eligibility|how\s+much)\b", re.IGNORECASE)
+    r"benefits?|requirements?|qualify|eligible|eligibility|how\s+much|amounts?|documents?|papers|"
+    r"need|apply|borrow)\b", re.IGNORECASE)
 
 
 # Product names as customers type them, longest first, for "what is the
@@ -958,6 +1026,9 @@ def _free_text(session, text, urgent_flows=True):
     unknown_town = _branch_in_unlisted_town(session, text)
     if unknown_town:
         return unknown_town
+    keyword = _keyword_intent(text)
+    if keyword:
+        return _answer(session, matcher.get(keyword), 1.0, text=text)
     praise = _praise(text, ranked)
     if praise:
         return praise

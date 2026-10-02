@@ -29,17 +29,19 @@ intents:
       - "interest rate on loans"
       - "loan interest"
       - "what is the interest on a business loan"
-    answer_short: "Business loans need 12+ months of trading, a guarantor and collateral, in a town we serve. Interest is 3%-8% a month over 4-30 months."
+    answer_short: "Business loans run from K1,000 to K5,000,000, repaid over 4 to 60 months. You need a business running 12+ months, a guarantor and collateral, in a town we serve."
     answer: |
-      Business (Micro & SME) loans are available if your business:
-      - Has been operating for at least 12 months
-      - Is within our network — Lusaka, Kitwe, Ndola, Mumbwa, Solwezi, or
-        Chipata
-      - Has collateral and a guarantor
-      Interest: 3%-8% per month, over 4-30 months depending on the loan
-      amount. Processing takes about 7 working days once documentation is
-      complete. Loan approval always depends on assessment — I can't
-      guarantee an amount or timeline before your documents are in.
+      Business loans for micro, small and medium-sized businesses:
+      - Micro Loan: K1,000 to K350,000, repaid over 4 to 24 months
+      - SME Loan: K200,000 to K5,000,000, repaid over 4 to 60 months
+      - Trader Mobility Loan: for motorbikes, tricycles, three-wheelers and
+        walking tractors
+      Interest: 3%-8% per month, depending on the amount and term.
+      Your business must have been running for at least 12 months, within our
+      network (Lusaka, Kitwe, Ndola, Mumbwa, Solwezi or Chipata), with
+      collateral and a guarantor. Processing takes about 7 working days once
+      documents are complete. Approval always depends on assessment, so I
+      can't promise an amount or timeline before your documents are in.
     answer_simple: >-
       We lend to businesses that are at least 12 months old. You need something valuable as security (collateral), and a person who agrees to repay if you can't (a guarantor).
     follow_ups:
@@ -54,6 +56,7 @@ intents:
 
   - intent: agri_loan
     label: "Loans for farming businesses"
+    lead_topic: "Agro / farming loan"
     short_label: "Farming loans"
     category: loans
     status: draft
@@ -76,21 +79,29 @@ intents:
       - "loan for my poultry"
       - "loan for crops"
       - "loan for cattle"
-    answer_short: "Farmers apply for our Business (Micro & SME) loan on the same terms: 12+ months trading, collateral and a guarantor."
+    answer_short: "Yes, we finance farmers. Our team can talk you through the Agro Loan and our Business loans, which need a guarantor and collateral."
     answer: |
-      We don't have a separate agriculture-specific loan product — a
-      farming business applies under our general Business (Micro & SME)
-      loan, on the same terms: 12+ months trading, within our branch
-      network, with collateral and a guarantor. A loan officer visits the
-      farm to assess the application, same as for any business.
+      Our website lists an Agro Loan for farmers:
+      - Amount: K1,000 to K350,000
+      - Repayment: 4 to 24 months
+      - Age: 21-72
+      - Currently in Lusaka only
+      - A guarantor and collateral (livestock, fixed assets, household goods
+        or a mortgage)
+      [CONFIRM: whether the Agro Loan is still offered; the Branch Staff FAQ
+      says farming businesses apply under the Business loan.]
+      Farming businesses can also apply for our Business (Micro & SME) loans:
+      12+ months of trading in a town we serve, with collateral and a
+      guarantor. A loan officer visits the farm to assess the application.
     follow_ups:
       account_opening_requirements: loan_requirements
       business_account_requirements: loan_requirements
       account_opening_how: loan_apply_how
+    on_yes: lead:agri_loan
     buttons:
+      - {label: "Yes, contact me", payload: "lead:agri_loan"}
       - {label: "Business loan details", short_label: "Business loans", payload: "msme_loan"}
-      - {label: "Loan requirements", payload: "loan_requirements"}
-      - {label: "Talk to a person", payload: "human_handoff"}
+      - {label: "Back", payload: "business_loan_options"}
 
   - intent: personal_loan
     label: "Personal loans (government employees)"
@@ -357,6 +368,7 @@ intents:
       - {label: "Trader Mobility Loan", payload: "trader_mobility_loan"}
       - {label: "Micro Loan", payload: "micro_loan"}
       - {label: "SME Loan", payload: "sme_loan"}
+      - {label: "Farming (Agro) loan", short_label: "Agro loan", payload: "agri_loan"}
       - {label: "Back", payload: "loans_overview"}
       - {label: "Talk to a person", payload: "human_handoff"}
 
@@ -391,7 +403,18 @@ intents:
       - "finance a motorbike"
       - "tricycle for my business"
       - "loan to buy a tricycle"
-    answer: "Looking to keep your business moving?\nOur Trader Mobility Loan helps you finance motorbikes, tricycles, three-wheelers, and walking tractors, giving your business the mobility it needs to reach more customers, make more deliveries, and seize new opportunities.\nReady to make your next move?"
+    answer_short: "Looking to keep your business moving?\nOur Trader Mobility Loan helps you finance motorbikes, tricycles, three-wheelers, and walking tractors, giving your business the mobility it needs to reach more customers, make more deliveries, and seize new opportunities.\nReady to make your next move?"
+    answer: |
+      Trader Mobility Loan, for traders and small businesses that need transport:
+      - It finances motorbikes, tricycles, three-wheelers and walking tractors
+      - Use it to deliver goods, reach more customers or move produce
+      [CONFIRM: amount range, deposit, repayment period, and whether the vehicle
+      itself is the security]
+      The usual business loan requirements apply: a business running for at
+      least 12 months in Lusaka, Kitwe, Ndola, Mumbwa, Solwezi or Chipata, aged
+      21-65, original ID, proof of residence and a guarantor.
+      A loan officer assesses your business and gives you the full terms and cost
+      in writing before you sign.
     on_yes: lead:trader_mobility_loan
     on_no: business_loan_options
     buttons:
@@ -410,7 +433,26 @@ intents:
       - "loan for market traders"
       - "small loan for my shop"
       - "loan for my stall"
-    answer: "Need financing to support your small business?\nOur Micro Loan is designed for small businesses, market traders, and shop owners looking to grow, manage cash flow, or invest in business opportunities.\nWith flexible repayment terms and financing tailored to your business needs, a Micro Loan can help you take your next step with confidence.\nReady to take your business to the next level?"
+    answer_short: "Need financing to support your small business?\nOur Micro Loan is designed for small businesses, market traders, and shop owners looking to grow, manage cash flow, or invest in business opportunities.\nWith flexible repayment terms and financing tailored to your business needs, a Micro Loan can help you take your next step with confidence.\nReady to take your business to the next level?"
+    answer: |
+      Micro Loan, for small businesses, market traders and shop owners:
+      - Amount: K1,000 to K350,000
+      - Repayment: 4 to 24 months
+      - Interest: 3%-8% per month, depending on the amount and term
+        [CONFIRM: the rate to quote for Micro loans]
+      You need:
+      - A business running for at least 12 months in Lusaka, Kitwe, Ndola,
+        Mumbwa, Solwezi or Chipata
+      - To be aged 21-65, Zambian, or a foreign national with a business, work
+        or investor's permit
+      - Original ID (NRC, passport or driving licence) and proof of residence
+        (a utility bill)
+      - A guarantor in business or formal employment
+      - Collateral (household goods, fixed assets or a mortgage)
+      - If you are married, your spouse takes part in the process
+      Processing takes about 7 working days once your documents are complete.
+      Approval always depends on assessment, and you get the full terms and cost
+      in writing before you sign.
     on_yes: lead:micro_loan
     on_no: business_loan_options
     buttons:
@@ -427,7 +469,27 @@ intents:
       - "loan to expand my business"
       - "loan to buy equipment"
       - "loan to increase stock"
-    answer: "Looking to expand your business?\nOur SME Loan is designed for small and medium-sized enterprises looking to invest in growth, purchase equipment, increase stock, or strengthen operations.\nWhether you're planning your next business move or financing a larger project, our SME Loan provides the support your business needs to grow.\nReady to grow your business?"
+    answer_short: "Looking to expand your business?\nOur SME Loan is designed for small and medium-sized enterprises looking to invest in growth, purchase equipment, increase stock, or strengthen operations.\nWhether you're planning your next business move or financing a larger project, our SME Loan provides the support your business needs to grow.\nReady to grow your business?"
+    answer: |
+      SME Loan, for small and medium-sized enterprises:
+      - Amount: K200,000 to K5,000,000
+      - Repayment: 4 to 60 months
+      - Interest: 3%-8% per month, depending on the amount and term
+        [CONFIRM: the rate to quote for SME loans]
+      You need:
+      - A business running for at least 12 months in Lusaka, Kitwe, Ndola,
+        Mumbwa, Solwezi or Chipata
+      - To be aged 21-65, Zambian, or a foreign national with a business, work
+        or investor's permit
+      - Original ID (NRC, passport or driving licence) and proof of residence
+        (a utility bill)
+      - A guarantor in business or formal employment
+      - Collateral (household goods, fixed assets or a mortgage)
+      - If you are married, your spouse takes part in the process
+      - A passport valid for the past 12 months, and your company documents
+      Processing takes about 7 working days once your documents are complete.
+      Approval always depends on assessment, and you get the full terms and cost
+      in writing before you sign.
     on_yes: lead:sme_loan
     on_no: business_loan_options
     buttons:

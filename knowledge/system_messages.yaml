@@ -217,6 +217,19 @@ messages:
   confirm.change:
     status: draft
     text: Which part would you like to change?
+  greeting.reply:
+    status: draft
+    # A customer's "hi" / "hello": a plain greeting back, rotated by turn.
+    text: Hi! How can I help you today?
+    variants: ["Hi! How can I help you today?", "Hello! What can I help you with today?", "Hi there! How can I help?"]
+  greeting.timed:
+    status: draft
+    fills: [part]
+    text: "Good {part}! How can I help you today?"
+  greeting.again:
+    status: draft
+    text: Hi again! What else can I help you with?
+    variants: ["Hi again! What else can I help you with?", "Hello again! How else can I help?"]
   ack:
     status: draft
     # Rotated in front of the next question, by turn number (C11).

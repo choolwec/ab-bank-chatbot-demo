@@ -58,6 +58,28 @@ above if it meets the same 12-months-trading, branch-network, collateral,
 and guarantor requirements. Don't promise season-aligned repayment terms
 unless a loan officer confirms that for the specific case.
 
+## Loan products listed on abbank.co.zm (checked 02/10/2026)
+
+From www.abbank.co.zm/loans/ and the older /loans-original/ page:
+
+- **Micro Loans** (small businesses, small shop owners, marketeers):
+  K1,000 – K350,000, maturity 4–24 months. Age 21–65, Zambian or foreign
+  national with a business/work/investor's permit, original ID, proof of
+  residence, guarantor, collateral; spouse involved if married.
+- **SME Loans**: K200,000 – K5,000,000, maturity 4–60 months. Same as Micro
+  plus a passport valid for the past 12 months and company documentation.
+- **Business loans overall**: K1,000 – K5,000,000, 4–60 months (the social
+  media template's "4–30 months" is out of date). [CONFIRM: 4–60 months]
+- **Agro Loans** (older page only): K1,000 – K350,000, 4–24 months, ages
+  21–72, Lusaka only, collateral may include livestock. [CONFIRM: still
+  offered? The Branch Staff FAQ says farmers use the Business loan.]
+- **Personal loans**: up to K500,000, no collateral, within 24 hours of
+  documents; the pre-approval form is the GRZ (government) form, consistent
+  with "government employees only".
+- **Trader Mobility Loan** (team flow document V1/2026 only, not on the
+  website): finances motorbikes, tricycles, three-wheelers and walking
+  tractors. [CONFIRM: amounts, deposit, tenure, security]
+
 ## Personal loans (consumer loans)
 
 Available to **government employees only**.

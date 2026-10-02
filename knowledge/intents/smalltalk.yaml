@@ -62,7 +62,7 @@ intents:
       - "muli shani"
       - "hello how are you"
       - "hey there"
-    answer: "👋 Welcome to AB Bank!\nI'm an automated assistant here to help you learn about our products and services, answer your banking questions, and connect you with our team when needed.\nHow can I help you today?"
+    answer: "Hi! How can I help you today?"
     buttons:
       - {label: "🏦 Accounts", payload: "account_types_overview"}
       - {label: "💰 Loans", payload: "loans_overview"}

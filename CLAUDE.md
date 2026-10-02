@@ -222,6 +222,24 @@ not incidental:
   canonical ("+260..." -> "0977...") in `clean_phone`. A person asking for a
   PIN/OTP is a hard fraud signal (`SCAM_CALL_RE`); failed or missing
   transactions are a soft complaint signal (`COMPLAINT_SOFT_RE`).
+- Product owner's rules (02/10/2026): `router._KEYWORD_INTENTS` answers a
+  topic named anywhere in a message (after the urgent scan, outside the
+  scored matcher): any bike / motorbike / tricycle / three-wheeler / tuk-tuk
+  / (walking) tractor -> `trader_mobility_loan`; a card product question ->
+  `cards_not_offered` (AB Bank offers no cards; the urgent model's soft
+  "lost or stolen?" is skipped for these, `_CARD_PRODUCT_QUESTION_RE`);
+  closing an account or changing a number/address/name/KYC ->
+  `account_changes` (visit a branch with original ID, or a callback);
+  sending to another bank -> `transfer_other_banks` (eTumba or Online
+  Banking; above K20,000 Online Banking); deposits -> `deposit_money` (any
+  branch, or from mobile money). A customer's "hi" gets a natural reply
+  (`router._natural_greeting`: `greeting.reply` rotated, "Good morning!" for
+  a timed greeting, `greeting.again` later in a chat), never the welcome
+  again; on messaging channels the first message always carries the
+  one-line `disclosure`. Loans: Micro (K1,000-K350,000, 4-24 months), SME
+  (K200,000-K5,000,000, 4-60 months) and Agro (website, [CONFIRM]) details
+  from abbank.co.zm sit behind "More details"; the team document's wording
+  stays the first reply.
 - Every reply is guaranteed at least one button before `handle()` returns —
   a hard "no dead ends" invariant enforced in code, not a per-answer
   convention to remember.

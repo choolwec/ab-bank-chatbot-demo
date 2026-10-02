@@ -90,14 +90,15 @@ def test_small_talk_only_on_the_whole_message():
         assert intent["phrases"], intent["intent"]  # an exact intent needs its phrases
 
 
-def test_greeting_is_the_documents_welcome_and_discloses(bot):
+def test_greeting_is_a_natural_reply_not_the_welcome(bot):
     from app.messages import msg
 
     b = bot()
     b.say("hello")
     assert b.last[1].get("intent") == "greeting"
-    assert "automated assistant" in b.text and "not a person" not in b.text
-    assert b.text == msg("welcome")
+    assert b.text != msg("welcome") and "How can I help" in b.text or "What can I help" in b.text
+    b.say("good morning")
+    assert b.text.startswith("Hi again") or b.text.startswith("Hello again")
 
 
 # --- Clear chat -----------------------------------------------------------------
